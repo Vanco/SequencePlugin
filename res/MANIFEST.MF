@@ -1,0 +1,4 @@
+Main-Class: org.intellij.sequencer.diagram.app.Sequence
+
+Name: com/zanthan/sequence
+

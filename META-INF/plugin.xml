@@ -1,0 +1,39 @@
+<idea-plugin version="2">
+    <name>SequencePluginReload</name>
+    <description>Simple Sequence Diagram Generator. fixed version, work with 10.5.x. Thanks ksibilev@yahoo.com for the
+        great work.
+        Add Sequence Diagram... menu under the Tools menu and Editor popup menu group with Diagram.
+        fixbug: method name with generic type.
+    </description>
+    <version>1.0.2</version>
+    <vendor>fanhuagang@gmail.com</vendor>
+    <idea-version since-build="IU-107.587" />
+
+    <depends>com.intellij.diagram</depends>
+
+    <application-components>
+        <component>
+            <implementation-class>org.intellij.sequencer.config.Configuration</implementation-class>
+            <interface-class>org.intellij.sequencer.config.Configuration</interface-class>
+        </component>
+    </application-components>
+    <project-components>
+        <component>
+            <implementation-class>org.intellij.sequencer.SequencePlugin</implementation-class>
+            <interface-class>org.intellij.sequencer.SequencePlugin</interface-class>
+            <option name="workspace" value="true"/>
+        </component>
+    </project-components>
+
+    <actions>
+        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction"
+                text="Sequence Diagram..." description="Generate sequence diagram of the current method">
+            <add-to-group group-id="UML.EditorGroup" anchor="last"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+</idea-plugin>
