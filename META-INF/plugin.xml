@@ -4,8 +4,9 @@
         great work.
         Add Sequence Diagram... menu under the Tools menu and Editor popup menu group with Diagram.
         fixbug: method name with generic type.
+        fixbug: NPE when call psiMethod.getContainingClass() on enum class.
     </description>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <vendor>fanhuagang@gmail.com</vendor>
     <idea-version since-build="IU-107.587" />
 

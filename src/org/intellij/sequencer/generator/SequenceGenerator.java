@@ -86,12 +86,16 @@ public class SequenceGenerator extends JavaElementVisitor {
             argTypes.add(psiType == null ? null : psiType.getCanonicalText());
         }
         List attributes = createAttributes(psiMethod.getModifierList());
+        PsiClass containingClass = psiMethod.getContainingClass();
+        if (containingClass == null) {
+            containingClass = (PsiClass) psiMethod.getParent().getContext();
+        }
         if(psiMethod.isConstructor())
             return MethodDescription.createConstructorDescription(
-                  createClassDescription(psiMethod.getContainingClass()),
+                  createClassDescription(containingClass),
                   attributes, argNames, argTypes);
         return MethodDescription.createMethodDescription(
-              createClassDescription(psiMethod.getContainingClass()),
+              createClassDescription(containingClass),
               attributes, psiMethod.getName(), psiMethod.getReturnType().getCanonicalText(),
               argNames, argTypes);
     }
