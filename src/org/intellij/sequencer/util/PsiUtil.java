@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
+import com.intellij.psi.util.ClassUtil;
 import com.intellij.util.Query;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 
@@ -79,14 +80,7 @@ public class PsiUtil {
 
     public static PsiMethod findPsiMethod(Project project, PsiManager psiManager,
                                           final String className, String methodName, List argTypes) {
-        Query<PsiClass> search = AllClassesSearch.search(GlobalSearchScope.projectScope(project), project, new Condition<String>() {
-            public boolean value(String s) {
-                return className.equals(s);
-            }
-        });
-        PsiClass psiClass = search.findFirst();
-//        PsiClass psiClass = psiManager.findClass(className,
-//              GlobalSearchScope.projectScope(project));
+        PsiClass psiClass = ClassUtil.findPsiClass(psiManager, className);
         if(psiClass == null)
             return null;
         PsiMethod[] psiMethods = psiClass.findMethodsByName(methodName, false);

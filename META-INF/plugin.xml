@@ -1,17 +1,24 @@
 <idea-plugin version="2">
     <name>SequencePluginReload</name>
-    <description>Simple Sequence Diagram Generator. fixed version, work with 10.5.x. Thanks ksibilev@yahoo.com for the
-        great work.
-        Add Sequence Diagram... menu under the Tools menu and Editor popup menu group with Diagram.
-        fixbug: method name with generic type.
-        fixbug: NPE when call psiMethod.getContainingClass() on enum class.
-    </description>
-    <version>1.0.3</version>
+    <description><![CDATA[Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 10.5.x. <br /> Thanks ksibilev@yahoo.com for the
+        great work of SequencePlugin..]]></description>
+    <version>1.0.4</version>
     <vendor>fanhuagang@gmail.com</vendor>
-    <idea-version since-build="IU-107.587" />
+    <idea-version since-build="IU-139.1117" />
 
     <depends>com.intellij.diagram</depends>
 
+    <change-notes><![CDATA[
+        <dl>
+        <dt>1.0.4</dt>
+        <dd>fixbug: go to source</dd>
+        <dt>1.0.3</dt>
+        <dd>fixbug: NPE when call psiMethod.getContainingClass() on enum class.</dd>
+        <dt>1.0.2</dt>
+        <dd>Add Sequence Diagram... menu under the Tools menu and Editor popup menu group with Diagram.</dd>
+        <dd>fixbug: method name with generic type.</dd>
+        </dl>
+    ]]></change-notes>
     <application-components>
         <component>
             <implementation-class>org.intellij.sequencer.config.Configuration</implementation-class>
@@ -27,7 +34,7 @@
     </project-components>
 
     <actions>
-        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction"
+        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction" icon="/icons/SequenceDiagramSmall.gif"
                 text="Sequence Diagram..." description="Generate sequence diagram of the current method">
             <add-to-group group-id="UML.EditorGroup" anchor="last"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
