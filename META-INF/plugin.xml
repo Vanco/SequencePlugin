@@ -2,14 +2,17 @@
     <name>SequencePluginReload</name>
     <description><![CDATA[Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 10.5.x. <br /> Thanks ksibilev@yahoo.com for the
         great work of SequencePlugin..]]></description>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <vendor>fanhuagang@gmail.com</vendor>
     <idea-version since-build="IU-139.1117" />
 
     <depends>com.intellij.diagram</depends>
+    <depends>com.intellij.modules.java</depends>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.0.5</dt>
+        <dd>Narrow the plugin support product list to java.</dd>
         <dt>1.0.4</dt>
         <dd>fixbug: go to source</dd>
         <dt>1.0.3</dt>
