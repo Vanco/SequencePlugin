@@ -2,15 +2,16 @@
     <name>SequencePluginReload</name>
     <description><![CDATA[Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 10.5.x. <br /> Thanks ksibilev@yahoo.com for the
         great work of SequencePlugin..]]></description>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <vendor>fanhuagang@gmail.com</vendor>
     <idea-version since-build="IU-139.1117" />
 
-    <depends>com.intellij.diagram</depends>
     <depends>com.intellij.modules.java</depends>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.0.7</dt>
+        <dd>Remove "com.intellij.diagram" dependency.</dd>
         <dt>1.0.6</dt>
         <dd>HotFix: add missing res file in version 1.0.5.</dd>
         <dt>1.0.5</dt>
@@ -41,7 +42,7 @@
     <actions>
         <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction" icon="/icons/SequenceDiagramSmall.gif"
                 text="Sequence Diagram..." description="Generate sequence diagram of the current method">
-            <add-to-group group-id="UML.EditorGroup" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
