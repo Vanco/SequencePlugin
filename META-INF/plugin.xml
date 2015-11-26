@@ -11,7 +11,7 @@
     <change-notes><![CDATA[
         <dl>
         <dt>1.0.7</dt>
-        <dd>Remove "com.intellij.diagram" dependency.</dd>
+        <dd>Remove "com.intellij.diagram" dependency. </dd>
         <dt>1.0.6</dt>
         <dd>HotFix: add missing res file in version 1.0.5.</dd>
         <dt>1.0.5</dt>
