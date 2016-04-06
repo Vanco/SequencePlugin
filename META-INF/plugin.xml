@@ -4,7 +4,7 @@
     For more info, please visit: http://vanco.github.io/SequencePlugin/]]></description>
     <version>1.0.8</version>
     <vendor>fanhuagang@gmail.com</vendor>
-    <idea-version since-build="133.*" />
+    <idea-version since-build="IU-123.72" />
 
     <depends>com.intellij.modules.java</depends>
 
