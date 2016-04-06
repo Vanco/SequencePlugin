@@ -1,15 +1,17 @@
 <idea-plugin version="2">
-    <name>SequencePluginReload</name>
-    <description><![CDATA[Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 10.5.x. <br /> Thanks ksibilev@yahoo.com for the
-        great work of SequencePlugin..]]></description>
-    <version>1.0.7</version>
+    <name>SequenceDiagram</name>
+    <description><![CDATA[Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x. <br /> The original version SequencePlugin come from ksibilev@yahoo.com. <br />
+    For more info, please visit: http://vanco.github.io/SequencePlugin/]]></description>
+    <version>1.0.8</version>
     <vendor>fanhuagang@gmail.com</vendor>
-    <idea-version since-build="IU-139.1117" />
+    <idea-version since-build="133.*" />
 
     <depends>com.intellij.modules.java</depends>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.0.8</dt>
+        <dd>Refine not to call "@Deprecated" methods. Add Exclude Settings. Change the name to SequenceDiagram. </dd>
         <dt>1.0.7</dt>
         <dd>Remove "com.intellij.diagram" dependency. </dd>
         <dt>1.0.6</dt>
@@ -25,12 +27,12 @@
         <dd>fixbug: method name with generic type.</dd>
         </dl>
     ]]></change-notes>
-    <application-components>
-        <component>
-            <implementation-class>org.intellij.sequencer.config.Configuration</implementation-class>
-            <interface-class>org.intellij.sequencer.config.Configuration</interface-class>
-        </component>
-    </application-components>
+    <!--<application-components>-->
+        <!--<component>-->
+            <!--<implementation-class>org.intellij.sequencer.config.Configuration</implementation-class>-->
+            <!--<interface-class>org.intellij.sequencer.config.Configuration</interface-class>-->
+        <!--</component>-->
+    <!--</application-components>-->
     <project-components>
         <component>
             <implementation-class>org.intellij.sequencer.SequencePlugin</implementation-class>
@@ -40,7 +42,7 @@
     </project-components>
 
     <actions>
-        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction" icon="/icons/SequenceDiagramSmall.gif"
+        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction" icon="/icons/SequenceDiagram16.gif"
                 text="Sequence Diagram..." description="Generate sequence diagram of the current method">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
@@ -49,5 +51,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <applicationConfigurable id="Settings.Sequence.Configuration" instance="org.intellij.sequencer.config.ConfigurationOptions" />
+        <applicationService serviceImplementation="org.intellij.sequencer.config.Configuration"/>
     </extensions>
 </idea-plugin>

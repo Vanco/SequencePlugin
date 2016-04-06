@@ -2,6 +2,7 @@ package org.intellij.sequencer;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -15,6 +16,8 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
+import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.Query;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.MethodFilter;
@@ -48,7 +51,9 @@ public class SequencePlugin implements ProjectComponent {
     public void projectOpened() {
         createTabPane();
         _toolWindow = getToolWindowManager().registerToolWindow(
-              PLAGIN_NAME, _jTabbedPane, ToolWindowAnchor.BOTTOM);
+              PLAGIN_NAME, false, ToolWindowAnchor.BOTTOM);
+        final Content content = ServiceManager.getService(ContentFactory.class).createContent(_jTabbedPane, "", false);
+        _toolWindow.getContentManager().addContent(content);
         _toolWindow.setIcon(loadIcon("SequenceDiagramSmall.gif"));
         _toolWindow.setAvailable(false, null);
     }

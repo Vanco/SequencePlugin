@@ -57,7 +57,7 @@ public class Sequence extends JFrame implements PropertyChangeListener {
         jButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 PreviewFrame frame = new PreviewFrame(displayScrollPane, _disp);
-                frame.show();
+                frame.setVisible(true);
             }
         });
         displayScrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, jButton);

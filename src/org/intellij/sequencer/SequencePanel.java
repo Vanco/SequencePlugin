@@ -84,7 +84,7 @@ public class SequencePanel extends JPanel {
 
     private void showBirdView() {
         PreviewFrame frame = new PreviewFrame(_jScrollPane, _display);
-        frame.show();
+        frame.setVisible(true);
     }
 
     public String getTitleName() {

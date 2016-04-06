@@ -1,8 +1,13 @@
 package org.intellij.sequencer.config;
 
+import com.intellij.util.xmlb.annotations.Tag;
+
+@Tag("excludeEntry")
 public class ExcludeEntry {
     private String _excludeName;
     private boolean _isEnabled;
+
+    public ExcludeEntry() {}
 
     public ExcludeEntry(String excludeName, boolean enabled) {
         _excludeName = excludeName;
