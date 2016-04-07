@@ -1,6 +1,8 @@
 <idea-plugin version="2">
     <name>SequenceDiagram</name>
-    <description><![CDATA[Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x. <br /> The original version SequencePlugin come from ksibilev@yahoo.com. <br />
+    <description><![CDATA[<strong>SequencePluginReload rename to SequenceDiagram<strong>. <br />
+    Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x. <br />
+    The original version SequencePlugin come from ksibilev@yahoo.com. <br />
     For more info, please visit: http://vanco.github.io/SequencePlugin/]]></description>
     <version>1.0.8</version>
     <vendor>fanhuagang@gmail.com</vendor>
@@ -27,12 +29,6 @@
         <dd>fixbug: method name with generic type.</dd>
         </dl>
     ]]></change-notes>
-    <!--<application-components>-->
-        <!--<component>-->
-            <!--<implementation-class>org.intellij.sequencer.config.Configuration</implementation-class>-->
-            <!--<interface-class>org.intellij.sequencer.config.Configuration</interface-class>-->
-        <!--</component>-->
-    <!--</application-components>-->
     <project-components>
         <component>
             <implementation-class>org.intellij.sequencer.SequencePlugin</implementation-class>
