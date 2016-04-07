@@ -1,7 +1,9 @@
 package org.intellij.sequencer.generator;
 
+import com.google.gson.GsonBuilder;
 import org.intellij.sequencer.Constants;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,7 +24,9 @@ public class ClassDescription {
         return _className;
     }
 
-    public String getSignature() {
+    public List getAttributes() { return Collections.unmodifiableList(_attributes); }
+
+    public String toString() {
         StringBuffer buffer = new StringBuffer();
         for(Iterator iterator = _attributes.iterator(); iterator.hasNext();) {
             String attribute = (String)iterator.next();

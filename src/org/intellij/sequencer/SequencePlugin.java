@@ -16,6 +16,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
+import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.Query;
@@ -214,7 +215,7 @@ public class SequencePlugin implements ProjectComponent {
     }
 
     private void createTabPane() {
-        _jTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
+        _jTabbedPane = new JBTabbedPane(JBTabbedPane.BOTTOM);
         if(UIManager.getLookAndFeel() instanceof MetalLookAndFeel)
             _jTabbedPane.setUI(new PlasticTabbedPaneUI());
         _jTabbedPane.addMouseListener(new MouseAdapter() {

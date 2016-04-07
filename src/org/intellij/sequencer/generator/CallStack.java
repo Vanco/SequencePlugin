@@ -45,8 +45,7 @@ public class CallStack {
     }
 
     private void generate(StringBuffer buffer) {
-        buffer.append('(').append(_method.getClassDescription().getSignature());
-        buffer.append(' ').append(_method.getSignature()).append(' ');
+        buffer.append('(').append(_method.toJson()).append(' ');
         for(Iterator iterator = _calls.iterator(); iterator.hasNext();) {
             CallStack callStack = (CallStack)iterator.next();
             callStack.generate(buffer);

@@ -1,5 +1,6 @@
 package org.intellij.sequencer.diagram.app;
 
+import com.intellij.ui.components.JBScrollPane;
 import org.apache.log4j.Logger;
 import org.intellij.sequencer.diagram.Display;
 import org.intellij.sequencer.diagram.Model;
@@ -50,7 +51,7 @@ public class Sequence extends JFrame implements PropertyChangeListener {
         _saveAsAction = new SaveAsAction(model);
 
         _disp = new Display(model, null);
-        final JScrollPane displayScrollPane = new JScrollPane(_disp);
+        final JScrollPane displayScrollPane = new JBScrollPane(_disp);
         displayScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         final JButton jButton = new JButton("B");
@@ -64,7 +65,7 @@ public class Sequence extends JFrame implements PropertyChangeListener {
         split.setTopComponent(displayScrollPane);
 
         _editor = new Editor(model);
-        final JScrollPane jScrollPane = new JScrollPane(_editor,
+        final JScrollPane jScrollPane = new JBScrollPane(_editor,
                   JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                   JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         jScrollPane.setFocusable(true);

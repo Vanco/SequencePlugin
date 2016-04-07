@@ -9,12 +9,12 @@ with this plugin, you can
 + Export the diagram as image.
 + Exclude classes from diagram by Settings > Other Settings > Sequence
 
-###### Name history
+#### Name history
 + **SequencePlugin** Maintained by Kentaur(Kesh Sibilev, ksibilve@yahoo.com) until 2011
 + **SequencePluginReload** Maintained by Vanhg(Evan Fan, fanhuagang@gmail.com) 2011 - 2015
 + **SequenceDiagram** Maintained by Vanco(Evan Fan, fanhuagang@gmail.com) since 2016
 
-###### Why change name?
+#### Why change name?
 Since 2011, I found a solution of NPE of original **SequencePlugin**, so I write email to Kentaur with my solution,
 He said he was not coding any more. Instead, he send me the code. I fix the NPE issue and publish to plugin
 repository with new name **SequencePluginReload**.
@@ -34,8 +34,10 @@ Place the cursor in side the method, trigger it from context menu > Sequence Dia
 
 ## Version History
 <dl>
+        <dt>1.0.9</dt>
+        <dd>fix issue #1 recognise more generic method definition, fix issue #2 show popup menu on mac and linux.</dd>
         <dt>1.0.8</dt>
-        <dd>Refine not to call "@Deprecated" methods. Add Exclude Settings. Change the name to SequenceDiagram. </dd>
+        <dd>Refine not to call "Deprecated" methods. Add Exclude Settings. Change the name to SequenceDiagram. </dd>
         <dt>1.0.7</dt>
         <dd>Remove "com.intellij.diagram" dependency. </dd>
         <dt>1.0.6</dt>

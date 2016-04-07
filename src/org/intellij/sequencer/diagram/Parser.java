@@ -1,40 +1,16 @@
 package org.intellij.sequencer.diagram;
 
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
+import org.intellij.sequencer.generator.ClassDescription;
+import org.intellij.sequencer.generator.MethodDescription;
 
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Parser {
-//    private final static Pattern METHOD_PATTERN =
-//          Pattern.compile("(?:\\|(\\w+))*\\|@([a-zA-Z_0-9.]+)\\[(?:(\\w+)=([a-zA-Z_0-9.]+(?:\\[\\])?),?)*\\]:([a-zA-Z_0-9.]+(?:\\[\\])?)");
-//    private final static Pattern CLASS_PATTERN =
-//          Pattern.compile("(?:\\|(\\w+))*\\|@([a-zA-Z_0-9.]+)");
-//    private final static Pattern ATTRIBUTE_PATTERN =
-//          Pattern.compile("\\|(\\w+)");
-//    private static final Pattern NAME_PATTERN =
-//          Pattern.compile("\\|@([a-zA-Z_0-9.]+)");
-//    private static final Pattern ARG_PATTERN =
-//          Pattern.compile("(?:(\\w+)=([a-zA-Z_0-9.]+(?:\\[\\])?))");
-//    private static final Pattern RETURN_TYPE =
-//          Pattern.compile(":([a-zA-Z_0-9.]+(?:\\[\\])?)");
-
-    private final static Pattern METHOD_PATTERN =
-            Pattern.compile("(?:\\|(\\w+))*\\|@([a-zA-Z_0-9.]+)\\[(?:(\\w+)=([a-zA-Z_0-9.]+(?:<(([a-zA-Z_0-9.]+),?)*>)?(?:\\[\\])?),?)*\\]:([a-zA-Z_0-9.]+(?:<(([a-zA-Z_0-9.]+),?)*>)?(?:\\[\\])?)");
-    private final static Pattern CLASS_PATTERN =
-            Pattern.compile("(?:\\|(\\w+))*\\|@([a-zA-Z_0-9.]+)");
-    private final static Pattern ATTRIBUTE_PATTERN =
-            Pattern.compile("\\|(\\w+)");
-    private static final Pattern NAME_PATTERN =
-            Pattern.compile("\\|@([a-zA-Z_0-9.]+)");
-    private static final Pattern ARG_PATTERN =
-            Pattern.compile("(?:(\\w+)=([a-zA-Z_0-9.]+(?:<(([a-zA-Z_0-9.]+),?)*>)?(?:\\[\\])?))");
-    private static final Pattern RETURN_TYPE =
-            Pattern.compile(":([a-zA-Z_0-9.]+(?:<(([a-zA-Z_0-9.]+),?)*>)?(?:\\[\\])?)");
 
     private static final Logger LOGGER = Logger.getLogger(Parser.class);
 
@@ -60,9 +36,8 @@ public class Parser {
             if(c == -1) {
                 break;
             } else if(c == '(') {
-                String objName = readIdent(reader);
                 String methodName = readIdent(reader);
-                addCall(objName, methodName);
+                addCall(methodName);
             } else if(c == ')') {
                 addReturn();
             } else {
@@ -96,21 +71,11 @@ public class Parser {
         return _objList;
     }
 
-    private void addCall(String calledObject, String calledMethod) {
-        Matcher matcher = CLASS_PATTERN.matcher(calledObject);
-        String className = calledObject;
-        List attributes = new ArrayList();
-        if(matcher.matches()) {
-            Matcher nameMatcher = NAME_PATTERN.matcher(calledObject);
-            if(nameMatcher.find())
-                className = nameMatcher.group(1);
-            else
-                className = "NotParsed";
-            Matcher attrMatcher = ATTRIBUTE_PATTERN.matcher(calledObject);
-            while(attrMatcher.find())
-                attributes.add(attrMatcher.group(1));
-        }
-        ObjectInfo objectInfo = new ObjectInfo(className, attributes, _currentHorizontalSeq);
+    private void addCall(String calledMethod) {
+        Gson gson = new Gson();
+        MethodDescription m = gson.fromJson(calledMethod, MethodDescription.class);
+        ClassDescription c = m.getClassDescription();
+        ObjectInfo objectInfo = new ObjectInfo(c.getClassName(), c.getAttributes(), _currentHorizontalSeq);
         int i = _objList.indexOf(objectInfo);
         if(i == -1) {
             ++_currentHorizontalSeq;
@@ -119,7 +84,7 @@ public class Parser {
             objectInfo = (ObjectInfo)_objList.get(i);
         }
 
-        CallInfo callInfo = new CallInfo(objectInfo, calledMethod, _currentVerticalSeq);
+        CallInfo callInfo = new CallInfo(objectInfo, m, _currentVerticalSeq);
 
         if(LOGGER.isDebugEnabled())
             LOGGER.debug("addCall(...) calling " + callInfo + " seq is " + _currentVerticalSeq);
@@ -187,6 +152,27 @@ public class Parser {
         while((c = r.read()) != -1) {
             if(c == ')')
                 break;
+            else if (c == '\\') {
+                int u = r.read();
+                if (u != -1 && u == 'u') {
+                    StringBuilder tmp = new StringBuilder();
+                    tmp.append((char)c).append((char)u);
+                    for (int j = 0; j < 4; j++) {
+                        u = r.read();
+                        tmp.append((char)u);
+                    }
+                    if (tmp.toString().equals("\\u003c")) {
+                        deep ++;
+                        isGeneric = true;
+                        sb.append(tmp.toString());
+                    } else if (tmp.toString().equals("\\u003e")) {
+                        deep --;
+                        if (deep == 0)
+                            isGeneric = false;
+                        sb.append(tmp.toString());
+                    }
+                }
+            }
             else if (c == '<') {
                 deep ++;
                 isGeneric = true;
@@ -264,27 +250,17 @@ public class Parser {
 
         CallInfo(ObjectInfo obj, String method, int startingSeq) {
             _obj = obj;
-            Matcher wholeExprMatcher = METHOD_PATTERN.matcher(method);
-            if(method == null || method.length() == 0 || !wholeExprMatcher.matches()) {
-                _method = method;
-            } else {
-                Matcher attrMatcher = ATTRIBUTE_PATTERN.matcher(method);
-                while(attrMatcher.find())
-                    _attributes.add(attrMatcher.group(1));
-                Matcher methodNameMatcher = NAME_PATTERN.matcher(method);
-                if(methodNameMatcher.find())
-                    _method = methodNameMatcher.group(1);
-                else
-                    _method = "NotParsed";
-                Matcher argMatcher = ARG_PATTERN.matcher(method);
-                while(argMatcher.find()) {
-                    _argNames.add(argMatcher.group(1));
-                    _argTypes.add(argMatcher.group(2));
-                }
-                Matcher returnTypeMatcher = RETURN_TYPE.matcher(method);
-                if(returnTypeMatcher.find())
-                    _returnType = returnTypeMatcher.group(1);
-            }
+            _method = method;
+            _startingSeq = startingSeq;
+        }
+
+        CallInfo(ObjectInfo obj, MethodDescription m, int startingSeq) {
+            _obj = obj;
+            _method = m.getMethodName();
+            _attributes.addAll(m.getAttributes());
+            _argNames.addAll(m.getArgNames());
+            _argTypes.addAll(m.getArgTypes());
+            _returnType = m.getReturnType();
             _startingSeq = startingSeq;
         }
 

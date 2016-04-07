@@ -1,7 +1,9 @@
 package org.intellij.sequencer.generator;
 
+import com.google.gson.GsonBuilder;
 import org.intellij.sequencer.Constants;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -26,7 +28,7 @@ public class MethodDescription {
         _methodName = methodName;
     }
 
-    public String getSignature() {
+    public String toString() {
         StringBuffer buffer = new StringBuffer();
         for(Iterator iterator = _attributes.iterator(); iterator.hasNext();) {
             String attribute = (String)iterator.next();
@@ -43,6 +45,10 @@ public class MethodDescription {
         return buffer.toString();
     }
 
+    public String toJson() {
+        return  new GsonBuilder().create().toJson(this);
+    }
+
     public ClassDescription getClassDescription() {
         return _classDescription;
     }
@@ -54,6 +60,22 @@ public class MethodDescription {
     public String getTitleName() {
         return getClassDescription().getClassShortName() + '.' +
               getMethodName() + "()";
+    }
+
+    public List getAttributes() {
+        return Collections.unmodifiableList(_attributes);
+    }
+
+    public List getArgNames() {
+        return Collections.unmodifiableList(_argNames);
+    }
+
+    public List getArgTypes() {
+        return Collections.unmodifiableList(_argTypes);
+    }
+
+    public String getReturnType() {
+        return _returnType;
     }
 
     public boolean equals(Object o) {

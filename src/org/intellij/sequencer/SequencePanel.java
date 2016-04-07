@@ -3,6 +3,7 @@ package org.intellij.sequencer;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiMethod;
+import com.intellij.ui.components.JBScrollPane;
 import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.CallStack;
 import org.intellij.sequencer.generator.SequenceGenerator;
@@ -54,7 +55,7 @@ public class SequencePanel extends JPanel {
             }
         });
 
-        _jScrollPane = new JScrollPane(_display);
+        _jScrollPane = new JBScrollPane(_display);
         _jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         _jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         _jScrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, birdViewButton);

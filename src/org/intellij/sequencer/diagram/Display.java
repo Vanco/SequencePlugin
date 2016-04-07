@@ -241,6 +241,17 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
                 _listener.displayMenuForScreenObject(screenObject, e.getX(), e.getY());
         }
 
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+            ScreenObject screenObject = _diagram.findScreenObjectByXY(e.getX(), e.getY());
+            if(screenObject == null)
+                return;
+//            setSelected(screenObject);
+            if(e.isPopupTrigger())
+                _listener.displayMenuForScreenObject(screenObject, e.getX(), e.getY());
+        }
+
         private boolean isDoubleClick(MouseEvent e) {
             return e.getClickCount() >= 2;
         }

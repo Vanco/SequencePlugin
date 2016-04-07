@@ -1,5 +1,7 @@
 package org.intellij.sequencer.diagram;
 
+import com.intellij.util.ui.UIUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -47,8 +49,7 @@ public class PreviewPanel extends JPanel {
         if(_yScale > 1.)
             _yScale = 1.;
 //        _xScale = _yScale = Math.min(_xScale, _yScale);
-
-        _image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_USHORT_555_RGB);
+        _image = UIUtil.createImage(getWidth(), getHeight(), BufferedImage.TYPE_USHORT_555_RGB);
         Graphics2D g2 = _image.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(Color.white);

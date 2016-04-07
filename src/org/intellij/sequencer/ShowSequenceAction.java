@@ -146,7 +146,7 @@ public class ShowSequenceAction extends AnAction {
         }
 
         public int getCallStackDepth() {
-            return ((Integer)dialogPanel.jSpinner.getValue()).intValue();
+            return (Integer) dialogPanel.jSpinner.getValue();
         }
 
         public boolean isProjectClassesOnly() {
