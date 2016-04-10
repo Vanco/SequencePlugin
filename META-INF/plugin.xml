@@ -4,7 +4,7 @@
     Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x. <br />
     The original version SequencePlugin come from ksibilev@yahoo.com. <br />
     For more info, please visit: http://vanco.github.io/SequencePlugin/]]></description>
-    <version>1.0.9</version>
+    <version>1.1</version>
     <vendor>fanhuagang@gmail.com</vendor>
     <idea-version since-build="IU-123.72" />
 
@@ -12,6 +12,8 @@
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.1</dt>
+        <dd>fix issue #3 support parameter is anther method call, fix issue #4 support pipeline call.</dd>
         <dt>1.0.9</dt>
         <dd>fix issue #1 recognise more generic method definition, fix issue #2 show popup menu on mac and linux.</dd>
         <dt>1.0.8</dt>

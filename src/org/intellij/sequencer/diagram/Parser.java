@@ -170,6 +170,8 @@ public class Parser {
                         if (deep == 0)
                             isGeneric = false;
                         sb.append(tmp.toString());
+                    } else {
+                        sb.append(tmp.toString());
                     }
                 }
             }

@@ -1,13 +1,9 @@
 package org.intellij.sequencer.util;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.psi.util.ClassUtil;
-import com.intellij.util.Query;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 
 import java.util.List;
@@ -113,6 +109,31 @@ public class PsiUtil {
 
     public static void acceptChildren(PsiElement psiElement, PsiElementVisitor visitor) {
         psiElement.acceptChildren(visitor);
+    }
+
+    public static boolean isPipeline(PsiCallExpression callExpression) {
+        PsiElement[] children = callExpression.getChildren();
+        for (PsiElement child : children) {
+            for (PsiElement psiElement : child.getChildren()) {
+                if (psiElement instanceof PsiMethodCallExpression) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isComplexCall(PsiCallExpression callExpression) {
+        PsiExpressionList argumentList = callExpression.getArgumentList();
+        if (argumentList != null) {
+            PsiExpression[] expressions = argumentList.getExpressions();
+            for (PsiExpression expression : expressions) {
+                if (expression instanceof PsiCallExpression) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

@@ -1,9 +1,12 @@
 package org.intellij.sequencer.util;
 
 import com.intellij.psi.*;
+import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 
 public class CallFinder extends JavaElementVisitor {
+    private final Stack<PsiCallExpression> _exprStack = new Stack<PsiCallExpression>();
+
     private int _callsLeft;
     private MethodFilter _methodFilter;
     private PsiMethod _psiMethod;
@@ -16,26 +19,29 @@ public class CallFinder extends JavaElementVisitor {
     }
 
     public void visitElement(PsiElement psiElement) {
-        PsiUtil.acceptChildren(psiElement, this);
+        psiElement.acceptChildren(this);
     }
 
     public void visitReferenceExpression(PsiReferenceExpression psiReferenceExpression) {
+        psiReferenceExpression.acceptChildren(this);
     }
 
     public PsiElement getPsiElement() {
         return _psiElement;
     }
 
-    public void visitNewExpression(PsiNewExpression psiNewExpression) {
-        PsiMethod psiMethod = psiNewExpression.resolveConstructor();
-        checkCurrentPsiElement(psiMethod, psiNewExpression);
-        super.visitNewExpression(psiNewExpression);
-    }
-
-    public void visitMethodCallExpression(PsiMethodCallExpression psiMethodCallExpression) {
-        PsiMethod psiMethod = psiMethodCallExpression.resolveMethod();
-        checkCurrentPsiElement(psiMethod, psiMethodCallExpression);
-        super.visitMethodCallExpression(psiMethodCallExpression);
+    public void visitCallExpression(PsiCallExpression callExpression) {
+        if (!(PsiUtil.isComplexCall(callExpression) || PsiUtil.isPipeline(callExpression))) {
+            PsiMethod psiMethod = callExpression.resolveMethod();
+            checkCurrentPsiElement(psiMethod, callExpression);
+        } else {
+            _exprStack.push(callExpression);
+        }
+        super.visitCallExpression(callExpression);
+        if (!_exprStack.isEmpty() && (PsiUtil.isPipeline(callExpression) || PsiUtil.isComplexCall(callExpression))) {
+            PsiCallExpression pop = _exprStack.pop();
+            checkCurrentPsiElement(pop.resolveMethod(), pop);
+        }
     }
 
     private void checkCurrentPsiElement(PsiMethod psiMethod, PsiElement psiElement) {
