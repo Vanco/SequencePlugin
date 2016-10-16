@@ -1,6 +1,5 @@
 package org.intellij.sequencer.generator;
 
-import com.google.gson.GsonBuilder;
 import org.intellij.sequencer.Constants;
 
 import java.util.Collections;

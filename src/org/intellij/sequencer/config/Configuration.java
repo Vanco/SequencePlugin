@@ -16,16 +16,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-@State(name = "sequencePlugin", storages = {@Storage("sequencePlugin.xml")})
+@State(name = "sequencePlugin", storages = {@Storage(file = "sequencePlugin.xml")})
 public class Configuration implements PersistentStateComponent<Configuration> {
     @OptionTag(converter = ColorConverter.class)
-    public Color CLASS_COLOR = new JBColor(new Color(0xcccc00), new Color(0xcccc00));
+    public Color CLASS_COLOR = new JBColor(new Color(0xffff00), new Color(0xcccc00));
     @OptionTag(converter = ColorConverter.class)
-    public Color EXTERNAL_CLASS_COLOR = new JBColor(new Color(0xff6666), new Color(0xff6666));
+    public Color EXTERNAL_CLASS_COLOR = new JBColor(new Color(0xff6666), new Color(0xCE5252));
     @OptionTag(converter = ColorConverter.class)
-    public Color METHOD_BAR_COLOR = new JBColor(new Color(0x9999ff), new Color(0x9999ff));
+    public Color METHOD_BAR_COLOR = new JBColor(new Color(0x9999ff), new Color(0x8E8EED));
     @OptionTag(converter = ColorConverter.class)
-    public Color SELECTED_METHOD_BAR_COLOR = new JBColor(new Color(0x3399ff), new Color(0x3399ff));
+    public Color SELECTED_METHOD_BAR_COLOR = new JBColor(new Color(0x3399ff), new Color(0x2C85DD));
     public boolean USE_3D_VIEW = false;
     public boolean USE_ANTIALIASING = true;
     public boolean SHOW_RETURN_ARROWS = true;

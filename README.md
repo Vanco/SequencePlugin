@@ -32,10 +32,15 @@ SequenceDiagram ONLY generate sequence diagram for the CURRENT method in the edi
 
 Place the cursor in side the method, trigger it from context menu > Sequence Diagram...
 
+## Q&A
+
+#### Why not build with IDEA 1.4.x SDK ?
+The new IDEA 2016.x SDK with gson.jar included, but IDEA 1.4.x SDK is not. So you need put gson-2.5.jar in lib directory to make it build properly.
+
 ## Version History
 <dl>
-        <dt>1.1</dt>
-        <dd>fix issue #3 support parameter is anther method call, fix issue #4 support pipeline call.</dd>
+        <dt>1.0.10</dt>
+        <dd>fix issue #3 support parameter is anther method call, fix issue #4 support pipeline call. Work with IDEA 1.4.x</dd>
         <dt>1.0.9</dt>
         <dd>fix issue #1 recognise more generic method definition, fix issue #2 show popup menu on mac and linux.</dd>
         <dt>1.0.8</dt>
