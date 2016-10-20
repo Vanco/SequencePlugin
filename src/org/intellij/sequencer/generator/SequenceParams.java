@@ -3,6 +3,7 @@ package org.intellij.sequencer.generator;
 import org.intellij.sequencer.config.Configuration;
 import org.intellij.sequencer.config.ExcludeEntry;
 import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
+import org.intellij.sequencer.generator.filters.InterfaceImplFilter;
 import org.intellij.sequencer.generator.filters.PackageFilter;
 import org.intellij.sequencer.generator.filters.SingleClassFilter;
 
@@ -15,7 +16,9 @@ public class SequenceParams {
 
     private int _maxDepth = 3;
     private boolean _allowRecursion = true;
+    private boolean smartInterface = true;
     private CompositeMethodFilter _methodFilter = new CompositeMethodFilter();
+    private InterfaceImplFilter _implFilter = new InterfaceImplFilter();
 
     public SequenceParams() {
         List excludeList = Configuration.getInstance().getExcludeList();
@@ -53,7 +56,20 @@ public class SequenceParams {
         this._allowRecursion = allowRecursion;
     }
 
+    public boolean isSmartInterface() {
+        return smartInterface;
+    }
+
+    public void setSmartInterface(boolean smartInterface) {
+        this.smartInterface = smartInterface;
+    }
+
     public CompositeMethodFilter getMethodFilter() {
         return _methodFilter;
     }
+
+    public InterfaceImplFilter getInterfaceImplFilter() {
+        return _implFilter;
+    }
 }
+

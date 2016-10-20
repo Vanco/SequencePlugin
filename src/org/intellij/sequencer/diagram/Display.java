@@ -1,5 +1,6 @@
 package org.intellij.sequencer.diagram;
 
+import com.intellij.util.ui.UIUtil;
 import org.intellij.sequencer.config.ConfigListener;
 import org.intellij.sequencer.config.Configuration;
 
@@ -32,6 +33,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
         setPreferredSize(new Dimension(200, 200));
         setFocusable(true);
+        setBackground(UIUtil.getListBackground());
 
         DisplayMouseAdapter displayMouseAdapter = new DisplayMouseAdapter();
         addMouseListener(displayMouseAdapter);
@@ -111,7 +113,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
     }
 
     public Dimension getPreferredScrollableViewportSize() {
-        return new Dimension();
+        return getPreferredSize();
     }
 
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
@@ -123,11 +125,13 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
     }
 
     public boolean getScrollableTracksViewportWidth() {
-        return false;
+        return getParent() instanceof JViewport && getParent().getWidth() > getPreferredSize().width;
+//        return false;
     }
 
     public boolean getScrollableTracksViewportHeight() {
-        return false;
+        return getParent() instanceof JViewport && getParent().getHeight() > getPreferredSize().height;
+//        return false;
     }
 
     public void addNotify() {

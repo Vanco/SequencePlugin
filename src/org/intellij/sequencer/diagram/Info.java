@@ -24,6 +24,11 @@ public class Info {
           };
 
     public static final String EXTERNAL_ATTRIBUTE = "external";
+    /**
+     * Indicate a class is an interface.
+     */
+    public static final String INTERFACE_ATTRIBUTE = "interface";
+
     protected List _attributes;
 
     public Info(List attributes) {

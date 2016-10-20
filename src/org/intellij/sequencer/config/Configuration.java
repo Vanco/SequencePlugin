@@ -4,7 +4,6 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.ui.JBColor;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.util.xmlb.annotations.Transient;
@@ -16,16 +15,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-@State(name = "sequencePlugin", storages = {@Storage("sequencePlugin.xml")})
+@State(name = "sequencePlugin", storages = {@Storage(file = "sequencePlugin.xml")})
 public class Configuration implements PersistentStateComponent<Configuration> {
     @OptionTag(converter = ColorConverter.class)
-    public Color CLASS_COLOR = new JBColor(new Color(0xcccc00), new Color(0xcccc00));
+    public Color CLASS_COLOR = new Color(0xffee00);
     @OptionTag(converter = ColorConverter.class)
-    public Color EXTERNAL_CLASS_COLOR = new JBColor(new Color(0xff6666), new Color(0xff6666));
+    public Color EXTERNAL_CLASS_COLOR = new Color(0xff6666);
     @OptionTag(converter = ColorConverter.class)
-    public Color METHOD_BAR_COLOR = new JBColor(new Color(0x9999ff), new Color(0x9999ff));
+    public Color METHOD_BAR_COLOR = new Color(0xD1DEFF);
     @OptionTag(converter = ColorConverter.class)
-    public Color SELECTED_METHOD_BAR_COLOR = new JBColor(new Color(0x3399ff), new Color(0x3399ff));
+    public Color SELECTED_METHOD_BAR_COLOR = new Color(0x3399ff);
+    @OptionTag(converter = ColorConverter.class)
+    public Color INTERFACE_COLOR = new Color(0xC0FAC6);
     public boolean USE_3D_VIEW = false;
     public boolean USE_ANTIALIASING = true;
     public boolean SHOW_RETURN_ARROWS = true;

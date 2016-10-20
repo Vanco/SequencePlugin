@@ -16,14 +16,19 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
+import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.Query;
+import org.intellij.sequencer.diagram.Info;
+import org.intellij.sequencer.diagram.MethodInfo;
+import org.intellij.sequencer.diagram.ObjectInfo;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.intellij.sequencer.ui.PlasticTabbedPaneUI;
 import org.intellij.sequencer.util.PsiUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -31,6 +36,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SequencePlugin implements ProjectComponent {
@@ -215,7 +222,7 @@ public class SequencePlugin implements ProjectComponent {
     }
 
     private void createTabPane() {
-        _jTabbedPane = new JBTabbedPane(JBTabbedPane.BOTTOM);
+        _jTabbedPane = new JBTabbedPane(JBTabbedPane.TOP);
         if(UIManager.getLookAndFeel() instanceof MetalLookAndFeel)
             _jTabbedPane.setUI(new PlasticTabbedPaneUI());
         _jTabbedPane.addMouseListener(new MouseAdapter() {
@@ -256,6 +263,53 @@ public class SequencePlugin implements ProjectComponent {
                 _toolWindow.setTitle(_jTabbedPane.getTitleAt(selectedIndex));
             }
         });
+    }
+
+    public List<String> findImplementations(String className) {
+        PsiClass psiClass = PsiUtil.findPsiClass(_project, getPsiManager(), className);
+
+        if (psiClass != null && psiClass.isInterface()) {
+            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiClass).toArray(PsiElement.EMPTY_ARRAY);
+            ArrayList<String> result = new ArrayList<String>();
+
+            for (PsiElement element : psiElements) {
+                if (element instanceof PsiClass) {
+                    PsiClass implClass = (PsiClass) element;
+                    result.add(implClass.getQualifiedName());
+                }
+            }
+
+            return result;
+        }
+        return new ArrayList<String>();
+
+    }
+
+    public List<String> findImplementations(String className, String methodName, List argTypes) {
+        PsiMethod psiMethod = PsiUtil.findPsiMethod(_project, getPsiManager(), className, methodName, argTypes);
+        PsiClass containingClass = psiMethod.getContainingClass();
+        if (containingClass == null) {
+            containingClass = (PsiClass) psiMethod.getParent().getContext();
+        }
+        if (containingClass.isInterface()) {
+            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
+            ArrayList<String> result = new ArrayList<String>();
+
+            for (PsiElement element : psiElements) {
+                if (element instanceof PsiMethod) {
+
+                    PsiMethod method = (PsiMethod) element;
+                    PsiClass implClass = method.getContainingClass();
+                    if (implClass == null) {
+                        implClass = (PsiClass) method.getParent().getContext();
+                    }
+                    result.add(implClass.getQualifiedName());
+                }
+            }
+
+            return result;
+        }
+        return new ArrayList<String>();
     }
 
     private class LockUnlockAction extends AnAction {

@@ -8,14 +8,13 @@ import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.CallStack;
 import org.intellij.sequencer.generator.SequenceGenerator;
 import org.intellij.sequencer.generator.SequenceParams;
+import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.generator.filters.SingleClassFilter;
 import org.intellij.sequencer.generator.filters.SingleMethodFilter;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
@@ -43,22 +42,23 @@ public class SequencePanel extends JPanel {
         actionGroup.add(new CloseAction());
         actionGroup.add(new ReGenerateAction());
         actionGroup.add(new ExportAction());
+        actionGroup.add(new PreviewAction());
 
         ActionManager actionManager = ActionManager.getInstance();
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
         add(actionToolbar.getComponent(), BorderLayout.WEST);
 
-        JButton birdViewButton = new JButton(SequencePlugin.loadIcon("preview.png"));
-        birdViewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showBirdView();
-            }
-        });
+//        JButton birdViewButton = new JButton(SequencePlugin.loadIcon("preview.png"));
+//        birdViewButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                showBirdView();
+//            }
+//        });
 
         _jScrollPane = new JBScrollPane(_display);
         _jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         _jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        _jScrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, birdViewButton);
+//        _jScrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, birdViewButton);
         add(_jScrollPane, BorderLayout.CENTER);
     }
 
@@ -69,11 +69,11 @@ public class SequencePanel extends JPanel {
     private void generate(String query) {
         LOGGER.debug("sequence = " + query);
         _model.setText(query, this);
-        _display.invalidate(); 
+        _display.invalidate();
     }
-    
+
     public void generate() {
-        if(_psiMethod == null || !_psiMethod.isValid()) { // || !_psiMethod.isPhysical()
+        if (_psiMethod == null || !_psiMethod.isValid()) { // || !_psiMethod.isPhysical()
             _psiMethod = null;
             return;
         }
@@ -93,18 +93,16 @@ public class SequencePanel extends JPanel {
     }
 
     private void gotoSourceCode(ScreenObject screenObject) {
-        if(screenObject instanceof DisplayObject) {
-            DisplayObject displayObject = (DisplayObject)screenObject;
+        if (screenObject instanceof DisplayObject) {
+            DisplayObject displayObject = (DisplayObject) screenObject;
             gotoClass(displayObject.getObjectInfo());
-        }
-        else if(screenObject instanceof DisplayMethod) {
-            DisplayMethod displayMethod = (DisplayMethod)screenObject;
+        } else if (screenObject instanceof DisplayMethod) {
+            DisplayMethod displayMethod = (DisplayMethod) screenObject;
             gotoMethod(displayMethod.getMethodInfo());
-        }
-        else if(screenObject instanceof DisplayLink) {
-            DisplayLink displayLink = (DisplayLink)screenObject;
+        } else if (screenObject instanceof DisplayLink) {
+            DisplayLink displayLink = (DisplayLink) screenObject;
             gotoCall(displayLink.getLink().getCallerMethodInfo(),
-                  displayLink.getLink().getMethodInfo());
+                    displayLink.getLink().getMethodInfo());
         }
     }
 
@@ -120,18 +118,29 @@ public class SequencePanel extends JPanel {
     }
 
     private void gotoCall(MethodInfo fromMethodInfo, MethodInfo toMethodInfo) {
-        if(fromMethodInfo == null || toMethodInfo == null)
+        if (fromMethodInfo == null || toMethodInfo == null)
             return;
         _plugin.openMethodCallInEditor(
-              _sequenceParams.getMethodFilter(),
-              fromMethodInfo.getObjectInfo().getFullName(),
-              fromMethodInfo.getRealName(),
-              fromMethodInfo.getArgTypes(),
-              toMethodInfo.getObjectInfo().getFullName(),
-              toMethodInfo.getRealName(),
-              toMethodInfo.getArgTypes(),
-              toMethodInfo.getNumbering().getTopLevel()
-              );
+                _sequenceParams.getMethodFilter(),
+                fromMethodInfo.getObjectInfo().getFullName(),
+                fromMethodInfo.getRealName(),
+                fromMethodInfo.getArgTypes(),
+                toMethodInfo.getObjectInfo().getFullName(),
+                toMethodInfo.getRealName(),
+                toMethodInfo.getArgTypes(),
+                toMethodInfo.getNumbering().getTopLevel()
+        );
+    }
+
+    private class PreviewAction extends AnAction {
+        public PreviewAction() {
+            super("BirdView", "Bird view", SequencePlugin.loadIcon("preview.png"));
+        }
+
+        @Override
+        public void actionPerformed(AnActionEvent anActionEvent) {
+            showBirdView();
+        }
     }
 
     private class CloseAction extends AnAction {
@@ -173,13 +182,13 @@ public class SequencePanel extends JPanel {
                 }
             });
             try {
-                if(fileChooser.showSaveDialog(SequencePanel.this) == JFileChooser.APPROVE_OPTION) {
+                if (fileChooser.showSaveDialog(SequencePanel.this) == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    if(!selectedFile.getName().endsWith("png"))
+                    if (!selectedFile.getName().endsWith("png"))
                         selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".png");
                     _display.saveImageToFile(selectedFile);
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(SequencePanel.this, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
             }
@@ -223,12 +232,32 @@ public class SequencePanel extends JPanel {
 
         public void actionPerformed(AnActionEvent anActionEvent) {
             _sequenceParams.getMethodFilter().addFilter(new SingleMethodFilter(
-                  _methodInfo.getObjectInfo().getFullName(),
-                  _methodInfo.getRealName(),
-                  _methodInfo.getArgTypes()
+                    _methodInfo.getObjectInfo().getFullName(),
+                    _methodInfo.getRealName(),
+                    _methodInfo.getArgTypes()
             ));
             generate();
 
+        }
+    }
+
+    private class ExpendInterfaceAction extends AnAction {
+        private String face;
+        private String impl;
+
+        public ExpendInterfaceAction(String face, String impl) {
+            super(impl);
+            this.face = face;
+            this.impl = impl;
+        }
+
+        @Override
+        public void actionPerformed(AnActionEvent anActionEvent) {
+            _sequenceParams.getInterfaceImplFilter().put(
+                    face,
+                    new ImplementClassFilter(impl)
+            );
+            generate();
         }
     }
 
@@ -241,22 +270,43 @@ public class SequencePanel extends JPanel {
         public void displayMenuForScreenObject(ScreenObject screenObject, int x, int y) {
             DefaultActionGroup actionGroup = new DefaultActionGroup("SequencePopup", true);
             actionGroup.add(new GotoSourceAction(screenObject));
-            if(screenObject instanceof DisplayObject) {
-                DisplayObject displayObject = (DisplayObject)screenObject;
-                actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
-            }
-            else if(screenObject instanceof DisplayMethod) {
-                DisplayMethod displayMethod = (DisplayMethod)screenObject;
+            if (screenObject instanceof DisplayObject) {
+                DisplayObject displayObject = (DisplayObject) screenObject;
+                if (displayObject.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && !_sequenceParams.isSmartInterface()) {
+                    String className = displayObject.getObjectInfo().getFullName();
+                    List<String> impls = _plugin.findImplementations(className);
+                    actionGroup.addSeparator();
+                    for (String impl : impls) {
+                        actionGroup.add(new ExpendInterfaceAction(className,impl));
+                    }
+                    actionGroup.addSeparator();
+                }
+               actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
+            } else if (screenObject instanceof DisplayMethod) {
+                DisplayMethod displayMethod = (DisplayMethod) screenObject;
+                if (displayMethod.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && !_sequenceParams.isSmartInterface()) {
+
+                    String className = displayMethod.getObjectInfo().getFullName();
+                    String methodName = displayMethod.getMethodInfo().getRealName();
+                    List argTypes = displayMethod.getMethodInfo().getArgTypes();
+                    List<String> impls = _plugin.findImplementations(className, methodName, argTypes);
+
+                    actionGroup.addSeparator();
+                    for (String impl : impls) {
+                        actionGroup.add(new ExpendInterfaceAction(className,impl));
+                    }
+                    actionGroup.addSeparator();
+
+                }
                 actionGroup.add(new RemoveMethodAction(displayMethod.getMethodInfo()));
-            }
-            else if(screenObject instanceof DisplayLink) {
-                DisplayLink displayLink = (DisplayLink)screenObject;
-                if(!displayLink.isReturnLink())
+            } else if (screenObject instanceof DisplayLink) {
+                DisplayLink displayLink = (DisplayLink) screenObject;
+                if (!displayLink.isReturnLink())
                     actionGroup.add(new RemoveMethodAction(displayLink.getLink().getMethodInfo()));
             }
             ActionPopupMenu actionPopupMenu = ActionManager.getInstance().
-                  createActionPopupMenu("SequenceDiagram.Popup", actionGroup);
-            Component invoker = screenObject instanceof DisplayObject? _display.getHeader(): _display;
+                    createActionPopupMenu("SequenceDiagram.Popup", actionGroup);
+            Component invoker = screenObject instanceof DisplayObject ? _display.getHeader() : _display;
             actionPopupMenu.getComponent().show(invoker, x, y);
         }
     }

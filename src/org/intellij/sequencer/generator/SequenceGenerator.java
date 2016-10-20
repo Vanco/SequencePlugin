@@ -2,8 +2,10 @@ package org.intellij.sequencer.generator;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.*;
+import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.diagram.Info;
+import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.PsiUtil;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ public class SequenceGenerator extends JavaElementVisitor {
     private final Stack<CallStack> _callStack = new Stack<CallStack>();
     private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class.getName());
 
+    private final ImplementationFinder implementationFinder = new ImplementationFinder();
     private CallStack topStack;
     private CallStack currentStack;
     private int depth;
@@ -28,12 +31,45 @@ public class SequenceGenerator extends JavaElementVisitor {
         psiElement.acceptChildren(this);
     }
 
-    public void visitClass(PsiClass psiClass) {
+    public CallStack generate(PsiMethod psiMethod) {
+        PsiClass containingClass = psiMethod.getContainingClass();
+        if (containingClass == null) {
+            containingClass = (PsiClass) psiMethod.getParent().getContext();
+        }
+
+        // follow implementation
+        if (containingClass.isInterface()) {
+            psiMethod.accept(this);
+            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
+            if (psiElements.length == 1 ) {
+                methodAccept(psiElements[0]);
+            } else {
+                for (PsiElement psiElement : psiElements) {
+                    if (psiElement instanceof PsiMethod) {
+                        if (params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
+                            methodAccept(psiElement);
+                    }
+                }
+            }
+        } else {
+            // resolve variable initializer
+            if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass))
+                containingClass.accept(implementationFinder);
+            psiMethod.accept(this);
+        }
+        return topStack;
     }
 
-    public CallStack generate(PsiMethod psiMethod) {
-        psiMethod.accept(this);
-        return topStack;
+    private void methodAccept(PsiElement psiElement) {
+        if (psiElement instanceof PsiMethod) {
+            PsiMethod method = (PsiMethod) psiElement;
+            if (params.getMethodFilter().allow(method)) {
+                PsiClass containingClass = (method).getContainingClass();
+                if (params.isSmartInterface() && containingClass != null && !PsiUtil.isExternal(containingClass))
+                    containingClass.accept(implementationFinder);
+                method.accept(this);
+            }
+        }
     }
 
     public void visitMethod(PsiMethod psiMethod) {
@@ -59,7 +95,7 @@ public class SequenceGenerator extends JavaElementVisitor {
             _callStack.push(currentStack);
         }
         super.visitCallExpression(callExpression);
-        if ((PsiUtil.isPipeline(callExpression) || PsiUtil.isComplexCall(callExpression)))
+        if ((PsiUtil.isPipeline(callExpression) || PsiUtil.isComplexCall(callExpression))) {
             if (!_exprStack.isEmpty()) {
                 CallStack old = currentStack;
                 PsiCallExpression pop = _exprStack.pop();
@@ -67,6 +103,7 @@ public class SequenceGenerator extends JavaElementVisitor {
                 methodCall(pop.resolveMethod());
                 currentStack = old;
             }
+        }
     }
 
     private void methodCall(PsiMethod psiMethod) {
@@ -127,10 +164,110 @@ public class SequenceGenerator extends JavaElementVisitor {
         }
         if (PsiUtil.isInClassFile(psiModifierList) || PsiUtil.isInJarFileSystem(psiModifierList))
             attributes.add(Info.EXTERNAL_ATTRIBUTE);
+        if (PsiUtil.isInterface(psiModifierList))
+            attributes.add(Info.INTERFACE_ATTRIBUTE);
         return attributes;
     }
 
-    public void visitReferenceExpression(PsiReferenceExpression psiReferenceExpression) {
-        psiReferenceExpression.acceptChildren(this);
+    @Override
+    public void visitReferenceExpression(PsiReferenceExpression expression) {
+        expression.acceptChildren(this);
+    }
+
+    @Override
+    public void visitLocalVariable(PsiLocalVariable variable) {
+        PsiJavaCodeReferenceElement referenceElement = variable.getTypeElement().getInnermostComponentReferenceElement();
+        if (referenceElement != null) {
+            PsiClass psiClass = (PsiClass) referenceElement.resolve();
+
+            if (psiClass != null && psiClass.isInterface()) {
+                String type = variable.getType().getCanonicalText();
+                String impl = variable.getInitializer().getType().getCanonicalText();
+                if (!type.equals(impl)) {
+                    params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                }
+            }
+
+        }
+
+        super.visitLocalVariable(variable);
+    }
+
+    @Override
+    public void visitAssignmentExpression(PsiAssignmentExpression expression) {
+        PsiExpression re = expression.getRExpression();
+        if (params.isSmartInterface() && re instanceof PsiNewExpression) {
+            String face = expression.getType().getCanonicalText();
+            String impl = expression.getRExpression().getType().getCanonicalText();
+
+            params.getInterfaceImplFilter().put(face, new ImplementClassFilter(impl));
+
+        }
+        super.visitAssignmentExpression(expression);
+    }
+
+    private class ImplementationFinder extends JavaElementVisitor {
+
+        @Override
+        public void visitClass(PsiClass aClass) {
+            for (PsiClass psiClass : aClass.getSupers()) {
+                if (!PsiUtil.isExternal(psiClass))
+                    psiClass.accept(this);
+            }
+
+            if (!aClass.isInterface() && !PsiUtil.isExternal(aClass)) {
+                super.visitClass(aClass);
+            }
+        }
+
+        @Override
+        public void visitField(PsiField field) {
+            PsiTypeElement typeElement = field.getTypeElement();
+            if (typeElement != null) {
+                PsiJavaCodeReferenceElement referenceElement = typeElement.getInnermostComponentReferenceElement();
+                if (referenceElement != null) {
+                    PsiClass psiClass = (PsiClass) referenceElement.resolve();
+                    if (psiClass != null && psiClass.isInterface()) {
+                        String type = field.getType().getCanonicalText();
+                        PsiExpression initializer = field.getInitializer();
+                        if (initializer != null) {
+                            String impl = initializer.getType().getCanonicalText();
+                            if (!type.equals(impl)) {
+                                params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                            }
+                        }
+                    }
+                }
+            }
+
+            super.visitField(field);
+        }
+
+        @Override
+        public void visitMethod(PsiMethod method) {
+            // only constructor
+            PsiClass containingClass = method.getContainingClass();
+            if (containingClass != null && method.getName().equals(containingClass.getName())) {
+                super.visitMethod(method);
+            }
+        }
+
+        @Override
+        public void visitAssignmentExpression(PsiAssignmentExpression expression) {
+            PsiExpression re = expression.getRExpression();
+            if (re instanceof PsiNewExpression) {
+                String face = expression.getType().getCanonicalText();
+                String impl = expression.getRExpression().getType().getCanonicalText();
+
+                params.getInterfaceImplFilter().put(face, new ImplementClassFilter(impl));
+
+            }
+            super.visitAssignmentExpression(expression);
+        }
+
+        public void visitElement(PsiElement psiElement) {
+            psiElement.acceptChildren(this);
+        }
+
     }
 }

@@ -13,7 +13,7 @@ public class CompositeMethodFilter implements MethodFilter {
         _filters.add(filter);
     }
 
-    public void remoteFilter(MethodFilter filter) {
+    public void removeFilter(MethodFilter filter) {
         _filters.remove(filter);
     }
 

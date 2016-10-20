@@ -13,7 +13,7 @@ public class DisplayObject extends ScreenObject {
 
     private static final Paint BORDER_COLOR = Color.black;
     private static final Paint TEXT_COLOR = Color.black;
-    private static final Paint LINE_COLOR = Color.blue;
+    private static final Paint LINE_COLOR = Color.black;
     private static final Paint SHADOW_COLOR = new Color(102, 102, 153, 150);
 
     private int _x = -1;
@@ -241,7 +241,7 @@ public class DisplayObject extends ScreenObject {
             g2.fillRect(_x + 2, _y + 2, _textBox.getWidth(), _textBox.getHeight());
         }
         g2.setPaint(_objectInfo.hasAttribute(Info.EXTERNAL_ATTRIBUTE) ?
-              configuration.EXTERNAL_CLASS_COLOR : configuration.CLASS_COLOR);
+              configuration.EXTERNAL_CLASS_COLOR : _objectInfo.hasAttribute(Info.INTERFACE_ATTRIBUTE) ? configuration.INTERFACE_COLOR : configuration.CLASS_COLOR);
         g2.fillRect(_x, _y, _textBox.getWidth(), _textBox.getHeight());
 
         g2.setPaint(BORDER_COLOR);

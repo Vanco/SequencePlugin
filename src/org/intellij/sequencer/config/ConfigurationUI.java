@@ -27,6 +27,7 @@ public class ConfigurationUI implements ActionListener {
     private JButton _addExcludeEntry;
     private JButton _removeExcludeEntry;
     private JTable _excludeTable;
+    private JButton _interfaceColor;
 
     private ExcludeTableModel _excludeTableModel;
 
@@ -43,6 +44,7 @@ public class ConfigurationUI implements ActionListener {
         _externalClassColor.addActionListener(this);
         _methodBarColor.addActionListener(this);
         _selectedMethodBarColor.addActionListener(this);
+        _interfaceColor.addActionListener(this);
         _addExcludeEntry.addActionListener(this);
         _removeExcludeEntry.addActionListener(this);
 
@@ -71,6 +73,8 @@ public class ConfigurationUI implements ActionListener {
             return true;
         if(!_selectedMethodBarColor.getBackground().equals(configuration.SELECTED_METHOD_BAR_COLOR))
             return true;
+        if(!_interfaceColor.getBackground().equals(configuration.INTERFACE_COLOR))
+            return true;
         if(configuration.USE_ANTIALIASING != _antialiasing.isSelected())
             return true;
         if(configuration.SHOW_RETURN_ARROWS != _showReturnArrows.isSelected())
@@ -93,6 +97,7 @@ public class ConfigurationUI implements ActionListener {
         configuration.EXTERNAL_CLASS_COLOR = _externalClassColor.getBackground();
         configuration.METHOD_BAR_COLOR = _methodBarColor.getBackground();
         configuration.SELECTED_METHOD_BAR_COLOR = _selectedMethodBarColor.getBackground();
+        configuration.INTERFACE_COLOR = _interfaceColor.getBackground();
         configuration.USE_ANTIALIASING = _antialiasing.isSelected();
         configuration.SHOW_RETURN_ARROWS = _showReturnArrows.isSelected();
         configuration.SHOW_CALL_NUMBERS = _showCallNumbers.isSelected();
@@ -107,6 +112,7 @@ public class ConfigurationUI implements ActionListener {
         _externalClassColor.setBackground(configuration.EXTERNAL_CLASS_COLOR);
         _methodBarColor.setBackground(configuration.METHOD_BAR_COLOR);
         _selectedMethodBarColor.setBackground(configuration.SELECTED_METHOD_BAR_COLOR);
+        _interfaceColor.setBackground(configuration.INTERFACE_COLOR);
         _antialiasing.setSelected(configuration.USE_ANTIALIASING);
         _showReturnArrows.setSelected(configuration.SHOW_RETURN_ARROWS);
         _showCallNumbers.setSelected(configuration.SHOW_CALL_NUMBERS);
@@ -125,6 +131,8 @@ public class ConfigurationUI implements ActionListener {
             handleColor(_methodBarColor);
         else if(e.getActionCommand().equals("selectedMethodBarColor"))
             handleColor(_selectedMethodBarColor);
+        else if(e.getActionCommand().equals("interfaceColor"))
+            handleColor(_interfaceColor);
         else if(e.getActionCommand().equals("addExcludeEntry")) {
             String excludeName = JOptionPane.showInputDialog(_mainPanel,
                   "Enter package or class name.\nFor example, java.lang.* or java.io.PrintStream:", "Exclude Entry",

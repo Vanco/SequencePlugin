@@ -16,11 +16,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ShowSequenceAction extends AnAction {
-    private int _callDepth = 3;
+    private int _callDepth = 5;
     private boolean _projectClassesOnly = true;
     private boolean _noGetterSetters = true;
     private boolean _noPrivateMethods;
     private boolean _noConstructors;
+    private boolean _smartInterface = true;
 
     public ShowSequenceAction() {
     }
@@ -43,9 +44,11 @@ public class ShowSequenceAction extends AnAction {
             _noGetterSetters = dialogWrapper.isNoGetterSetters();
             _noPrivateMethods = dialogWrapper.isNoPrivateMethods();
             _noConstructors = dialogWrapper.isNoConstructors();
+            _smartInterface = dialogWrapper.isSmartInterface();
 
             SequenceParams params = new SequenceParams();
             params.setMaxDepth(dialogWrapper.getCallStackDepth());
+            params.setSmartInterface(dialogWrapper.isSmartInterface());
             params.getMethodFilter().addFilter(new ProjectOnlyFilter(_projectClassesOnly));
             params.getMethodFilter().addFilter(new NoGetterSetterFilter(_noGetterSetters));
             params.getMethodFilter().addFilter(new NoPrivateMethodsFilter(_noPrivateMethods));
@@ -75,6 +78,7 @@ public class ShowSequenceAction extends AnAction {
         private JCheckBox jCheckBoxNGS;
         private JCheckBox jCheckBoxNPM;
         private JCheckBox jCheckBoxNC;
+        private JCheckBox jCheckBoxSI;
 
         public DialogPanel() {
             super(new GridBagLayout());
@@ -108,6 +112,14 @@ public class ShowSequenceAction extends AnAction {
             gc.insets = new Insets(0, 0, 0, 0);
             jCheckBoxNGS = new JCheckBox("Skip getters/setters", _noGetterSetters);
             add(jCheckBoxNGS, gc);
+
+            gc.gridx = 0;
+            gc.gridy = 3;
+            gc.anchor = GridBagConstraints.WEST;
+            gc.gridwidth = 2;
+            gc.insets = new Insets(0, 0, 0, 0);
+            jCheckBoxSI = new JCheckBox("Smart interface (experimental)", _smartInterface);
+            add(jCheckBoxSI, gc);
 
             gc.gridx = 2;
             gc.gridy = 1;
@@ -163,6 +175,10 @@ public class ShowSequenceAction extends AnAction {
 
         public boolean isNoConstructors() {
             return dialogPanel.jCheckBoxNC.isSelected();
+        }
+
+        public boolean isSmartInterface() {
+            return dialogPanel.jCheckBoxSI.isSelected();
         }
     }
 

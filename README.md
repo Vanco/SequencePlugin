@@ -8,6 +8,7 @@ with this plugin, you can
 + Delete Class from diagram.
 + Export the diagram as image.
 + Exclude classes from diagram by Settings > Other Settings > Sequence
++ Smart Interface(experimental)
 
 #### Name history
 + **SequencePlugin** Maintained by Kentaur(Kesh Sibilev, ksibilve@yahoo.com) until 2011
@@ -34,6 +35,8 @@ Place the cursor in side the method, trigger it from context menu > Sequence Dia
 
 ## Version History
 <dl>
+        <dt>1.2</dt>
+        <dd>new feature: Smart Interface, List implementation of interface in project, user can choose one to show in sequence diagram. If only one implementation found, it will show automatically. </dd>
         <dt>1.1</dt>
         <dd>fix issue #3 support parameter is anther method call, fix issue #4 support pipeline call.</dd>
         <dt>1.0.9</dt>

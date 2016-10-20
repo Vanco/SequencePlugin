@@ -74,6 +74,15 @@ public class PsiUtil {
         return true;
     }
 
+    public static boolean isExternal(PsiClass psiClass) {
+        return isInClassFile(psiClass) || isInJarFileSystem(psiClass);
+    }
+
+    public static PsiClass findPsiClass(Project project, PsiManager psiManager, String className) {
+        PsiClass psiClass = ClassUtil.findPsiClass(psiManager, className);
+        return psiClass;
+    }
+
     public static PsiMethod findPsiMethod(Project project, PsiManager psiManager,
                                           final String className, String methodName, List argTypes) {
         PsiClass psiClass = ClassUtil.findPsiClass(psiManager, className);
@@ -90,6 +99,7 @@ public class PsiUtil {
                                                           final PsiMethod toPsiMethod,
                                                           final int callNo) {
         PsiCodeBlock psiCodeBlock = fromPsiMethod.getBody();
+        if (psiCodeBlock == null) return  null;
         CallFinder callFinder = new CallFinder(callNo, methodFilter, toPsiMethod);
         psiCodeBlock.accept(callFinder);
         return callFinder.getPsiElement();
@@ -136,4 +146,12 @@ public class PsiUtil {
         return false;
     }
 
+    public static boolean isInterface(PsiModifierList psiModifierList) {
+        PsiElement parent = psiModifierList.getParent();
+        if (parent instanceof PsiClass) {
+            PsiClass psiClass = (PsiClass) parent;
+            return psiClass.isInterface();
+        }
+        return false;
+    }
 }
