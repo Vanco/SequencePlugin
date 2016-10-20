@@ -187,7 +187,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         Color color = getBackground();
         setBackground(Color.white);
         Dimension size = getFullSize();
-        BufferedImage image = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = UIUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D graphics = image.createGraphics();
         paintComponentWithHeader(graphics);

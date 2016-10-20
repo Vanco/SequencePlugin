@@ -21,28 +21,23 @@ import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.Query;
-import org.intellij.sequencer.diagram.Info;
-import org.intellij.sequencer.diagram.MethodInfo;
-import org.intellij.sequencer.diagram.ObjectInfo;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.MethodFilter;
-import org.intellij.sequencer.ui.PlasticTabbedPaneUI;
+import org.intellij.sequencer.ui.ButtonTabComponent;
 import org.intellij.sequencer.util.PsiUtil;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SequencePlugin implements ProjectComponent {
     private static final String PLAGIN_NAME = "Sequence";
     private static final Icon DISABLED_ICON = loadIcon("locked.png");
+    private static final Icon S_ICON = loadIcon("SequenceDiagramSmall.gif");
 
     private final Project _project;
     private ToolWindow _toolWindow;
@@ -62,7 +57,7 @@ public class SequencePlugin implements ProjectComponent {
               PLAGIN_NAME, false, ToolWindowAnchor.BOTTOM);
         final Content content = ServiceManager.getService(ContentFactory.class).createContent(_jTabbedPane, "", false);
         _toolWindow.getContentManager().addContent(content);
-        _toolWindow.setIcon(loadIcon("SequenceDiagramSmall.gif"));
+        _toolWindow.setIcon(loadIcon("SequenceDiagram16.gif"));
         _toolWindow.setAvailable(false, null);
     }
 
@@ -115,8 +110,9 @@ public class SequencePlugin implements ProjectComponent {
             _jTabbedPane.setSelectedIndex(tabIndex);
         }
         else {
-            _jTabbedPane.addTab(sequencePanel.getTitleName(), sequencePanel);
+            _jTabbedPane.addTab(sequencePanel.getTitleName(), S_ICON, sequencePanel);
             _jTabbedPane.setSelectedComponent(sequencePanel);
+            _jTabbedPane.setTabComponentAt(_jTabbedPane.getSelectedIndex(), new ButtonTabComponent(_jTabbedPane));
         }
         _toolWindow.setTitle(sequencePanel.getTitleName());
     }
@@ -223,8 +219,8 @@ public class SequencePlugin implements ProjectComponent {
 
     private void createTabPane() {
         _jTabbedPane = new JBTabbedPane(JBTabbedPane.TOP);
-        if(UIManager.getLookAndFeel() instanceof MetalLookAndFeel)
-            _jTabbedPane.setUI(new PlasticTabbedPaneUI());
+//        if(UIManager.getLookAndFeel() instanceof MetalLookAndFeel)
+//            _jTabbedPane.setUI(new PlasticTabbedPaneUI());
         _jTabbedPane.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 showPopupForTab(e);
@@ -323,7 +319,7 @@ public class SequencePlugin implements ProjectComponent {
         }
 
         public void actionPerformed(AnActionEvent anActionEvent) {
-            _jTabbedPane.setIconAt(_index, _isLock? DISABLED_ICON: null);
+            _jTabbedPane.setIconAt(_index, _isLock? DISABLED_ICON: S_ICON);
         }
     }
 

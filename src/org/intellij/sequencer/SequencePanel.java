@@ -3,7 +3,9 @@ package org.intellij.sequencer;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiMethod;
+import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.ui.UIUtil;
 import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.CallStack;
 import org.intellij.sequencer.generator.SequenceGenerator;
@@ -11,10 +13,14 @@ import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.generator.filters.SingleClassFilter;
 import org.intellij.sequencer.generator.filters.SingleMethodFilter;
+import org.intellij.sequencer.ui.MyButtonlessScrollBarUI;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
@@ -42,23 +48,25 @@ public class SequencePanel extends JPanel {
         actionGroup.add(new CloseAction());
         actionGroup.add(new ReGenerateAction());
         actionGroup.add(new ExportAction());
-        actionGroup.add(new PreviewAction());
 
         ActionManager actionManager = ActionManager.getInstance();
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
         add(actionToolbar.getComponent(), BorderLayout.WEST);
 
-//        JButton birdViewButton = new JButton(SequencePlugin.loadIcon("preview.png"));
-//        birdViewButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                showBirdView();
-//            }
-//        });
+        MyButton birdViewButton = new MyButton(SequencePlugin.loadIcon("preview.png"));
+        birdViewButton.setToolTipText("Bird view");
+        birdViewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showBirdView();
+            }
+        });
 
         _jScrollPane = new JBScrollPane(_display);
+        _jScrollPane.setVerticalScrollBar(new MyScrollBar(Adjustable.VERTICAL));
+        _jScrollPane.setHorizontalScrollBar(new MyScrollBar(Adjustable.HORIZONTAL));
         _jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         _jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-//        _jScrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, birdViewButton);
+        _jScrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, birdViewButton);
         add(_jScrollPane, BorderLayout.CENTER);
     }
 
@@ -67,7 +75,7 @@ public class SequencePanel extends JPanel {
     }
 
     private void generate(String query) {
-        LOGGER.debug("sequence = " + query);
+//        LOGGER.debug("sequence = " + query);
         _model.setText(query, this);
         _display.invalidate();
     }
@@ -130,17 +138,6 @@ public class SequencePanel extends JPanel {
                 toMethodInfo.getArgTypes(),
                 toMethodInfo.getNumbering().getTopLevel()
         );
-    }
-
-    private class PreviewAction extends AnAction {
-        public PreviewAction() {
-            super("BirdView", "Bird view", SequencePlugin.loadIcon("preview.png"));
-        }
-
-        @Override
-        public void actionPerformed(AnActionEvent anActionEvent) {
-            showBirdView();
-        }
     }
 
     private class CloseAction extends AnAction {
@@ -310,4 +307,37 @@ public class SequencePanel extends JPanel {
             actionPopupMenu.getComponent().show(invoker, x, y);
         }
     }
+
+    private class MyScrollBar extends JBScrollBar {
+        public MyScrollBar(int orientation) {
+            super(orientation);
+        }
+
+        @Override
+        public void updateUI() {
+            setUI(MyButtonlessScrollBarUI.createNormal());
+        }
+
+
+    }
+
+    private class MyButton extends JButton {
+
+        public MyButton(Icon icon) {
+            super(icon);
+            setUI(new BasicButtonUI());
+            setBackground(UIUtil.getLabelBackground());
+//            setContentAreaFilled(false);
+            setBorder(BorderFactory.createEmptyBorder());
+            setBorderPainted(false);
+            setFocusable(false);
+            setRequestFocusEnabled(false);
+        }
+
+        @Override
+        public void updateUI() {
+
+        }
+    }
+
 }

@@ -182,9 +182,12 @@ public class SequenceGenerator extends JavaElementVisitor {
 
             if (psiClass != null && psiClass.isInterface()) {
                 String type = variable.getType().getCanonicalText();
-                String impl = variable.getInitializer().getType().getCanonicalText();
-                if (!type.equals(impl)) {
-                    params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                PsiExpression initializer = variable.getInitializer();
+                if (initializer instanceof PsiNewExpression) {
+                    String impl = initializer.getType().getCanonicalText();
+                    if (!type.equals(impl)) {
+                        params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                    }
                 }
             }
 
@@ -230,7 +233,7 @@ public class SequenceGenerator extends JavaElementVisitor {
                     if (psiClass != null && psiClass.isInterface()) {
                         String type = field.getType().getCanonicalText();
                         PsiExpression initializer = field.getInitializer();
-                        if (initializer != null) {
+                        if (initializer != null && initializer instanceof PsiNewExpression) {
                             String impl = initializer.getType().getCanonicalText();
                             if (!type.equals(impl)) {
                                 params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
