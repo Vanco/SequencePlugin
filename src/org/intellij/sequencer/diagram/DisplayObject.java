@@ -1,8 +1,12 @@
 package org.intellij.sequencer.diagram;
 
+import com.intellij.ui.Gray;
+import com.intellij.ui.JBColor;
+import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
 import org.intellij.sequencer.config.Configuration;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,10 +15,16 @@ import java.util.List;
 public class DisplayObject extends ScreenObject {
     private static final Logger LOGGER = Logger.getLogger(DisplayObject.class);
 
-    private static final Paint BORDER_COLOR = Color.black;
-    private static final Paint TEXT_COLOR = Color.black;
-    private static final Paint LINE_COLOR = Color.black;
-    private static final Paint SHADOW_COLOR = new Color(102, 102, 153, 150);
+    private static final Paint BORDER_COLOR = JBColor.DARK_GRAY;
+    private static final Paint TEXT_COLOR = Color.DARK_GRAY;
+    private static final Paint LINE_COLOR =  JBColor.DARK_GRAY;
+    private static final Paint SHADOW_COLOR = JBColor.LIGHT_GRAY;
+    private static final Stroke DASH_STROKE = new BasicStroke(1.0f,
+            BasicStroke.CAP_SQUARE,
+            BasicStroke.JOIN_MITER,
+            12.0f,
+            new float[]{12.0f, 6.0f},
+            0.0f);
 
     private int _x = -1;
     private int _y = -1;
@@ -197,7 +207,10 @@ public class DisplayObject extends ScreenObject {
     public void paint(Graphics2D g2) {
         if(isInClipArea(g2, _fullHeight)) {
             g2.setPaint(LINE_COLOR);
+            Stroke oldStroke = g2.getStroke();
+            g2.setStroke(DASH_STROKE);
             g2.drawLine(getCenterX(), 0, getCenterX(), _fullHeight);
+            g2.setStroke(oldStroke);
 
             for(Iterator it = _methods.iterator(); it.hasNext();) {
                 DisplayMethod methodBox = (DisplayMethod)it.next();

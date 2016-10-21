@@ -1,5 +1,6 @@
 package org.intellij.sequencer.diagram;
 
+import com.intellij.ui.JBColor;
 import org.apache.log4j.Logger;
 import org.intellij.sequencer.config.Configuration;
 
@@ -9,8 +10,8 @@ public class DisplayMethod extends ScreenObject {
 
     private static final Logger LOGGER = Logger.getLogger(DisplayMethod.class);
 
-    private static final Paint LINE_COLOR = Color.black;
-    private static final Paint SHADOW_COLOR = new Color(102, 102, 153, 150);
+    private static final Paint LINE_COLOR = JBColor.DARK_GRAY;
+    private static final Paint SHADOW_COLOR = JBColor.LIGHT_GRAY;
 
     private ObjectInfo _objectInfo;
     private MethodInfo _methodInfo;

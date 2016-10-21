@@ -25,7 +25,7 @@ import java.io.File;
 import java.util.List;
 
 public class SequencePanel extends JPanel {
-//    private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
+    private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
 
     private Display _display;
     private Model _model;
@@ -325,6 +325,10 @@ public class SequencePanel extends JPanel {
 
         public MyButton(Icon icon) {
             super(icon);
+            init();
+        }
+
+        private void init() {
             setUI(new BasicButtonUI());
             setBackground(UIUtil.getLabelBackground());
 //            setContentAreaFilled(false);
@@ -336,7 +340,7 @@ public class SequencePanel extends JPanel {
 
         @Override
         public void updateUI() {
-
+            init();
         }
     }
 

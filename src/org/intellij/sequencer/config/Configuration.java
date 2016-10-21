@@ -18,15 +18,15 @@ import java.util.Vector;
 @State(name = "sequencePlugin", storages = {@Storage(file = "sequencePlugin.xml")})
 public class Configuration implements PersistentStateComponent<Configuration> {
     @OptionTag(converter = ColorConverter.class)
-    public Color CLASS_COLOR = new Color(0xffee00);
+    public Color CLASS_COLOR = new Color(0xFFFFC0);
     @OptionTag(converter = ColorConverter.class)
-    public Color EXTERNAL_CLASS_COLOR = new Color(0xff6666);
+    public Color EXTERNAL_CLASS_COLOR = new Color(0xFFD1CE);
     @OptionTag(converter = ColorConverter.class)
-    public Color METHOD_BAR_COLOR = new Color(0xD1DEFF);
+    public Color METHOD_BAR_COLOR = new Color(0xFFE0A7);
     @OptionTag(converter = ColorConverter.class)
-    public Color SELECTED_METHOD_BAR_COLOR = new Color(0x3399ff);
+    public Color SELECTED_METHOD_BAR_COLOR = new Color(0x85C1FF);
     @OptionTag(converter = ColorConverter.class)
-    public Color INTERFACE_COLOR = new Color(0xC0FAC6);
+    public Color INTERFACE_COLOR = new Color(0xCCFACF);
     public boolean USE_3D_VIEW = false;
     public boolean USE_ANTIALIASING = true;
     public boolean SHOW_RETURN_ARROWS = true;

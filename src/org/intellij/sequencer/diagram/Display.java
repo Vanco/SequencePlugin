@@ -1,5 +1,6 @@
 package org.intellij.sequencer.diagram;
 
+import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import org.intellij.sequencer.config.ConfigListener;
 import org.intellij.sequencer.config.Configuration;
@@ -28,12 +29,12 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         _model = model;
         _diagram = new Diagram();
         _listener = listener;
-        if(_listener == null)
+        if (_listener == null)
             _listener = new NullListener();
 
         setPreferredSize(new Dimension(200, 200));
         setFocusable(true);
-        setBackground(UIUtil.getListBackground());
+        setBackground(JBColor.background());
 
         DisplayMouseAdapter displayMouseAdapter = new DisplayMouseAdapter();
         addMouseListener(displayMouseAdapter);
@@ -66,13 +67,13 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
     public synchronized void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Graphics2D g2 = (Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
         setupGraphics(g2);
 
         Insets insets = getInsets();
         g2.translate(insets.left, insets.top);
 
-        if(!_initialized)
+        if (!_initialized)
             layout(g2);
 
         _diagram.paint(g2);
@@ -81,7 +82,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
     private void setupGraphics(Graphics2D g2) {
         Configuration configuration = Configuration.getInstance();
         g2.setFont(new Font(configuration.FONT_NAME, Font.PLAIN, configuration.FONT_SIZE));
-        if(configuration.USE_ANTIALIASING) {
+        if (configuration.USE_ANTIALIASING) {
             HashMap hintsMap = new HashMap();
             hintsMap.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.addRenderingHints(hintsMap);
@@ -90,7 +91,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
     public String getToolTipText(MouseEvent event) {
         ScreenObject screenObject = _diagram.findScreenObjectByXY(event.getX(), event.getY());
-        if(screenObject == null)
+        if (screenObject == null)
             return null;
         return screenObject.getToolTip();
     }
@@ -104,7 +105,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
     public void revalidate() {
         super.revalidate();
-        if(_displayHeader != null)
+        if (_displayHeader != null)
             _displayHeader.revalidate();
     }
 
@@ -145,15 +146,15 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         setScrollPaneHeaderView(null);
         super.removeNotify();
     }
-    
+
     private void setScrollPaneHeaderView(Component header) {
         Component component = getParent();
-        if(component instanceof JViewport) {
+        if (component instanceof JViewport) {
             Container container = component.getParent();
-            if(container instanceof JScrollPane) {
-                JScrollPane scrollPane = (JScrollPane)container;
+            if (container instanceof JScrollPane) {
+                JScrollPane scrollPane = (JScrollPane) container;
                 JViewport jViewport = scrollPane.getViewport();
-                if(jViewport == null || jViewport.getView() != this)
+                if (jViewport == null || jViewport.getView() != this)
                     return;
                 scrollPane.setColumnHeaderView(header);
             }
@@ -188,11 +189,22 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         setBackground(Color.white);
         Dimension size = getFullSize();
         BufferedImage image = UIUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-
+        LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
+        try {
+            String systemLookAndFeelClassName = UIUtil.getSystemLookAndFeelClassName();
+            UIManager.setLookAndFeel(systemLookAndFeelClassName);
+        } catch (Exception e) {
+            //ignore
+        }
         Graphics2D graphics = image.createGraphics();
         paintComponentWithHeader(graphics);
 
         setBackground(color);
+        try {
+            UIManager.setLookAndFeel(lookAndFeel);
+        } catch (UnsupportedLookAndFeelException e) {
+            //ignore
+        }
         ImageIO.write(image, "png", file);
     }
 
@@ -215,7 +227,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D)g;
+            Graphics2D g2 = (Graphics2D) g;
             setupGraphics(g2);
             _diagram.paintHeader(g2);
         }
@@ -229,19 +241,19 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         private ScreenObject selectedScreenObject;
 
         public void mouseReleased(MouseEvent e) {
-            if(selectedScreenObject != null) {
+            if (selectedScreenObject != null) {
                 selectedScreenObject.setSelected(false);
                 selectedScreenObject = null;
                 repaint();
             }
 
             ScreenObject screenObject = _diagram.findScreenObjectByXY(e.getX(), e.getY());
-            if(screenObject == null)
+            if (screenObject == null)
                 return;
             setSelected(screenObject);
-            if(isDoubleClick(e))
+            if (isDoubleClick(e))
                 _listener.selectedScreenObject(screenObject);
-            else if(e.isPopupTrigger())
+            else if (e.isPopupTrigger())
                 _listener.displayMenuForScreenObject(screenObject, e.getX(), e.getY());
         }
 
@@ -249,10 +261,10 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         public void mousePressed(MouseEvent e) {
 
             ScreenObject screenObject = _diagram.findScreenObjectByXY(e.getX(), e.getY());
-            if(screenObject == null)
+            if (screenObject == null)
                 return;
 //            setSelected(screenObject);
-            if(e.isPopupTrigger())
+            if (e.isPopupTrigger())
                 _listener.displayMenuForScreenObject(screenObject, e.getX(), e.getY());
         }
 
