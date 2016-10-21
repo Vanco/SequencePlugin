@@ -9,6 +9,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
@@ -37,14 +38,14 @@ import java.util.List;
 public class SequencePlugin implements ProjectComponent {
     private static final String PLAGIN_NAME = "Sequence";
     private static final Icon DISABLED_ICON = loadIcon("locked.png");
-    private static final Icon S_ICON = loadIcon("SequenceDiagramSmall.gif");
+    private static final Icon S_ICON = loadIcon("sequence-13x13.png");
 
     private final Project _project;
     private ToolWindow _toolWindow;
     private JTabbedPane _jTabbedPane;
 
     public static Icon loadIcon(String name) {
-        return new ImageIcon(SequencePlugin.class.getResource("/icons/" + name));
+        return IconLoader.findIcon(SequencePlugin.class.getResource("/icons/" + name),true);
     }
 
     public SequencePlugin(Project project) {
@@ -57,7 +58,7 @@ public class SequencePlugin implements ProjectComponent {
               PLAGIN_NAME, false, ToolWindowAnchor.BOTTOM);
         final Content content = ServiceManager.getService(ContentFactory.class).createContent(_jTabbedPane, "", false);
         _toolWindow.getContentManager().addContent(content);
-        _toolWindow.setIcon(loadIcon("SequenceDiagram16.gif"));
+        _toolWindow.setIcon(loadIcon("sequence-13x13.png"));
         _toolWindow.setAvailable(false, null);
     }
 
