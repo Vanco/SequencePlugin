@@ -5,6 +5,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.diagram.Info;
+import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.PsiUtil;
 
@@ -133,11 +134,11 @@ public class SequenceGenerator extends JavaElementVisitor {
             PsiType psiType = parameter.getType();
             argTypes.add(psiType == null ? null : psiType.getCanonicalText());
         }
-        List attributes = createAttributes(psiMethod.getModifierList());
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
         }
+        List attributes = createAttributes(psiMethod.getModifierList(), PsiUtil.isExternal(containingClass));
         if (psiMethod.isConstructor())
             return MethodDescription.createConstructorDescription(
                     createClassDescription(containingClass),
@@ -150,10 +151,10 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     private ClassDescription createClassDescription(PsiClass psiClass) {
         return new ClassDescription(psiClass.getQualifiedName(),
-                createAttributes(psiClass.getModifierList()));
+                createAttributes(psiClass.getModifierList(), PsiUtil.isExternal(psiClass)));
     }
 
-    private List createAttributes(PsiModifierList psiModifierList) {
+    private List createAttributes(PsiModifierList psiModifierList, boolean external) {
         if (psiModifierList == null)
             return Collections.EMPTY_LIST;
         List attributes = new ArrayList();
@@ -162,7 +163,7 @@ public class SequenceGenerator extends JavaElementVisitor {
             if (psiModifierList.hasModifierProperty(attribute))
                 attributes.add(attribute);
         }
-        if (PsiUtil.isInClassFile(psiModifierList) || PsiUtil.isInJarFileSystem(psiModifierList))
+        if (external)
             attributes.add(Info.EXTERNAL_ATTRIBUTE);
         if (PsiUtil.isInterface(psiModifierList))
             attributes.add(Info.INTERFACE_ATTRIBUTE);
