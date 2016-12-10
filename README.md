@@ -35,6 +35,8 @@ Place the cursor in side the method, trigger it from context menu > Sequence Dia
 
 ## Version History
 <dl>
+        <dt>1.5</dt>
+        <dd>new feature: support scala.</dd>
         <dt>1.2</dt>
         <dd>new feature: Smart Interface, List implementation of interface in project, user can choose one to show in sequence diagram. If only one implementation found, it will show automatically. </dd>
         <dt>1.1</dt>

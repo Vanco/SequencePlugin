@@ -22,6 +22,7 @@ import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.Query;
+import icons.SequencePluginIcons;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.intellij.sequencer.ui.ButtonTabComponent;
@@ -37,8 +38,8 @@ import java.util.List;
 
 public class SequencePlugin implements ProjectComponent {
     private static final String PLAGIN_NAME = "Sequence";
-    private static final Icon DISABLED_ICON = loadIcon("locked.png");
-    private static final Icon S_ICON = loadIcon("sequence-13x13.png");
+    private static final Icon DISABLED_ICON = SequencePluginIcons.LOCKED_ICON;
+    private static final Icon S_ICON = SequencePluginIcons.SEQUENCE_ICON_13;
 
     private final Project _project;
     private ToolWindow _toolWindow;
@@ -58,7 +59,7 @@ public class SequencePlugin implements ProjectComponent {
               PLAGIN_NAME, false, ToolWindowAnchor.BOTTOM);
         final Content content = ServiceManager.getService(ContentFactory.class).createContent(_jTabbedPane, "", false);
         _toolWindow.getContentManager().addContent(content);
-        _toolWindow.setIcon(loadIcon("sequence-13x13.png"));
+        _toolWindow.setIcon(SequencePluginIcons.SEQUENCE_ICON_13);
         _toolWindow.setAvailable(false, null);
     }
 

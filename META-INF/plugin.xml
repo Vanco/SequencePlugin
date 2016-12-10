@@ -48,7 +48,7 @@
     </project-components>
 
     <actions>
-        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction" icon="/icons/sequence-16x16.png"
+        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction" icon="SequencePluginIcons.SEQUENCE_ICON"
                 text="Sequence Diagram..." description="Generate sequence diagram of the current method">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>

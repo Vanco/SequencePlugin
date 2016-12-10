@@ -6,6 +6,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
+import icons.SequencePluginIcons;
 import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.CallStack;
 import org.intellij.sequencer.generator.SequenceGenerator;
@@ -53,7 +54,7 @@ public class SequencePanel extends JPanel {
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
         add(actionToolbar.getComponent(), BorderLayout.WEST);
 
-        MyButton birdViewButton = new MyButton(SequencePlugin.loadIcon("preview-13x13.png"));
+        MyButton birdViewButton = new MyButton(SequencePluginIcons.PREVIEW_ICON_13);
         birdViewButton.setToolTipText("Bird view");
         birdViewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -142,7 +143,7 @@ public class SequencePanel extends JPanel {
 
     private class CloseAction extends AnAction {
         public CloseAction() {
-            super("Close", "Close sequence", SequencePlugin.loadIcon("close-16x16.png"));
+            super("Close", "Close sequence", SequencePluginIcons.CLOSE_ICON);
         }
 
         public void actionPerformed(AnActionEvent event) {
@@ -152,7 +153,7 @@ public class SequencePanel extends JPanel {
 
     private class ReGenerateAction extends AnAction {
         public ReGenerateAction() {
-            super("ReGenerate", "Regenerate diagram", SequencePlugin.loadIcon("refresh-16x16.png"));
+            super("ReGenerate", "Regenerate diagram", SequencePluginIcons.REFRESH_ICON);
         }
 
         public void actionPerformed(AnActionEvent anActionEvent) {
@@ -163,7 +164,7 @@ public class SequencePanel extends JPanel {
 
     private class ExportAction extends AnAction {
         public ExportAction() {
-            super("Export", "Export image to file", SequencePlugin.loadIcon("export-16x16.png"));
+            super("Export", "Export image to file", SequencePluginIcons.EXPORT_ICON);
         }
 
         public void actionPerformed(AnActionEvent event) {
