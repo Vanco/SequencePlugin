@@ -1,12 +1,25 @@
 <idea-plugin version="2">
     <name>SequenceDiagram</name>
-    <description><![CDATA[<strong>SequencePluginReload rename to SequenceDiagram<strong>. <br />
+    <description><![CDATA[
+SequenceDiagram for IntelliJ IDEA
+http://vanco.github.io/SequencePlugin.
+
+with this plugin, you can
++ generate Simple Sequence Diagram.
++ Navigate the code by click the diagram shape.
++ Delete Class from diagram.
++ Export the diagram as image.
++ Exclude classes from diagram by Settings > Other Settings > Sequence
++ Smart Interface(experimental)
+
+    <strong>SequencePluginReload rename to SequenceDiagram</strong>. <br />
     Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x. <br />
     The original version SequencePlugin come from ksibilev@yahoo.com. <br />
-    For more info, please visit: http://vanco.github.io/SequencePlugin/]]></description>
+    For more info, please visit: http://vanco.github.io/SequencePlugin/
+]]></description>
     <version>1.2.2</version>
     <vendor>fanhuagang@gmail.com</vendor>
-    <idea-version since-build="IU-141.1" />
+    <idea-version since-build="141.1"/>
 
     <depends>com.intellij.modules.java</depends>
 
@@ -48,7 +61,8 @@
     </project-components>
 
     <actions>
-        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction" icon="SequencePluginIcons.SEQUENCE_ICON"
+        <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction"
+                icon="SequencePluginIcons.SEQUENCE_ICON"
                 text="Sequence Diagram..." description="Generate sequence diagram of the current method">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
@@ -57,7 +71,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <applicationConfigurable id="Settings.Sequence.Configuration" instance="org.intellij.sequencer.config.ConfigurationOptions" />
+        <applicationConfigurable id="Settings.Sequence.Configuration"
+                                 instance="org.intellij.sequencer.config.ConfigurationOptions"/>
         <applicationService serviceImplementation="org.intellij.sequencer.config.Configuration"/>
     </extensions>
 </idea-plugin>
