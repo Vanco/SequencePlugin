@@ -191,8 +191,8 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         BufferedImage image = UIUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
         try {
-            String systemLookAndFeelClassName = UIUtil.getSystemLookAndFeelClassName();
-            UIManager.setLookAndFeel(systemLookAndFeelClassName);
+//            String systemLookAndFeelClassName = UIUtil.getSystemLookAndFeelClassName();
+            UIManager.setLookAndFeel("default");
         } catch (Exception e) {
             //ignore
         }
