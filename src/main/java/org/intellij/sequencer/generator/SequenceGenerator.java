@@ -28,10 +28,6 @@ public class SequenceGenerator extends JavaElementVisitor {
         this.params = params;
     }
 
-    public void visitElement(PsiElement psiElement) {
-        psiElement.acceptChildren(this);
-    }
-
     public CallStack generate(PsiMethod psiMethod) {
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
@@ -71,6 +67,10 @@ public class SequenceGenerator extends JavaElementVisitor {
                 method.accept(this);
             }
         }
+    }
+
+    public void visitElement(PsiElement psiElement) {
+        psiElement.acceptChildren(this);
     }
 
     public void visitMethod(PsiMethod psiMethod) {

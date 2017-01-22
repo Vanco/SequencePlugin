@@ -22,6 +22,7 @@ with this plugin, you can
     <idea-version since-build="141.1"/>
 
     <depends>com.intellij.modules.java</depends>
+    <depends optional="true">org.intellij.scala</depends>
 
     <change-notes><![CDATA[
         <dl>

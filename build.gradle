@@ -6,6 +6,7 @@ plugins {
 intellij {
     version '14.1.2'
     pluginName 'SequenceDiagram'
+    plugins = ['org.intellij.scala:1.5.2']
     updateSinceUntilBuild false
     publish {
         pluginId '8286'
@@ -19,5 +20,5 @@ apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
-
+tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
 
