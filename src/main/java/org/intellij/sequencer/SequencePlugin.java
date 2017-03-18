@@ -266,7 +266,7 @@ public class SequencePlugin implements ProjectComponent {
     public List<String> findImplementations(String className) {
         PsiClass psiClass = PsiUtil.findPsiClass(_project, getPsiManager(), className);
 
-        if (psiClass != null && psiClass.isInterface()) {
+        if (PsiUtil.isAbstract(psiClass)) {
             PsiElement[] psiElements = DefinitionsScopedSearch.search(psiClass).toArray(PsiElement.EMPTY_ARRAY);
             ArrayList<String> result = new ArrayList<String>();
 
@@ -289,7 +289,7 @@ public class SequencePlugin implements ProjectComponent {
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
         }
-        if (containingClass.isInterface()) {
+        if (PsiUtil.isAbstract(containingClass)) {
             PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
             ArrayList<String> result = new ArrayList<String>();
 

@@ -12,12 +12,12 @@ with this plugin, you can
 + Exclude classes from diagram by Settings > Other Settings > Sequence
 + Smart Interface(experimental)
 
-    <strong>SequencePluginReload rename to SequenceDiagram</strong>. <br />
+    SequencePluginReload rename to SequenceDiagram. <br />
     Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x. <br />
     The original version SequencePlugin come from ksibilev@yahoo.com. <br />
     For more info, please visit: http://vanco.github.io/SequencePlugin/
 ]]></description>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
     <vendor>fanhuagang@gmail.com</vendor>
     <idea-version since-build="141.1"/>
 
@@ -26,6 +26,8 @@ with this plugin, you can
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.2.3</dt>
+        <dd>Add abstract class support.</dd>
         <dt>1.2.2</dt>
         <dd>hotfix: #10 NPE when visitNewException.</dd>
         <dt>1.2.1</dt>

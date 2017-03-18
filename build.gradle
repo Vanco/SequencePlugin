@@ -1,22 +1,25 @@
 
 plugins {
-    id "org.jetbrains.intellij" version "0.1.10"
+    id "org.jetbrains.intellij" version "0.2.5"
 }
+
+apply plugin: 'java'
 
 intellij {
     version '14.1.2'
     pluginName 'SequenceDiagram'
     plugins = ['org.intellij.scala:1.5.2']
     updateSinceUntilBuild false
-    publish {
-        pluginId '8286'
-    }
+}
+
+publishPlugin {
+    username publishUsername
+    password publishPassword
+    channels publishChannels.split(',')
 }
 
 group 'vanstudio'
 version '1.5'
-
-apply plugin: 'java'
 
 sourceCompatibility = 1.8
 

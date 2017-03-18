@@ -6,6 +6,7 @@ import org.intellij.sequencer.generator.CallStack;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor;
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition;
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition;
 
 /**
  * &copy; fanhuagang@gmail.com
@@ -28,9 +29,10 @@ public class ScSequenceGenerator extends ScalaElementVisitor {
     }
 
     public CallStack generate(ScFunctionDefinition fun) {
-        PsiClass containingClass = fun.getContainingClass();
-        if (containingClass == null) {
-            containingClass = (PsiClass) fun.getParent();
+        ScTemplateDefinition scTemplateDefinition = fun.containingClass();
+        if (scTemplateDefinition.isInterface()) {
+            fun.accept(this);
+
         }
         return topStack;
     }
