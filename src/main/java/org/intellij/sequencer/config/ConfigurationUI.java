@@ -28,6 +28,7 @@ public class ConfigurationUI implements ActionListener {
     private JButton _removeExcludeEntry;
     private JTable _excludeTable;
     private JButton _interfaceColor;
+    private JCheckBox _showSimplifyCallName;
 
     private ExcludeTableModel _excludeTableModel;
 
@@ -81,6 +82,8 @@ public class ConfigurationUI implements ActionListener {
             return true;
         if(configuration.SHOW_CALL_NUMBERS != _showCallNumbers.isSelected())
             return true;
+        if(configuration.SHOW_SIMPLIFY_CALL_NAME != _showSimplifyCallName.isSelected())
+            return true;
         if(configuration.USE_3D_VIEW != _use3dView.isSelected())
             return true;
         if(!_fontName.getSelectedItem().equals(configuration.FONT_NAME))
@@ -101,6 +104,7 @@ public class ConfigurationUI implements ActionListener {
         configuration.USE_ANTIALIASING = _antialiasing.isSelected();
         configuration.SHOW_RETURN_ARROWS = _showReturnArrows.isSelected();
         configuration.SHOW_CALL_NUMBERS = _showCallNumbers.isSelected();
+        configuration.SHOW_SIMPLIFY_CALL_NAME = _showSimplifyCallName.isSelected();
         configuration.USE_3D_VIEW = _use3dView.isSelected();
         configuration.FONT_NAME = (String)_fontName.getSelectedItem();
         configuration.FONT_SIZE = Integer.parseInt(((String)_fondSize.getSelectedItem()));
@@ -116,6 +120,7 @@ public class ConfigurationUI implements ActionListener {
         _antialiasing.setSelected(configuration.USE_ANTIALIASING);
         _showReturnArrows.setSelected(configuration.SHOW_RETURN_ARROWS);
         _showCallNumbers.setSelected(configuration.SHOW_CALL_NUMBERS);
+        _showSimplifyCallName.setSelected(configuration.SHOW_SIMPLIFY_CALL_NAME);
         _use3dView.setSelected(configuration.USE_3D_VIEW);
         _fontName.setSelectedItem(configuration.FONT_NAME);
         _fondSize.setSelectedItem(String.valueOf(configuration.FONT_SIZE));

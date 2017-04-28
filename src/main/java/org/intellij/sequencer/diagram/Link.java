@@ -1,5 +1,7 @@
 package org.intellij.sequencer.diagram;
 
+import org.intellij.sequencer.config.Configuration;
+
 public class Link {
 
     protected ObjectInfo _from;
@@ -14,9 +16,12 @@ public class Link {
     }
 
     public String getName() {
-        if(_methodInfo == null)
+        if (_methodInfo == null)
             return "";
-        return _methodInfo.getName();
+        if (Configuration.getInstance().SHOW_SIMPLIFY_CALL_NAME)
+            return _methodInfo.getName();
+        else
+            return _methodInfo.getFullName();
     }
 
     public MethodInfo getMethodInfo() {

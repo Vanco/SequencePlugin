@@ -1,6 +1,7 @@
 package org.intellij.sequencer.diagram;
 
 import org.intellij.sequencer.Constants;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -38,6 +39,29 @@ public class MethodInfo extends Info {
 
     public String getRealName() {
         return Constants.CONSTUCTOR_METHOD_NAME.equals(_name)? _objectInfo.getName() : _name;
+    }
+
+    public String getFullName() {
+        String name = Constants.CONSTUCTOR_METHOD_NAME.equals(_name) ? "<<create>>" : _name;
+        StringBuilder sb = new StringBuilder();
+        sb.append(name).append("(");
+        for (int i = 0; i < _argNames.size(); i++) {
+            if (i > 0) sb.append(", ");
+            String argName = (String) _argNames.get(i);
+            String argType = (String) _argTypes.get(i);
+            argType = shortTypeName(argType);
+            sb.append(argName).append(": ").append(argType);
+        }
+        sb.append(")").append(": ").append(shortTypeName(_returnType));
+        return sb.toString();
+    }
+
+    @NotNull
+    private String shortTypeName(String argType) {
+        String result = argType;
+        int idx = argType.lastIndexOf(".");
+        if (idx != -1) result = argType.substring(idx + 1);
+        return result;
     }
 
     public ObjectInfo getObjectInfo() {

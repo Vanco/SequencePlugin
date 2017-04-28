@@ -19,7 +19,7 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '1.5'
+version '1.2.4'
 
 sourceCompatibility = 1.8
 

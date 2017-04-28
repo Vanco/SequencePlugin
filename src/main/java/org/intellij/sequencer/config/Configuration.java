@@ -31,6 +31,7 @@ public class Configuration implements PersistentStateComponent<Configuration> {
     public boolean USE_ANTIALIASING = true;
     public boolean SHOW_RETURN_ARROWS = true;
     public boolean SHOW_CALL_NUMBERS = true;
+    public boolean SHOW_SIMPLIFY_CALL_NAME = true;
     public String FONT_NAME = "Dialog";
     public int FONT_SIZE = 11;
 

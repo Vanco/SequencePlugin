@@ -18,7 +18,7 @@ public class DisplayCall extends DisplayLink {
 
     @Override
     void drawLine(Graphics2D g2) {
-        if (_from.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE)) {
+        if (_from.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) || _from.getObjectInfo().hasAttribute(Info.ABSTRACT_ATTRIBUTE)) {
             Stroke oldStroke = g2.getStroke();
             g2.setStroke(DASH_STROKE);
             super.drawLine(g2);

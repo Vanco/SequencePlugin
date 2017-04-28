@@ -1,23 +1,24 @@
 <idea-plugin version="2">
+    <id>SequenceDiagram</id>
     <name>SequenceDiagram</name>
     <description><![CDATA[
-SequenceDiagram for IntelliJ IDEA
-http://vanco.github.io/SequencePlugin.
+<p>SequenceDiagram for IntelliJ IDEA
+http://vanco.github.io/SequencePlugin.</p>
 
-with this plugin, you can
-+ generate Simple Sequence Diagram.
-+ Navigate the code by click the diagram shape.
-+ Delete Class from diagram.
-+ Export the diagram as image.
-+ Exclude classes from diagram by Settings > Other Settings > Sequence
-+ Smart Interface(experimental)
 
-    SequencePluginReload rename to SequenceDiagram. <br />
+<p>with this plugin, you can
++ generate Simple Sequence Diagram.<br />
++ Navigate the code by click the diagram shape.<br />
++ Delete Class from diagram.<br />
++ Export the diagram as image.<br />
++ Exclude classes from diagram by Settings > Other Settings > Sequence<br />
++ Smart Interface(experimental)</p>
+
+    <p>SequencePluginReload rename to SequenceDiagram. <br />
     Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x. <br />
-    The original version SequencePlugin come from ksibilev@yahoo.com. <br />
-    For more info, please visit: http://vanco.github.io/SequencePlugin/
+    The original version SequencePlugin come from ksibilev@yahoo.com. </p>
 ]]></description>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <vendor>fanhuagang@gmail.com</vendor>
     <idea-version since-build="141.1"/>
 
@@ -26,6 +27,8 @@ with this plugin, you can
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.2.4</dt>
+        <dd>Add configuration for method call name, It's now showing in simple/full format.</dd>
         <dt>1.2.3</dt>
         <dd>Add abstract class support.</dd>
         <dt>1.2.2</dt>
