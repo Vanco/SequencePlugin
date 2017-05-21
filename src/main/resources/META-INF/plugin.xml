@@ -1,4 +1,4 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>SequenceDiagram</id>
     <name>SequenceDiagram</name>
     <description><![CDATA[
@@ -27,6 +27,8 @@ http://vanco.github.io/SequencePlugin.</p>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.2.5</dt>
+        <dd>fix#20: Export PNG cropped method names.</dd>
         <dt>1.2.4</dt>
         <dd>Add configuration for method call name, It's now showing in simple/full format.</dd>
         <dt>1.2.3</dt>

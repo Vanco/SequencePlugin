@@ -207,4 +207,8 @@ public class Diagram {
             displayObject.paintHeader(g2);
         }
     }
+
+    public boolean isSingleObject() {
+        return _objectLifeLines.size() == 1;
+    }
 }
