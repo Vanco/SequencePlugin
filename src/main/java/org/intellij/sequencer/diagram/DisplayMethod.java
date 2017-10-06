@@ -10,7 +10,7 @@ public class DisplayMethod extends ScreenObject {
 
     private static final Logger LOGGER = Logger.getLogger(DisplayMethod.class);
 
-    private static final Paint LINE_COLOR = JBColor.DARK_GRAY;
+    private static final Paint LINE_COLOR = JBColor.foreground();
     private static final Paint SHADOW_COLOR = JBColor.LIGHT_GRAY;
 
     private ObjectInfo _objectInfo;

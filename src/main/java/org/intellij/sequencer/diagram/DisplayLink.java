@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class DisplayLink extends ScreenObject {
     private static final Paint TEXT_COLOR = JBColor.foreground();
-    private static final Paint LINK_COLOR = JBColor.DARK_GRAY;
+    private static final Paint LINK_COLOR = JBColor.foreground();
     private static final Stroke DASH_STROKE = new BasicStroke(1.0f,
           BasicStroke.CAP_SQUARE,
           BasicStroke.JOIN_MITER,

@@ -1,9 +1,9 @@
 
 plugins {
-    id "org.jetbrains.intellij" version "0.2.5"
+    id "org.jetbrains.intellij" version "0.2.17"
 }
 
-apply plugin: 'java'
+//apply plugin: 'java'
 
 intellij {
     version '14.1.2'
@@ -15,11 +15,10 @@ intellij {
 publishPlugin {
     username publishUsername
     password publishPassword
-    channels publishChannels.split(',')
 }
 
 group 'vanstudio'
-version '1.2.4'
+version '1.2.6'
 
 sourceCompatibility = 1.8
 

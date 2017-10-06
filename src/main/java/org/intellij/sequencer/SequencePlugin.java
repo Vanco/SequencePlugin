@@ -31,6 +31,8 @@ import org.intellij.sequencer.util.PsiUtil;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -110,11 +112,26 @@ public class SequencePlugin implements ProjectComponent {
             _jTabbedPane.setComponentAt(tabIndex, sequencePanel);
             _jTabbedPane.setTitleAt(tabIndex, sequencePanel.getTitleName());
             _jTabbedPane.setSelectedIndex(tabIndex);
+            ButtonTabComponent buttonTabComponent = new ButtonTabComponent(_jTabbedPane);
+            buttonTabComponent.addTabButtonListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    closeSequence(sequencePanel);
+                }
+            });
+            _jTabbedPane.setTabComponentAt(tabIndex, buttonTabComponent);
         }
         else {
             _jTabbedPane.addTab(sequencePanel.getTitleName(), S_ICON, sequencePanel);
             _jTabbedPane.setSelectedComponent(sequencePanel);
-            _jTabbedPane.setTabComponentAt(_jTabbedPane.getSelectedIndex(), new ButtonTabComponent(_jTabbedPane));
+            ButtonTabComponent buttonTabComponent = new ButtonTabComponent(_jTabbedPane);
+            buttonTabComponent.addTabButtonListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    closeSequence(sequencePanel);
+                }
+            });
+            _jTabbedPane.setTabComponentAt(_jTabbedPane.getSelectedIndex(), buttonTabComponent);
         }
         _toolWindow.setTitle(sequencePanel.getTitleName());
     }

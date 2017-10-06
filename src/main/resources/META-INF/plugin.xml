@@ -27,6 +27,8 @@ http://vanco.github.io/SequencePlugin.</p>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.2.6</dt>
+        <dd>fix#22: PNG export.</dd>
         <dt>1.2.5</dt>
         <dd>fix#20: Export PNG cropped method names.</dd>
         <dt>1.2.4</dt>

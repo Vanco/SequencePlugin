@@ -185,21 +185,18 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
     }
 
     public void saveImageToFile(File file) throws IOException {
-        Color color = getBackground();
-        setBackground(Color.white);
         Dimension size = getFullSize();
         BufferedImage image = UIUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
         try {
-//            String systemLookAndFeelClassName = UIUtil.getSystemLookAndFeelClassName();
-            UIManager.setLookAndFeel("default");
+            String systemLookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
+            UIManager.setLookAndFeel(systemLookAndFeelClassName);
         } catch (Exception e) {
             //ignore
         }
         Graphics2D graphics = image.createGraphics();
         paintComponentWithHeader(graphics);
 
-        setBackground(color);
         try {
             UIManager.setLookAndFeel(lookAndFeel);
         } catch (UnsupportedLookAndFeelException e) {

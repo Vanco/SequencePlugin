@@ -15,9 +15,9 @@ import java.util.List;
 public class DisplayObject extends ScreenObject {
     private static final Logger LOGGER = Logger.getLogger(DisplayObject.class);
 
-    private static final Paint BORDER_COLOR = JBColor.DARK_GRAY;
+    private static final Paint BORDER_COLOR = JBColor.foreground();
     private static final Paint TEXT_COLOR = Color.DARK_GRAY;
-    private static final Paint LINE_COLOR =  JBColor.DARK_GRAY;
+    private static final Paint LINE_COLOR =  JBColor.foreground();
     private static final Paint SHADOW_COLOR = JBColor.LIGHT_GRAY;
     private static final Stroke DASH_STROKE = new BasicStroke(1.0f,
             BasicStroke.CAP_SQUARE,
