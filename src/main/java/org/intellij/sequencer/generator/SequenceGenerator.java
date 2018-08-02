@@ -45,7 +45,9 @@ public class SequenceGenerator extends JavaElementVisitor {
             } else {
                 for (PsiElement psiElement : psiElements) {
                     if (psiElement instanceof PsiMethod) {
-                        if (params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
+                        if (alreadyInStack((PsiMethod) psiElement)) continue;
+
+                        if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
                             methodAccept(psiElement);
                     }
                 }
@@ -57,6 +59,11 @@ public class SequenceGenerator extends JavaElementVisitor {
             psiMethod.accept(this);
         }
         return topStack;
+    }
+
+    private boolean alreadyInStack(PsiMethod psiMethod) {
+        MethodDescription method = createMethod(psiMethod);
+        return currentStack.isReqursive(method);
     }
 
     private void methodAccept(PsiElement psiElement) {
