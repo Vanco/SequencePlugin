@@ -29,9 +29,13 @@ Now it open source.
 Thanks Kentaur for the great work on the original source.
 
 ## How to use
-SequenceDiagram ONLY generate sequence diagram for the CURRENT method in the editor.
+SequenceDiagram **ONLY** generate sequence diagram for the **CURRENT** method of **JAVA** file in the editor.
+### When installed, where to find it?
+![Tools Menu](imges/tools_menu.png "Tools Menu")
 
-Place the cursor in side the method, trigger it from context menu > Sequence Diagram...
+![Context Menu](imges/context_menu.png "Context Menu")
+
+Place the cursor in side the method, trigger it from `Tools` menu or `context` menu > `Sequence Diagram...`
 
 ## Version History
 <dl>
