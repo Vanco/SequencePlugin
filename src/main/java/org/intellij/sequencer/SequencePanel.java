@@ -23,6 +23,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 public class SequencePanel extends JPanel {
@@ -49,6 +52,7 @@ public class SequencePanel extends JPanel {
         actionGroup.add(new CloseAction());
         actionGroup.add(new ReGenerateAction());
         actionGroup.add(new ExportAction());
+        actionGroup.add(new ExportTextAction());
 
         ActionManager actionManager = ActionManager.getInstance();
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
@@ -90,6 +94,21 @@ public class SequencePanel extends JPanel {
         final CallStack callStack = generator.generate(_psiMethod);
         _titleName = callStack.getMethod().getTitleName();
         generate(callStack.generateSequence());
+    }
+
+    public void generateTextFile(File selectedFile) throws IOException {
+        if (_psiMethod == null || !_psiMethod.isValid()) { // || !_psiMethod.isPhysical()
+            _psiMethod = null;
+            return;
+        }
+        SequenceGenerator generator = new SequenceGenerator(_sequenceParams);
+        final CallStack callStack = generator.generate(_psiMethod);
+
+        Files.write(selectedFile.toPath(),
+                callStack.generateText().getBytes(),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+
     }
 
     private void showBirdView() {
@@ -185,6 +204,39 @@ public class SequencePanel extends JPanel {
                     if (!selectedFile.getName().endsWith("png"))
                         selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".png");
                     _display.saveImageToFile(selectedFile);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(SequencePanel.this, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private class ExportTextAction extends AnAction {
+
+        public ExportTextAction() {
+            super("ExportTextFile", "Export call stack as text file", SequencePluginIcons.EXPORT_TEXT_ICON);
+        }
+        @Override
+        public void actionPerformed(AnActionEvent event) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+            fileChooser.setFileFilter(new FileFilter() {
+                public boolean accept(File f) {
+                    return f.isDirectory() || f.getName().endsWith("txt");
+                }
+
+                public String getDescription() {
+                    return "Text File";
+                }
+            });
+            try {
+                if (fileChooser.showSaveDialog(SequencePanel.this) == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    if (!selectedFile.getName().endsWith("txt"))
+                        selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".txt");
+
+                    generateTextFile(selectedFile);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

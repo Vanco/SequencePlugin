@@ -6,9 +6,7 @@ import com.intellij.psi.impl.source.tree.java.PsiMethodCallExpressionImpl;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.diagram.Info;
-import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
-import org.intellij.sequencer.generator.filters.InterfaceImplFilter;
 import org.intellij.sequencer.util.PsiUtil;
 
 import java.util.ArrayList;

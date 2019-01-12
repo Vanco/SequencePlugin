@@ -56,4 +56,22 @@ public class CallStack {
         buffer.append(')');
     }
 
+    public String generateText() {
+        StringBuffer buffer = new StringBuffer();
+        int deep = 0;
+        generateFormatStr(buffer, deep);
+        return buffer.toString();
+    }
+
+    private void generateFormatStr(StringBuffer buffer, int deep) {
+        for (int i = 0; i< deep; i ++) {
+            buffer.append("\t");
+        }
+        buffer.append(_method.toJson()).append('\n');
+        for(Iterator iterator = _calls.iterator(); iterator.hasNext();) {
+            CallStack callStack = (CallStack)iterator.next();
+            callStack.generateFormatStr(buffer, deep + 1 );
+        }
+    }
+
 }

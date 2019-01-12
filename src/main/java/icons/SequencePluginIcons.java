@@ -17,6 +17,7 @@ public interface SequencePluginIcons {
     Icon PREVIEW_ICON = icon("/icons/preview-16x16.png");
     Icon REFRESH_ICON = icon("/icons/refresh-16x16.png");
     Icon LOCKED_ICON = icon("/icons/locked.png");
+    Icon EXPORT_TEXT_ICON = icon("/icons/exporttext-16x16.png");
 
     static Icon icon(String path) {return IconLoader.getIcon(path, SequencePluginIcons.class);}
 }
