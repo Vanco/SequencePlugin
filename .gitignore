@@ -6,4 +6,4 @@ build/
 out/
 gradle.properties
 *.iml
-
+target/

@@ -2,21 +2,21 @@
     <id>SequenceDiagram</id>
     <name>SequenceDiagram</name>
     <description><![CDATA[
-<p>SequenceDiagram for IntelliJ IDEA
-http://vanco.github.io/SequencePlugin.</p>
+<h3>SequenceDiagram for IntelliJ IDEA</h3>
+<a href="http://vanco.github.io/SequencePlugin">http://vanco.github.io/SequencePlugin.</a>
 
+<p>with this plugin, you can<br>
++ generate Simple Sequence Diagram.<br>
++ Navigate the code by click the diagram shape.<br>
++ Delete Class from diagram.<br>
++ Export the diagram as image.<br>
++ Exclude classes from diagram by Settings > Other Settings > Sequence<br>
++ Smart Interface(experimental)<br></p>
 
-<p>with this plugin, you can
-+ generate Simple Sequence Diagram.<br />
-+ Navigate the code by click the diagram shape.<br />
-+ Delete Class from diagram.<br />
-+ Export the diagram as image.<br />
-+ Exclude classes from diagram by Settings > Other Settings > Sequence<br />
-+ Smart Interface(experimental)</p>
+<p>SequencePluginReload rename to SequenceDiagram.
+Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x.
+The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
-    <p>SequencePluginReload rename to SequenceDiagram. <br />
-    Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x. <br />
-    The original version SequencePlugin come from ksibilev@yahoo.com. </p>
 ]]></description>
     <version>1.2.4</version>
     <vendor>fanhuagang@gmail.com</vendor>

@@ -65,7 +65,7 @@ public class CallStack {
 
     private void generateFormatStr(StringBuffer buffer, int deep) {
         for (int i = 0; i< deep; i ++) {
-            buffer.append("\t");
+            buffer.append("    ");
         }
         buffer.append(_method.toJson()).append('\n');
         for(Iterator iterator = _calls.iterator(); iterator.hasNext();) {
