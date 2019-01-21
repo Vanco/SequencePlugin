@@ -32,14 +32,14 @@ Thanks Kentaur for the great work on the original source.
 SequenceDiagram **ONLY** generate sequence diagram for the **CURRENT** method of **JAVA** file in the editor.
 ### When installed, where to find it?
 1. Open a **JAVA** file in editor.
-2. Navigate to one **Method**, witch you want to generate sequence diagram. (See the screenshot bellow)
+2. Navigate to one **Method**, which you want to generate sequence diagram. (See the screenshot bellow)
 3. From the `Tools` > `Sequence Diagram...` menu.
 
 ![Tools Menu](imges/tools_menu.png "Tools Menu")
 
 ![Context Menu](imges/context_menu.png "Context Menu")
 
-Place the cursor in side the method, trigger it from `Tools` menu or `context` menu > `Sequence Diagram...`
+Place the cursor inside the method, trigger it from `Tools` menu or `context` menu > `Sequence Diagram...`
 
 ## Version History
 <dl>
