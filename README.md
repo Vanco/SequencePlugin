@@ -46,7 +46,7 @@ I draw dummy `implementation call` in dash line.
 For the interface or abstract class, if there is only one implementation found, it will draw in diagram automatically. 
 More than one implementations, you need to choose one to draw. this is an option in settings.
 
-## Lambda Expression
+### Lambda Expression
 No standard for the lambda expression in the sequence diagram yet. So I create mine. e.g.
 ```java
 public interface Service<Int, String> {
