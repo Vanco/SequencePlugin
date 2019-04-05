@@ -132,11 +132,14 @@ public class PsiUtil {
     public static boolean isPipeline(PsiCallExpression callExpression) {
         PsiElement[] children = callExpression.getChildren();
         for (PsiElement child : children) {
-            for (PsiElement psiElement : child.getChildren()) {
-                if (psiElement instanceof PsiMethodCallExpression) {
-                    return true;
+            if (child instanceof PsiReferenceExpression) {
+                for (PsiElement psiElement : child.getChildren()) {
+                    if (psiElement instanceof PsiMethodCallExpression) {
+                        return true;
+                    }
                 }
             }
+
         }
         return false;
     }
@@ -161,5 +164,13 @@ public class PsiUtil {
             return psiClass.isInterface();
         }
         return false;
+    }
+
+    public static PsiMethod findEncolsedPsiMethod(PsiLambdaExpression expression) {
+        PsiElement parent = expression.getParent();
+        while (!(parent instanceof PsiMethod)) {
+            parent = parent.getParent();
+        }
+        return (PsiMethod) parent;
     }
 }

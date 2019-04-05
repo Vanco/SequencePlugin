@@ -3,6 +3,7 @@ package org.intellij.sequencer.generator;
 import com.google.gson.GsonBuilder;
 import org.intellij.sequencer.Constants;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -50,4 +51,6 @@ public class ClassDescription {
     public int hashCode() {
         return _className.hashCode();
     }
+
+    public static ClassDescription ANONYMOUS_CLASS = new ClassDescription(Constants.ANONYMOUS_CLASS_NAME,new ArrayList());
 }

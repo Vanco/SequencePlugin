@@ -9,24 +9,68 @@ with this plugin, you can
 + Export the diagram as image.
 + Exclude classes from diagram by Settings > Other Settings > Sequence
 + Smart Interface(experimental)
++ Lambda Expression(experimental)
 
-#### Name history
-+ **SequencePlugin** Maintained by Kentaur(Kesh Sibilev, ksibilve@yahoo.com) until 2011
-+ **SequencePluginReload** Maintained by Vanhg(Evan Fan, fanhuagang@gmail.com) 2011 - 2015
-+ **SequenceDiagram** Maintained by Vanco(Evan Fan, fanhuagang@gmail.com) since 2016
+## Experimental features
+**The experimental features are created by myself, which is not part of UML standard. Use this feature in your own risk.**
 
-#### Why change name?
-Since 2011, I found a solution of NPE of original **SequencePlugin**, so I write email to Kentaur with my solution,
-He said he was not coding any more. Instead, he send me the code. I fix the NPE issue and publish to plugin
-repository with new name **SequencePluginReload**.
+### Smart Interface
+Find the implementation of the interface smartly.  e.g.
+```java
+public interface Fruit {
+    int eat();
+}
 
-But in 2015, the IntelliJ change the login system, and I lost my account, cannot continue publish new version to
-the repository.
+public class Apple implements Fruit {
+    @Override
+    public int eat() {
+        return 5;
+    }
+}
+```
+`Apple` implemented the `Fruit` interface. When we generate sequence diagram for the `eatFruit` method:
+```java
+public class People {
+    
+    private Fruit fruit = new Apple();
 
-In 2016, I change the Name again to **SequenceDiagram** and host the source code on [github](https://github.com/Vanco/SequencePlugin).
-Now it open source.
+    public void eatFruit() {
+        fruit.eat();
+    }
+}
+```
+I draw dummy `implementation call` in dash line.
 
-Thanks Kentaur for the great work on the original source.
+![Smart Interface](imges/smart_interface.png)
+
+For the interface or abstract class, if there is only one implementation found, it will draw in diagram automatically. 
+More than one implementations, you need to choose one to draw. this is an option in settings.
+
+## Lambda Expression
+No standard for the lambda expression in the sequence diagram yet. So I create mine. e.g.
+```java
+public interface Service<Int, String> {
+
+    String invoke(Int a);
+}
+```
+And I need draw the sequence diagram for `hello` method:
+```java
+public class Lambda {
+
+    public Service<Integer, String> hello() {
+        return a -> {
+            Fruit fruit = new Apple();
+            fruit.eat();
+            return "I'm good!";
+        };
+    }
+}
+```
+I draw a dummy `λ→` self call in diagram.
+
+![Lambda Expression](imges/lambda_expr.png)
+
 
 ## How to use
 SequenceDiagram **ONLY** generate sequence diagram for the **CURRENT** method of **JAVA** file in the editor.
@@ -42,9 +86,12 @@ SequenceDiagram **ONLY** generate sequence diagram for the **CURRENT** method of
 Place the cursor inside the method, trigger it from `Tools` menu or `context` menu > `Sequence Diagram...`
 
 ## Version History
+**Current Verison 1.3**
+
+older:
 <dl>
-        <dt>1.5</dt>
-        <dd>new feature: support scala.</dd>
+        <dt>1.3</dt>
+        <dd>Lambda Expression. #38</dd>
         <dt>1.2</dt>
         <dd>new feature: Smart Interface, List implementation of interface in project, user can choose one to show in sequence diagram. If only one implementation found, it will show automatically. </dd>
         <dt>1.1</dt>
@@ -67,3 +114,23 @@ Place the cursor inside the method, trigger it from `Tools` menu or `context` me
         <dd>Add Sequence Diagram... menu under the Tools menu and Editor popup menu group with Diagram.</dd>
         <dd>fixbug: method name with generic type.</dd>
 </dl>
+
+## Acknowledgement
+
+#### Name history
++ **SequencePlugin** Maintained by Kentaur(Kesh Sibilev, ksibilve@yahoo.com) until 2011
++ **SequencePluginReload** Maintained by Vanhg(Evan Fan, fanhuagang@gmail.com) 2011 - 2015
++ **SequenceDiagram** Maintained by Vanco(Evan Fan, fanhuagang@gmail.com) since 2016
+
+#### Why change name?
+Since 2011, I found a solution of NPE of original **SequencePlugin**, so I write email to Kentaur with my solution,
+He said he was not coding any more. Instead, he send me the code. I fix the NPE issue and publish to plugin
+repository with new name **SequencePluginReload**.
+
+But in 2015, the IntelliJ change the login system, and I lost my account, cannot continue publish new version to
+the repository.
+
+In 2016, I change the Name again to **SequenceDiagram** and host the source code on [github](https://github.com/Vanco/SequencePlugin).
+Now it open source.
+
+Thanks Kentaur for the great work on the original source.

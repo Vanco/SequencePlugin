@@ -27,6 +27,8 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>1.3</dt>
+        <dd>fix #38: Lambda Expression.</dd>
         <dt>1.2.8</dt>
         <dd>fix#34: Can we export the whole call stack to a text file.</dd>
         <dt>1.2.7</dt>

@@ -34,15 +34,15 @@ public class MethodInfo extends Info {
     }
 
     public String getName() {
-        return Constants.CONSTUCTOR_METHOD_NAME.equals(_name)? "<<create>>" : _name;
+        return Constants.CONSTRUCTOR_METHOD_NAME.equals(_name)? "<<create>>" : _name;
     }
 
     public String getRealName() {
-        return Constants.CONSTUCTOR_METHOD_NAME.equals(_name)? _objectInfo.getName() : _name;
+        return Constants.CONSTRUCTOR_METHOD_NAME.equals(_name)? _objectInfo.getName() : _name;
     }
 
     public String getFullName() {
-        String name = Constants.CONSTUCTOR_METHOD_NAME.equals(_name) ? "<<create>>" : _name;
+        String name = Constants.CONSTRUCTOR_METHOD_NAME.equals(_name) ? "<<create>>" : _name;
         StringBuilder sb = new StringBuilder();
         sb.append(name).append("(");
         for (int i = 0; i < _argNames.size(); i++) {
@@ -73,7 +73,7 @@ public class MethodInfo extends Info {
     }
 
     public String getHtmlName() {
-        return Constants.CONSTUCTOR_METHOD_NAME.equals(_name)? "&lt;constructor&gt;": _name;
+        return Constants.CONSTRUCTOR_METHOD_NAME.equals(_name)? "&lt;constructor&gt;": _name;
     }
 
     public List getArgNames() {

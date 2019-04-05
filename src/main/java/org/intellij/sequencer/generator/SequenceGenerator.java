@@ -95,16 +95,12 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     @Override
     public void visitCallExpression(PsiCallExpression callExpression) {
-        if (!(PsiUtil.isComplexCall(callExpression) || PsiUtil.isPipeline(callExpression))) {
-            PsiMethod psiMethod = callExpression.resolveMethod();
-            findAbstractImplFilter(callExpression, psiMethod);
-            methodCall(psiMethod);
-        } else {
+        if (PsiUtil.isPipeline(callExpression)) {
             _exprStack.push(callExpression);
             _callStack.push(currentStack);
-        }
-        super.visitCallExpression(callExpression);
-        if ((PsiUtil.isPipeline(callExpression) || PsiUtil.isComplexCall(callExpression))) {
+
+            callExpression.getFirstChild().acceptChildren(this);
+
             if (!_exprStack.isEmpty()) {
                 CallStack old = currentStack;
                 PsiCallExpression pop = _exprStack.pop();
@@ -113,9 +109,33 @@ public class SequenceGenerator extends JavaElementVisitor {
                 methodCall(pop.resolveMethod());
                 currentStack = old;
             }
+            super.visitCallExpression(callExpression);
+        } else if (PsiUtil.isComplexCall(callExpression)) {
+            _exprStack.push(callExpression);
+            _callStack.push(currentStack);
+            super.visitCallExpression(callExpression);
+            if (!_exprStack.isEmpty()) {
+                CallStack old = currentStack;
+                PsiCallExpression pop = _exprStack.pop();
+                currentStack = _callStack.pop();
+                findAbstractImplFilter(pop, pop.resolveMethod());
+                methodCall(pop.resolveMethod());
+                currentStack = old;
+            }
+        } else {
+            PsiMethod psiMethod = callExpression.resolveMethod();
+            findAbstractImplFilter(callExpression, psiMethod);
+            methodCall(psiMethod);
+            super.visitCallExpression(callExpression);
         }
     }
 
+    /**
+     * If the psiMethod's containing class is Interface or abstract, then try to find it's implement class.
+     *
+     * @param callExpression
+     * @param psiMethod
+     */
     private void findAbstractImplFilter(PsiCallExpression callExpression, PsiMethod psiMethod) {
         try {
             PsiClass containingClass = psiMethod.getContainingClass();
@@ -194,11 +214,6 @@ public class SequenceGenerator extends JavaElementVisitor {
     }
 
     @Override
-    public void visitReferenceExpression(PsiReferenceExpression expression) {
-        expression.acceptChildren(this);
-    }
-
-    @Override
     public void visitLocalVariable(PsiLocalVariable variable) {
         PsiJavaCodeReferenceElement referenceElement = variable.getTypeElement().getInnermostComponentReferenceElement();
         if (referenceElement != null) {
@@ -231,6 +246,53 @@ public class SequenceGenerator extends JavaElementVisitor {
 
         }
         super.visitAssignmentExpression(expression);
+    }
+
+    @Override
+    public void visitLambdaExpression(PsiLambdaExpression expression) {
+        MethodDescription method = createMethod(expression);
+        if (topStack == null) {
+            topStack = new CallStack(method);
+            currentStack = topStack;
+        } else {
+            if (!params.isAllowRecursion() && currentStack.isReqursive(method))
+                return;
+            currentStack = currentStack.methodCall(method);
+        }
+        super.visitLambdaExpression(expression);
+    }
+
+    private MethodDescription createMethod(PsiLambdaExpression expression) {
+        PsiParameter[] parameters = expression.getParameterList().getParameters();
+        List argNames = new ArrayList();
+        List argTypes = new ArrayList();
+        for (int i = 0; i < parameters.length; i++) {
+            PsiParameter parameter = parameters[i];
+            argNames.add(parameter.getName());
+            PsiType psiType = parameter.getType();
+            argTypes.add(psiType == null ? null : psiType.getCanonicalText());
+        }
+        String returnType;
+        PsiType functionalInterfaceType = expression.getFunctionalInterfaceType();
+        if (functionalInterfaceType == null) {
+            returnType = null;
+        } else {
+            returnType = functionalInterfaceType.getCanonicalText();
+        }
+
+        PsiMethod psiMethod = PsiUtil.findEncolsedPsiMethod(expression);
+        PsiClass containingClass = psiMethod.getContainingClass();
+        if (containingClass == null) {
+            containingClass = (PsiClass) psiMethod.getParent().getContext();
+        }
+
+        return MethodDescription.createLambdaDescription(
+                createClassDescription(containingClass), argNames, argTypes, returnType);
+    }
+
+    @Override
+    public void visitInstanceOfExpression(PsiInstanceOfExpression expression) {
+        super.visitInstanceOfExpression(expression);
     }
 
     private class ImplementationFinder extends JavaElementVisitor {
