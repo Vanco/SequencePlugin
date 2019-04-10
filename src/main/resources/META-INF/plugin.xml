@@ -11,7 +11,8 @@
 + Delete Class from diagram.<br>
 + Export the diagram as image.<br>
 + Exclude classes from diagram by Settings > Other Settings > Sequence<br>
-+ Smart Interface(experimental)<br></p>
++ Smart Interface(experimental)<br>
++ Lambda Expression(experimental)</p>
 
 <p>SequencePluginReload rename to SequenceDiagram.
 Simple Sequence Diagram Generator. fixed version of SequencePlugin , work from 13.x.
@@ -23,7 +24,6 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
     <idea-version since-build="141.1"/>
 
     <depends>com.intellij.modules.java</depends>
-    <depends optional="true">org.intellij.scala</depends>
 
     <change-notes><![CDATA[
         <dl>
