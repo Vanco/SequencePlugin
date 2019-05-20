@@ -1,0 +1,3 @@
+RootClass.function(a1,a2){
+  result=RootClass.function2(a1,a2);
+}
