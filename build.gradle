@@ -14,8 +14,8 @@ intellij {
 }
 
 publishPlugin {
-    username publishUsername
-    password publishPassword
+    username ""
+    password ""
 }
 
 group 'vanstudio'
@@ -27,4 +27,9 @@ tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
 
 repositories {
     jcenter()
+}
+
+dependencies {
+    implementation 'junit:junit:4.12'
+    implementation 'junit:junit:4.12'
 }

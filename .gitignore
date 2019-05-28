@@ -2,8 +2,12 @@
 .DS_Store
 .idea/
 .gradle/
+gradle/**
+gradle.*
+local.properties
 build/
 out/
 gradle.properties
 *.iml
 target/
+.sandbox/**

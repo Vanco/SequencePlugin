@@ -1,0 +1,5 @@
+RootClass.function(a1,a2){
+  class4 = new Class4(a1,a2){
+    Class2.function();
+  }
+}

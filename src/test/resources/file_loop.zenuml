@@ -1,0 +1,5 @@
+RootClass.function(a1,a2){
+  while(condition){
+    class2.function();
+  }
+}

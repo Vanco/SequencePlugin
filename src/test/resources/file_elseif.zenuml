@@ -1,0 +1,11 @@
+RootClass.function(a1,a2){
+  if(condition){
+    Class1.function();
+  }
+  else if(condition2){
+    Class2.function();
+  }
+  else{
+    Class3.function();
+  }
+}
