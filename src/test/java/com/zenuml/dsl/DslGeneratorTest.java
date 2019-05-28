@@ -86,4 +86,19 @@ public class DslGeneratorTest {
         checkDslResult(root,"file_elseif");
 
     }
+
+    @Test
+    public void test_new(){
+        DslNode root = new FunctionNode("RootClass", "function(a1,a2)");
+        root.addChild(new ConstructorNode("class4","Class4(a1,a2)"));
+        checkDslResult(root,"file_new");
+    }
+
+    @Test
+    public void test_new_has_child(){
+        DslNode root = new FunctionNode("RootClass", "function(a1,a2)");
+        DslNode newNode = root.addChild(new ConstructorNode("class4", "Class4(a1,a2)"));
+        newNode.addChild(new FunctionNode("Class2","function()"));
+        checkDslResult(root,"file_new_has_child");
+    }
 }

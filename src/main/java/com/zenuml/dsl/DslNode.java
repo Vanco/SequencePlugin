@@ -8,7 +8,7 @@ public abstract class DslNode {
     List<DslNode> children;
 
     public DslNode() {
-        children=new ArrayList<>();
+        children = new ArrayList<>();
     }
 
 
@@ -24,7 +24,7 @@ public abstract class DslNode {
 
     public final DslNode addChild(DslNode node) {
         children.add(node);
-        node.parent=this;
+        node.parent = this;
         return node;
     }
 
@@ -36,12 +36,16 @@ public abstract class DslNode {
     }
 
     protected int getLevel() {
-        int level=0;
-        DslNode node=this;
-        while(node.parent!=null){
+        int level = 0;
+        DslNode node = this;
+        while (node.parent != null) {
             level++;
-            node=node.parent;
+            node = node.parent;
         }
         return level;
+    }
+
+    protected boolean hasChildren() {
+        return children != null && children.size() > 0;
     }
 }

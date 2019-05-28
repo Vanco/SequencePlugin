@@ -19,20 +19,28 @@ public class FunctionNode extends DslNode {
     @Override
     public void toDsl(StringBuffer output) {
         printIndent(output);
-        if(result!=null){
-            output.append(result);
-            output.append("=");
-        }
-        output.append(className);
-        output.append(".");
-        output.append(functionName);
-        if (children.size() == 0 && !isRoot()) {
+        printResult(output);
+        printFunctionCall(output);
+        if (!hasChildren() && !isRoot()) {
             output.append(";\n");
         } else {
             output.append("{\n");
             printChindren(output);
             printIndent(output);
             output.append("}");
+        }
+    }
+
+    private void printFunctionCall(StringBuffer output) {
+        output.append(className);
+        output.append(".");
+        output.append(functionName);
+    }
+
+    private void printResult(StringBuffer output) {
+        if(result!=null){
+            output.append(result);
+            output.append("=");
         }
     }
 
