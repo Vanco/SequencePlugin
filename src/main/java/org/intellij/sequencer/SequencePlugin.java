@@ -22,7 +22,10 @@ import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.Query;
+import com.zenuml.dsl.SequenceDiagram;
 import icons.SequencePluginIcons;
+import org.intellij.sequencer.generator.CallStack;
+import org.intellij.sequencer.generator.SequenceGenerator;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.intellij.sequencer.ui.ButtonTabComponent;
@@ -91,6 +94,10 @@ public class SequencePlugin implements ProjectComponent {
         PsiMethod enclosingPsiMethod = getCurrentPsiMethod();
         if(enclosingPsiMethod == null)
             return;
+        SequenceDiagram sequenceDiagram=new SequenceDiagram();
+        SequenceGenerator sequenceGenerator=new SequenceGenerator(params);
+        CallStack callStack = sequenceGenerator.generate(enclosingPsiMethod);
+
         _toolWindow.setAvailable(true, null);
 
         final SequencePanel sequencePanel = new SequencePanel(this, enclosingPsiMethod, params);

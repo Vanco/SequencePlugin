@@ -5,6 +5,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiMethodCallExpressionImpl;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
+import com.zenuml.dsl.SequenceDiagram;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.PsiUtil;
@@ -23,9 +24,11 @@ public class SequenceGenerator extends JavaElementVisitor {
     private CallStack currentStack;
     private int depth;
     private SequenceParams params;
+    private SequenceDiagram sequenceDiagram;
 
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
+        this.sequenceDiagram=new SequenceDiagram();
     }
 
     public CallStack generate(PsiMethod psiMethod) {

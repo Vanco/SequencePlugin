@@ -110,7 +110,8 @@ public class DslGeneratorTest {
     @Test
     public void test_sequence() {
         DslNode root=new FunctionNode("RootClass","function(a1,a2)");
-        SequenceDiagram sequenceDiagram=new SequenceDiagram(root);
+        SequenceDiagram sequenceDiagram=new SequenceDiagram();
+        sequenceDiagram.addSub(root);
         sequenceDiagram.addSub(new FunctionNode("class1","function1()"));
         sequenceDiagram.addSub(new FunctionNode("class2","function2()"));
         sequenceDiagram.end();
