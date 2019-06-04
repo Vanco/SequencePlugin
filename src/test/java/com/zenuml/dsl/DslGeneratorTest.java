@@ -40,7 +40,11 @@ public class DslGeneratorTest {
     private void checkDslResult(DslNode root, String file) {
         StringBuffer dsl = new StringBuffer();
         root.toDsl(dsl);
-        assertEquals(readUmlFile(file), dsl.toString());
+        checkDslResult(file, dsl.toString());
+    }
+
+    private void checkDslResult(String file, String dsl) {
+        assertEquals(readUmlFile(file), dsl);
     }
 
     @Test
@@ -100,5 +104,17 @@ public class DslGeneratorTest {
         DslNode newNode = root.addChild(new ConstructorNode("class4", "Class4(a1,a2)"));
         newNode.addChild(new FunctionNode("Class2","function()"));
         checkDslResult(root,"file_new_has_child");
+    }
+
+
+    @Test
+    public void test_sequence() {
+        DslNode root=new FunctionNode("RootClass","function(a1,a2)");
+        SequenceDiagram sequenceDiagram=new SequenceDiagram(root);
+        sequenceDiagram.addSub(new FunctionNode("class1","function1()"));
+        sequenceDiagram.addSub(new FunctionNode("class2","function2()"));
+        sequenceDiagram.end();
+        sequenceDiagram.addSub(new FunctionNode("class3","function3()"));
+        checkDslResult("file_sequence",sequenceDiagram.toDsl());
     }
 }

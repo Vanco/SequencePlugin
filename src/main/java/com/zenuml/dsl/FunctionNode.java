@@ -27,7 +27,7 @@ public class FunctionNode extends DslNode {
             output.append("{\n");
             printChindren(output);
             printIndent(output);
-            output.append("}");
+            output.append("}\n");
         }
     }
 

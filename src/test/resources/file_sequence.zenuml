@@ -1,0 +1,6 @@
+RootClass.function(a1,a2){
+  class1.function1(){
+    class2.function2();
+    class3.function3();
+  }
+}
