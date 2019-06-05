@@ -23,6 +23,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.Query;
 import com.zenuml.dsl.SequenceDiagram;
+import com.zenuml.dsl.SequenceGeneratorV1;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.generator.CallStack;
 import org.intellij.sequencer.generator.SequenceGenerator;
@@ -94,10 +95,6 @@ public class SequencePlugin implements ProjectComponent {
         PsiMethod enclosingPsiMethod = getCurrentPsiMethod();
         if(enclosingPsiMethod == null)
             return;
-        SequenceDiagram sequenceDiagram=new SequenceDiagram();
-        SequenceGenerator sequenceGenerator=new SequenceGenerator(params);
-        CallStack callStack = sequenceGenerator.generate(enclosingPsiMethod);
-
         _toolWindow.setAvailable(true, null);
 
         final SequencePanel sequencePanel = new SequencePanel(this, enclosingPsiMethod, params);

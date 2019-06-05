@@ -6,6 +6,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
+import com.zenuml.dsl.SequenceGeneratorV1;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.CallStack;
@@ -23,6 +24,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -91,6 +94,16 @@ public class SequencePanel extends JPanel {
             return;
         }
         SequenceGenerator generator = new SequenceGenerator(_sequenceParams);
+        SequenceGeneratorV1 sequenceGeneratorV1=new SequenceGeneratorV1(_sequenceParams);
+        sequenceGeneratorV1.generate(_psiMethod);
+        try {
+            new File("/Users/dengzhiguo/workspace/test.zenuml").createNewFile();
+            FileOutputStream file=new FileOutputStream(new File("/Users/dengzhiguo/workspace/test.zenuml"));
+            file.write(sequenceGeneratorV1.toDsl().getBytes());
+            file.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         final CallStack callStack = generator.generate(_psiMethod);
         _titleName = callStack.getMethod().getTitleName();
         generate(callStack.generateSequence());

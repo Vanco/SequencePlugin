@@ -1,13 +1,12 @@
-package org.intellij.sequencer.generator;
+package com.zenuml.dsl;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiMethodCallExpressionImpl;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
-import com.zenuml.dsl.FunctionNode;
-import com.zenuml.dsl.SequenceDiagram;
 import org.intellij.sequencer.diagram.Info;
+import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.PsiUtil;
 
@@ -15,10 +14,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SequenceGenerator extends JavaElementVisitor {
+public class SequenceGeneratorV1 extends JavaElementVisitor {
     private final Stack<PsiCallExpression> _exprStack = new Stack<PsiCallExpression>();
-    private final Stack<CallStack> _callStack = new Stack<CallStack>();
-    private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class.getName());
+    private final Stack<CallStack> _callStack = new Stack<>();
+    private static final Logger LOGGER = Logger.getInstance(SequenceGeneratorV1.class.getName());
 
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
     private CallStack topStack;
@@ -27,12 +26,12 @@ public class SequenceGenerator extends JavaElementVisitor {
     private SequenceParams params;
     private SequenceDiagram sequenceDiagram;
 
-    public SequenceGenerator(SequenceParams params) {
+    public SequenceGeneratorV1(SequenceParams params) {
         this.params = params;
         this.sequenceDiagram = new SequenceDiagram();
     }
 
-    public CallStack generate(PsiMethod psiMethod) {
+    public void generate(PsiMethod psiMethod) {
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
@@ -60,7 +59,7 @@ public class SequenceGenerator extends JavaElementVisitor {
                 containingClass.accept(implementationFinder);
             psiMethod.accept(this);
         }
-        return topStack;
+        sequenceDiagram.end();
     }
 
     private boolean alreadyInStack(PsiMethod psiMethod) {
@@ -86,8 +85,8 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     public void visitMethod(PsiMethod psiMethod) {
         MethodDescription method = createMethod(psiMethod);
+        sequenceDiagram.addSub(new FunctionNode(method.getClassDescription().getClassShortName(), method.getMethodSignature(), null));
         if (topStack == null) {
-            sequenceDiagram.addSub(new FunctionNode(method.getClassDescription().getClassName(), method.getMethodName(), method.getReturnType()));
             topStack = new CallStack(method);
             currentStack = topStack;
         } else {
@@ -298,6 +297,10 @@ public class SequenceGenerator extends JavaElementVisitor {
     @Override
     public void visitInstanceOfExpression(PsiInstanceOfExpression expression) {
         super.visitInstanceOfExpression(expression);
+    }
+
+    public String toDsl() {
+        return sequenceDiagram.toDsl();
     }
 
     private class ImplementationFinder extends JavaElementVisitor {
