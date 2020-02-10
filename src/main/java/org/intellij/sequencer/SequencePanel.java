@@ -49,7 +49,6 @@ public class SequencePanel extends JPanel {
         _display = new Display(_model, new SequenceListenerImpl());
 
         DefaultActionGroup actionGroup = new DefaultActionGroup("SequencerActionGroup", false);
-        actionGroup.add(new CloseAction());
         actionGroup.add(new ReGenerateAction());
         actionGroup.add(new ExportAction());
         actionGroup.add(new ExportTextAction());
@@ -160,15 +159,6 @@ public class SequencePanel extends JPanel {
         );
     }
 
-    private class CloseAction extends AnAction {
-        public CloseAction() {
-            super("Close", "Close sequence", SequencePluginIcons.CLOSE_ICON);
-        }
-
-        public void actionPerformed(AnActionEvent event) {
-            _plugin.closeSequence(SequencePanel.this);
-        }
-    }
 
     private class ReGenerateAction extends AnAction {
         public ReGenerateAction() {

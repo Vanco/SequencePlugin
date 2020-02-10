@@ -21,8 +21,10 @@ public class Parser {
     private int _currentVerticalSeq = 0;
 
     public Parser() {
-        ObjectInfo objectInfo = new ObjectInfo(ObjectInfo.ACTOR_NAME, Collections.EMPTY_LIST, _currentHorizontalSeq);
-        _callStack.push(new CallInfo(objectInfo, "aMethod", _currentVerticalSeq));
+//        ObjectInfo objectInfo = new ObjectInfo(ObjectInfo.ACTOR_NAME, Collections.EMPTY_LIST, _currentHorizontalSeq);
+//        ++_currentHorizontalSeq;
+//        _objList.add(objectInfo);
+//        _callStack.push(new CallInfo(objectInfo, "aMethod", _currentVerticalSeq));
     }
 
     public void parse(String sequenceStr) throws IOException {
@@ -30,18 +32,18 @@ public class Parser {
     }
 
     public void parse(PushbackReader reader) throws IOException {
-        while(true) {
+        while (true) {
             skipWhitespace(reader);
             int c = reader.read();
-            if(c == -1) {
+            if (c == -1) {
                 break;
-            } else if(c == '(') {
+            } else if (c == '(') {
                 String methodName = readIdent(reader);
                 addCall(methodName);
-            } else if(c == ')') {
+            } else if (c == ')') {
                 addReturn();
             } else {
-                LOGGER.error("Error '" + (char)c + "'");
+                LOGGER.error("Error '" + (char) c + "'");
             }
         }
         resolveBackCalls();
@@ -49,17 +51,17 @@ public class Parser {
 
     private void resolveBackCalls() {
         HashMap callsMap = new HashMap();
-        for(Iterator iterator = _linkList.iterator(); iterator.hasNext();) {
-            Link link = (Link)iterator.next();
-            if(!(link instanceof Call))
+        for (Iterator iterator = _linkList.iterator(); iterator.hasNext(); ) {
+            Link link = (Link) iterator.next();
+            if (!(link instanceof Call))
                 continue;
             callsMap.put(link.getMethodInfo().getNumbering(), link.getMethodInfo());
         }
-        for(Iterator iterator = _linkList.iterator(); iterator.hasNext();) {
-            Link link = (Link)iterator.next();
+        for (Iterator iterator = _linkList.iterator(); iterator.hasNext(); ) {
+            Link link = (Link) iterator.next();
             Numbering numbering = link.getMethodInfo().getNumbering().getPreviousNumbering();
-            if(numbering != null)
-                link.setCallerMethodInfo((MethodInfo)callsMap.get(numbering));
+            if (numbering != null)
+                link.setCallerMethodInfo((MethodInfo) callsMap.get(numbering));
         }
     }
 
@@ -75,24 +77,38 @@ public class Parser {
         Gson gson = new Gson();
         MethodDescription m = gson.fromJson(calledMethod, MethodDescription.class);
         ClassDescription c = m.getClassDescription();
+        if (_objList.isEmpty()) {
+            ObjectInfo objectInfo = new ObjectInfo(ObjectInfo.ACTOR_NAME, Collections.EMPTY_LIST, _currentHorizontalSeq);
+            ++_currentHorizontalSeq;
+            _objList.add(objectInfo);
+            _callStack.push(new CallInfo(objectInfo, "aMethod", _currentVerticalSeq));
+        }
         ObjectInfo objectInfo = new ObjectInfo(c.getClassName(), c.getAttributes(), _currentHorizontalSeq);
         int i = _objList.indexOf(objectInfo);
-        if(i == -1) {
+        if (i == -1) {
             ++_currentHorizontalSeq;
             _objList.add(objectInfo);
         } else {
-            objectInfo = (ObjectInfo)_objList.get(i);
+            objectInfo = (ObjectInfo) _objList.get(i);
         }
 
         CallInfo callInfo = new CallInfo(objectInfo, m, _currentVerticalSeq);
 
-        if(LOGGER.isDebugEnabled())
+        MethodInfo methodInfo = new MethodInfo(callInfo.getObj(),
+                callInfo.getNumbering(), callInfo.getAttributes(),
+                callInfo.getMethod(), callInfo.getReturnType(),
+                callInfo.getArgNames(), callInfo.getArgTypes(),
+                callInfo.getStartingVerticalSeq(), _currentVerticalSeq);
+
+        if (LOGGER.isDebugEnabled())
             LOGGER.debug("addCall(...) calling " + callInfo + " seq is " + _currentVerticalSeq);
 
-        if(!_callStack.isEmpty()) {
+        if (!_callStack.isEmpty()) {
             CallInfo currentInfo = _callStack.peek();
+            //currentInfo.getCall().setMethodInfo(methodInfo);
             callInfo.setNumbering();
             Call call = currentInfo.createCall(callInfo);
+            call.setMethodInfo(methodInfo);
             call.setVerticalSeq(_currentVerticalSeq++);
             _linkList.add(call);
         }
@@ -104,16 +120,16 @@ public class Parser {
         CallInfo callInfo = _callStack.pop();
 
         MethodInfo methodInfo = new MethodInfo(callInfo.getObj(),
-              callInfo.getNumbering(), callInfo.getAttributes(),
-              callInfo.getMethod(), callInfo.getReturnType(),
-              callInfo.getArgNames(), callInfo.getArgTypes(),
-              callInfo.getStartingVerticalSeq(), _currentVerticalSeq);
+                callInfo.getNumbering(), callInfo.getAttributes(),
+                callInfo.getMethod(), callInfo.getReturnType(),
+                callInfo.getArgNames(), callInfo.getArgTypes(),
+                callInfo.getStartingVerticalSeq(), _currentVerticalSeq);
         callInfo.getObj().addMethod(methodInfo);
 
-        if(LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
             LOGGER.debug("addReturn(...) returning from " + callInfo + " seq is " + _currentVerticalSeq);
 
-        if(!_callStack.isEmpty()) {
+        if (!_callStack.isEmpty()) {
             CallInfo currentInfo = _callStack.peek();
             currentInfo.getCall().setMethodInfo(methodInfo);
             CallReturn call = new CallReturn(callInfo.getObj(), currentInfo.getObj());
@@ -129,7 +145,7 @@ public class Parser {
         String result = readNonWhitespace(reader);
         skipWhitespace(reader);
 
-        if(LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
             LOGGER.debug("readIdent(...) returning " + result);
 
         return result;
@@ -138,9 +154,9 @@ public class Parser {
     private void skipWhitespace(PushbackReader reader) throws IOException {
 
         int c = -1;
-        while(Character.isWhitespace((char)(c = reader.read()))) {
+        while (Character.isWhitespace((char) (c = reader.read()))) {
         }
-        if(c != -1)
+        if (c != -1)
             reader.unread(c);
     }
 
@@ -149,24 +165,24 @@ public class Parser {
         StringBuffer sb = new StringBuffer();
         int deep = 0;
         boolean isGeneric = false;
-        while((c = r.read()) != -1) {
-            if(c == ')')
+        while ((c = r.read()) != -1) {
+            if (c == ')')
                 break;
             else if (c == '\\') {
                 int u = r.read();
                 if (u != -1 && u == 'u') {
                     StringBuilder tmp = new StringBuilder();
-                    tmp.append((char)c).append((char)u);
+                    tmp.append((char) c).append((char) u);
                     for (int j = 0; j < 4; j++) {
                         u = r.read();
-                        tmp.append((char)u);
+                        tmp.append((char) u);
                     }
                     if (tmp.toString().equals("\\u003c")) {
-                        deep ++;
+                        deep++;
                         isGeneric = true;
                         sb.append(tmp.toString());
                     } else if (tmp.toString().equals("\\u003e")) {
-                        deep --;
+                        deep--;
                         if (deep == 0)
                             isGeneric = false;
                         sb.append(tmp.toString());
@@ -174,29 +190,25 @@ public class Parser {
                         sb.append(tmp.toString());
                     }
                 }
-            }
-            else if (c == '<') {
-                deep ++;
+            } else if (c == '<') {
+                deep++;
                 isGeneric = true;
-                sb.append((char)c);
-            }
-            else if (c == '>') {
-                deep --;
+                sb.append((char) c);
+            } else if (c == '>') {
+                deep--;
                 if (deep == 0)
                     isGeneric = false;
-                sb.append((char)c);
-            }
-            else if(Character.isWhitespace((char)c)) {
+                sb.append((char) c);
+            } else if (Character.isWhitespace((char) c)) {
                 if (isGeneric) {
-                    sb.append((char)c);
+                    sb.append((char) c);
                 } else {
                     break;
                 }
-            }
-            else
-                sb.append((char)c);
+            } else
+                sb.append((char) c);
         }
-        if(c != -1)
+        if (c != -1)
             r.unread(c);
         return sb.toString();
     }
@@ -209,24 +221,24 @@ public class Parser {
         public void push(CallInfo callInfo) {
             stack.push(callInfo);
             nPointerCounter++;
-            if(nPointerCounter > 1)
+            if (nPointerCounter > 1)
                 nPointerCallInfo = callInfo;
         }
 
         public CallInfo pop() {
-            CallInfo result = (CallInfo)stack.pop();
+            CallInfo result = (CallInfo) stack.pop();
             nPointerCallInfo = result;
             return result;
         }
 
         public Numbering getNumbering() {
-            if(nPointerCallInfo == null)
+            if (nPointerCallInfo == null)
                 return peek().getNumbering();
             return nPointerCallInfo.getNumbering();
         }
 
         public CallInfo peek() {
-            return (CallInfo)stack.peek();
+            return (CallInfo) stack.peek();
         }
 
         public int size() {
@@ -270,7 +282,7 @@ public class Parser {
             int stackLevel = _callStack.size() - 1;
             Numbering numbering = _callStack.getNumbering();
             _numbering = new Numbering(numbering);
-            if(_numbering.level() <= stackLevel)
+            if (_numbering.level() <= stackLevel)
                 _numbering.addNewLevel();
             else
                 _numbering.incrementLevel(stackLevel);

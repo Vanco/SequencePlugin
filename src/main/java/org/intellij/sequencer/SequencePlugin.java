@@ -1,6 +1,5 @@
 package org.intellij.sequencer;
 
-import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
@@ -18,34 +17,25 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
-import com.intellij.ui.components.JBTabbedPane;
-import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
+import com.intellij.ui.content.*;
 import com.intellij.util.Query;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.MethodFilter;
-import org.intellij.sequencer.ui.ButtonTabComponent;
 import org.intellij.sequencer.util.PsiUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SequencePlugin implements ProjectComponent {
-    private static final String PLAGIN_NAME = "Sequence";
-    private static final Icon DISABLED_ICON = SequencePluginIcons.LOCKED_ICON;
+    private static final String PLUGIN_NAME = "Sequence";
+//    private static final Icon DISABLED_ICON = SequencePluginIcons.LOCKED_ICON;
     private static final Icon S_ICON = SequencePluginIcons.SEQUENCE_ICON_13;
 
     private final Project _project;
     private ToolWindow _toolWindow;
-    private JTabbedPane _jTabbedPane;
 
     public static Icon loadIcon(String name) {
         return IconLoader.findIcon(SequencePlugin.class.getResource("/icons/" + name),true);
@@ -56,13 +46,20 @@ public class SequencePlugin implements ProjectComponent {
     }
 
     public void projectOpened() {
-        createTabPane();
         _toolWindow = getToolWindowManager().registerToolWindow(
-              PLAGIN_NAME, false, ToolWindowAnchor.BOTTOM);
-        final Content content = ServiceManager.getService(ContentFactory.class).createContent(_jTabbedPane, "", false);
-        _toolWindow.getContentManager().addContent(content);
-        _toolWindow.setIcon(SequencePluginIcons.SEQUENCE_ICON_13);
+                PLUGIN_NAME, true, ToolWindowAnchor.BOTTOM);
+        _toolWindow.setIcon(S_ICON);
         _toolWindow.setAvailable(false, null);
+        _toolWindow.getContentManager().addContentManagerListener(new ContentManagerAdapter() {
+
+            @Override
+            public void contentRemoved(@NotNull ContentManagerEvent event) {
+                if (_toolWindow.getContentManager().getContentCount() == 0) {
+                    _toolWindow.setAvailable(false, null);
+                }
+            }
+
+        });
     }
 
     private ToolWindowManager getToolWindowManager() {
@@ -74,11 +71,11 @@ public class SequencePlugin implements ProjectComponent {
     }
 
     public void projectClosed() {
-        getToolWindowManager().unregisterToolWindow(PLAGIN_NAME);
+        getToolWindowManager().unregisterToolWindow(PLUGIN_NAME);
     }
 
     public String getComponentName() {
-        return PLAGIN_NAME;
+        return PLUGIN_NAME;
     }
 
     public void initComponent() {
@@ -107,56 +104,11 @@ public class SequencePlugin implements ProjectComponent {
     }
 
     private void addSequencePanel(final SequencePanel sequencePanel) {
-        int tabIndex = findUnlockedTab();
-        if(tabIndex != -1) {
-            _jTabbedPane.setComponentAt(tabIndex, sequencePanel);
-            _jTabbedPane.setTitleAt(tabIndex, sequencePanel.getTitleName());
-            _jTabbedPane.setSelectedIndex(tabIndex);
-            ButtonTabComponent buttonTabComponent = new ButtonTabComponent(_jTabbedPane);
-            buttonTabComponent.addTabButtonListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    closeSequence(sequencePanel);
-                }
-            });
-            _jTabbedPane.setTabComponentAt(tabIndex, buttonTabComponent);
-        }
-        else {
-            _jTabbedPane.addTab(sequencePanel.getTitleName(), S_ICON, sequencePanel);
-            _jTabbedPane.setSelectedComponent(sequencePanel);
-            ButtonTabComponent buttonTabComponent = new ButtonTabComponent(_jTabbedPane);
-            buttonTabComponent.addTabButtonListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    closeSequence(sequencePanel);
-                }
-            });
-            _jTabbedPane.setTabComponentAt(_jTabbedPane.getSelectedIndex(), buttonTabComponent);
-        }
-        _toolWindow.setTitle(sequencePanel.getTitleName());
+        final Content content = ServiceManager.getService(ContentFactory.class).createContent(sequencePanel, sequencePanel.getTitleName(), false);
+        _toolWindow.getContentManager().addContent(content);
+        _toolWindow.getContentManager().setSelectedContent(content);
     }
 
-    private int findUnlockedTab() {
-        for(int i = 0; i < _jTabbedPane.getTabCount(); i++) {
-            if(!isLockedTab(i))
-                return i;
-        }
-        return -1;
-    }
-
-    private boolean isLockedTab(int i) {
-        return _jTabbedPane.getIconAt(i) == DISABLED_ICON;
-    }
-
-    public void closeSequenceAtIndex(int index) {
-        _jTabbedPane.remove(index);
-        if(_jTabbedPane.getTabCount() == 0)
-            _toolWindow.setAvailable(false, null);
-    }
-
-    public void closeSequence(SequencePanel sequencePanel) {
-        closeSequenceAtIndex(_jTabbedPane.indexOfComponent(sequencePanel));
-    }
 
     public boolean isInsideAMethod() {
         return getCurrentPsiMethod() != null;
@@ -200,8 +152,6 @@ public class SequencePlugin implements ProjectComponent {
             }
         });
         PsiClass psiClass = search.findFirst();
-//        PsiClass psiClass = PsiManager.getInstance(_project).findClass(className,
-//                GlobalSearchScope.projectScope(_project));
         if(psiClass == null)
             return;
         openInEditor(psiClass, psiClass);
@@ -236,49 +186,6 @@ public class SequencePlugin implements ProjectComponent {
         openInEditor(fromPsiMethod.getContainingClass(), psiElement);
     }
 
-    private void createTabPane() {
-        _jTabbedPane = new JBTabbedPane(JBTabbedPane.TOP);
-//        if(UIManager.getLookAndFeel() instanceof MetalLookAndFeel)
-//            _jTabbedPane.setUI(new PlasticTabbedPaneUI());
-        _jTabbedPane.addMouseListener(new MouseAdapter() {
-            public void mouseReleased(MouseEvent e) {
-                showPopupForTab(e);
-            }
-
-            public void mousePressed(MouseEvent e) {
-                showPopupForTab(e);
-            }
-
-            public void mouseClicked(MouseEvent e) {
-                showPopupForTab(e);
-            }
-
-            private void showPopupForTab(MouseEvent e) {
-                if(!e.isPopupTrigger())
-                    return;
-                int index = _jTabbedPane.indexAtLocation(e.getX(), e.getY());
-                if(index == -1)
-                    return;
-                DefaultActionGroup popupGroup = new DefaultActionGroup("SequencePlugin.TabPopup", true);
-                if(isLockedTab(index))
-                    popupGroup.add(new LockUnlockAction(index, false));
-                else
-                    popupGroup.add(new LockUnlockAction(index, true));
-                popupGroup.addSeparator();
-                popupGroup.add(new CloseAction(index));
-                ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu("Popup", popupGroup);
-                popupMenu.getComponent().show(_jTabbedPane, e.getX(), e.getY());
-            }
-        });
-        _jTabbedPane.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int selectedIndex = _jTabbedPane.getSelectedIndex();
-                if(selectedIndex == -1)
-                    return;
-                _toolWindow.setTitle(_jTabbedPane.getTitleAt(selectedIndex));
-            }
-        });
-    }
 
     public List<String> findImplementations(String className) {
         PsiClass psiClass = PsiUtil.findPsiClass(_project, getPsiManager(), className);
@@ -327,32 +234,5 @@ public class SequencePlugin implements ProjectComponent {
         return new ArrayList<String>();
     }
 
-    private class LockUnlockAction extends AnAction {
-        private int _index;
-        private boolean _isLock;
-
-        public LockUnlockAction(int index, boolean isLock) {
-            super(isLock? "Lock Tab": "Unlock Tab");
-            _index = index;
-            _isLock = isLock;
-        }
-
-        public void actionPerformed(AnActionEvent anActionEvent) {
-            _jTabbedPane.setIconAt(_index, _isLock? DISABLED_ICON: S_ICON);
-        }
-    }
-
-    private class CloseAction extends AnAction {
-        private int _index;
-
-        public CloseAction(int index) {
-            super("Close Tab");
-            _index = index;
-        }
-
-        public void actionPerformed(AnActionEvent anActionEvent) {
-            closeSequenceAtIndex(_index);
-        }
-    }
 
 }
