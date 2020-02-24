@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import org.intellij.sequencer.diagram.app.Sequence;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.NoConstructorsFilter;
 import org.intellij.sequencer.generator.filters.NoGetterSetterFilter;
@@ -30,12 +31,12 @@ public class ShowSequenceAction extends AnAction {
         super.update(event);
 
         Presentation presentation = event.getPresentation();
-        SequencePlugin plugin = getPlugin(event);
+        SequenceService plugin = getPlugin(event);
         presentation.setEnabled(plugin != null && plugin.isInsideAMethod());
     }
 
     public void actionPerformed(AnActionEvent event) {
-        SequencePlugin plugin = getPlugin(event);
+        SequenceService plugin = getPlugin(event);
         OptionsDialogWrapper dialogWrapper = new OptionsDialogWrapper(getProject(event));
         dialogWrapper.show();
         if(dialogWrapper.isOK()) {
@@ -57,15 +58,15 @@ public class ShowSequenceAction extends AnAction {
         }
     }
 
-    private SequencePlugin getPlugin(AnActionEvent event) {
+    private SequenceService getPlugin(AnActionEvent event) {
         Project project = getProject(event);
         if(project == null)
             return null;
         return getPlugin(project);
     }
 
-    private SequencePlugin getPlugin(Project project) {
-        return SequencePlugin.getInstance(project);
+    private SequenceService getPlugin(Project project) {
+        return project.getService(SequenceService.class);
     }
 
     private Project getProject(AnActionEvent event) {

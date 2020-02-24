@@ -1,25 +1,27 @@
-package org.intellij.sequencer;
+package org.intellij.sequencer.impl;
 
-import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Condition;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.RegisterToolWindowTask;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
-import com.intellij.ui.content.*;
+import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentFactory;
+import com.intellij.ui.content.ContentManagerEvent;
+import com.intellij.ui.content.ContentManagerListener;
 import com.intellij.util.Query;
 import icons.SequencePluginIcons;
+import org.intellij.sequencer.SequencePanel;
+import org.intellij.sequencer.SequenceService;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.intellij.sequencer.util.PsiUtil;
@@ -29,28 +31,24 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SequencePlugin implements ProjectComponent {
-    private static final String PLUGIN_NAME = "Sequence";
-//    private static final Icon DISABLED_ICON = SequencePluginIcons.LOCKED_ICON;
+/**
+ * &copy; fanhuagang@gmail.com
+ * Created by van on 2020/2/23.
+ */
+public class SequenceServiceImpl implements SequenceService {
+    private static final String PLUGIN_NAME = "Sequence Diagram";
     private static final Icon S_ICON = SequencePluginIcons.SEQUENCE_ICON_13;
 
     private final Project _project;
     private ToolWindow _toolWindow;
 
-    public static Icon loadIcon(String name) {
-        return IconLoader.findIcon(SequencePlugin.class.getResource("/icons/" + name),true);
-    }
+    public SequenceServiceImpl(Project project) {
 
-    public SequencePlugin(Project project) {
         _project = project;
-    }
-
-    public void projectOpened() {
-        _toolWindow = getToolWindowManager().registerToolWindow(
-                PLUGIN_NAME, true, ToolWindowAnchor.BOTTOM);
-        _toolWindow.setIcon(S_ICON);
+        _toolWindow = ToolWindowManager.getInstance(_project)
+                .registerToolWindow(RegisterToolWindowTask.closable(PLUGIN_NAME, S_ICON));
         _toolWindow.setAvailable(false, null);
-        _toolWindow.getContentManager().addContentManagerListener(new ContentManagerAdapter() {
+        _toolWindow.getContentManager().addContentManagerListener(new ContentManagerListener() {
 
             @Override
             public void contentRemoved(@NotNull ContentManagerEvent event) {
@@ -62,28 +60,7 @@ public class SequencePlugin implements ProjectComponent {
         });
     }
 
-    private ToolWindowManager getToolWindowManager() {
-        return ToolWindowManager.getInstance(_project);
-    }
-
-    public static SequencePlugin getInstance(Project project) {
-        return (SequencePlugin)project.getComponent(SequencePlugin.class);
-    }
-
-    public void projectClosed() {
-        getToolWindowManager().unregisterToolWindow(PLUGIN_NAME);
-    }
-
-    public String getComponentName() {
-        return PLUGIN_NAME;
-    }
-
-    public void initComponent() {
-    }
-
-    public void disposeComponent() {
-    }
-
+    @Override
     public void showSequence(SequenceParams params) {
         PsiMethod enclosingPsiMethod = getCurrentPsiMethod();
         if(enclosingPsiMethod == null)
@@ -91,11 +68,9 @@ public class SequencePlugin implements ProjectComponent {
         _toolWindow.setAvailable(true, null);
 
         final SequencePanel sequencePanel = new SequencePanel(this, enclosingPsiMethod, params);
-        Runnable postAction = new Runnable() {
-            public void run() {
-                sequencePanel.generate();
-                addSequencePanel(sequencePanel);
-            }
+        Runnable postAction = () -> {
+            sequencePanel.generate();
+            addSequencePanel(sequencePanel);
         };
         if(_toolWindow.isActive())
             _toolWindow.show(postAction);
@@ -103,60 +78,16 @@ public class SequencePlugin implements ProjectComponent {
             _toolWindow.activate(postAction);
     }
 
-    private void addSequencePanel(final SequencePanel sequencePanel) {
-        final Content content = ServiceManager.getService(ContentFactory.class).createContent(sequencePanel, sequencePanel.getTitleName(), false);
-        _toolWindow.getContentManager().addContent(content);
-        _toolWindow.getContentManager().setSelectedContent(content);
-    }
-
-
-    public boolean isInsideAMethod() {
-        return getCurrentPsiMethod() != null;
-    }
-
-    private Editor getSelectedEditor() {
-        Editor selectedEditor = getFileEditorManager().getSelectedTextEditor();
-        if(selectedEditor == null)
-            return null;
-        return selectedEditor;
-    }
-
-    private PsiManager getPsiManager() {
-        return PsiManager.getInstance(_project);
-    }
-
-
-    private PsiFile getPsiFile(VirtualFile virtualFile) {
-        return PsiManager.getInstance(_project).findFile(virtualFile);
-    }
-
-    private FileEditorManager getFileEditorManager() {
-        return FileEditorManager.getInstance(_project);
-    }
-
-    private PsiMethod getCurrentPsiMethod() {
-        Editor editor = getSelectedEditor();
-        if(editor == null)
-            return null;
-        VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(editor.getDocument());
-        if(virtualFile == null)
-            return null;
-        PsiFile psiFile = getPsiFile(virtualFile);
-        return PsiUtil.getEnclosingMethod(psiFile, editor.getCaretModel().getOffset());
-    }
-
+    @Override
     public void openClassInEditor(final String className) {
-        Query<PsiClass> search = AllClassesSearch.search(GlobalSearchScope.projectScope(_project), _project, new Condition<String>() {
-            public boolean value(String s) {
-                return className.endsWith(s);
-            }
-        });
+        Query<PsiClass> search = AllClassesSearch.search(GlobalSearchScope.projectScope(_project), _project, className::endsWith);
         PsiClass psiClass = search.findFirst();
         if(psiClass == null)
             return;
         openInEditor(psiClass, psiClass);
     }
 
+    @Override
     public void openMethodInEditor(String className, String methodName, List argTypes) {
         PsiMethod psiMethod = PsiUtil.findPsiMethod(_project, getPsiManager(), className, methodName, argTypes);
         if(psiMethod == null)
@@ -164,14 +95,12 @@ public class SequencePlugin implements ProjectComponent {
         openInEditor(psiMethod.getContainingClass(), psiMethod);
     }
 
-    private void openInEditor(PsiClass psiClass, PsiElement psiElement) {
-        VirtualFile virtualFile = PsiUtil.findVirtualFile(psiClass);
-        if(virtualFile == null)
-            return;
-        getFileEditorManager().openTextEditor(new OpenFileDescriptor(_project,
-                virtualFile, psiElement.getTextOffset()), true);
+    @Override
+    public boolean isInsideAMethod() {
+        return getCurrentPsiMethod() != null;
     }
 
+    @Override
     public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List fromArgTypes,
                                        String toClass, String toMethod, List toArgType, int callNo) {
         PsiMethod fromPsiMethod = PsiUtil.findPsiMethod(_project, getPsiManager(), fromClass, fromMethod, fromArgTypes);
@@ -186,7 +115,7 @@ public class SequencePlugin implements ProjectComponent {
         openInEditor(fromPsiMethod.getContainingClass(), psiElement);
     }
 
-
+    @Override
     public List<String> findImplementations(String className) {
         PsiClass psiClass = PsiUtil.findPsiClass(_project, getPsiManager(), className);
 
@@ -207,6 +136,7 @@ public class SequencePlugin implements ProjectComponent {
 
     }
 
+    @Override
     public List<String> findImplementations(String className, String methodName, List argTypes) {
         PsiMethod psiMethod = PsiUtil.findPsiMethod(_project, getPsiManager(), className, methodName, argTypes);
         PsiClass containingClass = psiMethod.getContainingClass();
@@ -231,7 +161,48 @@ public class SequencePlugin implements ProjectComponent {
 
             return result;
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
+    }
+
+    private PsiMethod getCurrentPsiMethod() {
+        Editor editor = getSelectedEditor();
+        if(editor == null)
+            return null;
+        VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(editor.getDocument());
+        if(virtualFile == null)
+            return null;
+        PsiFile psiFile = getPsiFile(virtualFile);
+        return PsiUtil.getEnclosingMethod(psiFile, editor.getCaretModel().getOffset());
+    }
+
+    private Editor getSelectedEditor() {
+        return getFileEditorManager().getSelectedTextEditor();
+    }
+
+    private FileEditorManager getFileEditorManager() {
+        return FileEditorManager.getInstance(_project);
+    }
+
+    private PsiFile getPsiFile(VirtualFile virtualFile) {
+        return PsiManager.getInstance(_project).findFile(virtualFile);
+    }
+
+    private void addSequencePanel(final SequencePanel sequencePanel) {
+        final Content content = ServiceManager.getService(ContentFactory.class).createContent(sequencePanel, sequencePanel.getTitleName(), false);
+        _toolWindow.getContentManager().addContent(content);
+        _toolWindow.getContentManager().setSelectedContent(content);
+    }
+
+    private PsiManager getPsiManager() {
+        return PsiManager.getInstance(_project);
+    }
+
+    private void openInEditor(PsiClass psiClass, PsiElement psiElement) {
+        VirtualFile virtualFile = PsiUtil.findVirtualFile(psiClass);
+        if(virtualFile == null)
+            return;
+        getFileEditorManager().openTextEditor(new OpenFileDescriptor(_project,
+                virtualFile, psiElement.getTextOffset()), true);
     }
 
 

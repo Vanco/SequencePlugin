@@ -33,13 +33,13 @@ public class SequencePanel extends JPanel {
 
     private Display _display;
     private Model _model;
-    private final SequencePlugin _plugin;
+    private final SequenceService _plugin;
     private SequenceParams _sequenceParams;
     private PsiMethod _psiMethod;
     private String _titleName;
     private JScrollPane _jScrollPane;
 
-    public SequencePanel(SequencePlugin plugin, PsiMethod psiMethod, SequenceParams sequenceParams) {
+    public SequencePanel(SequenceService plugin, PsiMethod psiMethod, SequenceParams sequenceParams) {
         super(new BorderLayout());
         _plugin = plugin;
         _psiMethod = psiMethod;

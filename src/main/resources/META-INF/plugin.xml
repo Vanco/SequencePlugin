@@ -23,10 +23,12 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
     <vendor>fanhuagang@gmail.com</vendor>
     <idea-version since-build="141.1"/>
 
-    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.java</depends>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>2.0</dt>
+        <dd>New Plugin version support 2020.x</dd>
         <dt>1.3</dt>
         <dd>fix #38: Lambda Expression.</dd>
         <dt>1.2.8</dt>
@@ -68,13 +70,6 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
         <dd>fixbug: method name with generic type.</dd>
         </dl>
     ]]></change-notes>
-    <project-components>
-        <component>
-            <implementation-class>org.intellij.sequencer.SequencePlugin</implementation-class>
-            <interface-class>org.intellij.sequencer.SequencePlugin</interface-class>
-            <option name="workspace" value="true"/>
-        </component>
-    </project-components>
 
     <actions>
         <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction"
@@ -87,8 +82,11 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <applicationConfigurable id="Settings.Sequence.Configuration"
+        <applicationConfigurable groupId="tools"
+                                 id="Settings.Sequence.Configuration"
                                  instance="org.intellij.sequencer.config.ConfigurationOptions"/>
         <applicationService serviceImplementation="org.intellij.sequencer.config.Configuration"/>
+        <projectService serviceInterface="org.intellij.sequencer.SequenceService"
+                        serviceImplementation="org.intellij.sequencer.impl.SequenceServiceImpl"/>
     </extensions>
 </idea-plugin>

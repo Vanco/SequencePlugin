@@ -1,20 +1,20 @@
 
 plugins {
-    id "org.jetbrains.intellij" version "0.4.10"
+    id "org.jetbrains.intellij" version "0.4.16"
 }
 
 //apply plugin: 'java'
 
 intellij {
-    version 'IC-2019.1.2'
+    version 'LATEST-EAP-SNAPSHOT'
     pluginName 'SequenceDiagram'
-    plugins = []
+    plugins = ['java']
     updateSinceUntilBuild true
     sandboxDirectory = "${project.rootDir}/.sandbox"
 }
 
 patchPluginXml {
-    sinceBuild 191.1
+    sinceBuild 201
 }
 
 publishPlugin {
@@ -22,7 +22,7 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '1.4.0'
+version '2.0'
 
 sourceCompatibility = 1.8
 

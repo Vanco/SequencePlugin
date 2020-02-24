@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-@State(name = "sequencePlugin", storages = {@Storage(file = "sequencePlugin.xml")})
+@State(name = "sequencePlugin", storages = {@Storage("sequencePlugin.xml")})
 public class Configuration implements PersistentStateComponent<Configuration> {
     @OptionTag(converter = ColorConverter.class)
     public Color CLASS_COLOR = new Color(0xFFFFC0);

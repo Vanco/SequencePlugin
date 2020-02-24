@@ -18,7 +18,7 @@ public class ConfigurationOptions implements SearchableConfigurable {
     }
 
     public String getDisplayName() {
-        return "SequenceDiagram";
+        return "Sequence Diagram";
     }
 
     public String getHelpTopic() {
