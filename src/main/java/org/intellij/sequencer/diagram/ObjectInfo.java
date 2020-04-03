@@ -12,9 +12,9 @@ public class ObjectInfo extends Info {
     private String _name;
     private String _fullName;
     private int _seq;
-    private List _methods = new ArrayList();
+    private List<MethodInfo> _methods = new ArrayList<MethodInfo>();
 
-    public ObjectInfo(String name, List attributes, int seq) {
+    public ObjectInfo(String name, List<String> attributes, int seq) {
         super(attributes);
         _name = name.substring(name.lastIndexOf('.') + 1);
         _fullName = name;
@@ -26,7 +26,7 @@ public class ObjectInfo extends Info {
             LOGGER.debug("addMethod(" + mi + ")");
         int possible = -1;
         for(int i = 0; i < _methods.size(); ++i) {
-            MethodInfo otherMethod = (MethodInfo)_methods.get(i);
+            MethodInfo otherMethod = _methods.get(i);
             if(otherMethod.getStartSeq() > mi.getStartSeq()) {
                 possible = i;
                 break;
@@ -38,7 +38,7 @@ public class ObjectInfo extends Info {
             _methods.add(possible, mi);
     }
 
-    public List getMethods() {
+    public List<MethodInfo> getMethods() {
         return _methods;
     }
 

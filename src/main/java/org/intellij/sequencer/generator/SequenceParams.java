@@ -7,7 +7,6 @@ import org.intellij.sequencer.generator.filters.InterfaceImplFilter;
 import org.intellij.sequencer.generator.filters.PackageFilter;
 import org.intellij.sequencer.generator.filters.SingleClassFilter;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class SequenceParams {
@@ -21,21 +20,18 @@ public class SequenceParams {
     private InterfaceImplFilter _implFilter = new InterfaceImplFilter();
 
     public SequenceParams() {
-        List excludeList = Configuration.getInstance().getExcludeList();
-        for(Iterator iterator = excludeList.iterator(); iterator.hasNext();) {
-            ExcludeEntry excludeEntry = (ExcludeEntry)iterator.next();
-            if(!excludeEntry.isEnabled())
+        List<ExcludeEntry> excludeList = Configuration.getInstance().getExcludeList();
+        for (ExcludeEntry excludeEntry : excludeList) {
+            if (!excludeEntry.isEnabled())
                 continue;
             String excludeName = excludeEntry.getExcludeName();
-            if(excludeName.endsWith(PACKAGE_INDICATOR)) {
+            if (excludeName.endsWith(PACKAGE_INDICATOR)) {
                 int index = excludeName.lastIndexOf(PACKAGE_INDICATOR);
                 _methodFilter.addFilter(new PackageFilter(excludeName.substring(0, index)));
-            }
-            else if(excludeName.endsWith(RECURSIVE_PACKAGE_INDICATOR)) {
+            } else if (excludeName.endsWith(RECURSIVE_PACKAGE_INDICATOR)) {
                 int index = excludeName.lastIndexOf(RECURSIVE_PACKAGE_INDICATOR);
                 _methodFilter.addFilter(new PackageFilter(excludeName.substring(0, index), true));
-            }
-            else
+            } else
                 _methodFilter.addFilter(new SingleClassFilter(excludeName));
         }
     }
@@ -48,8 +44,8 @@ public class SequenceParams {
         this._maxDepth = maxDepth;
     }
 
-    public boolean isAllowRecursion() {
-        return _allowRecursion;
+    public boolean isNotAllowRecursion() {
+        return !_allowRecursion;
     }
 
     public void setAllowRecursion(boolean allowRecursion) {

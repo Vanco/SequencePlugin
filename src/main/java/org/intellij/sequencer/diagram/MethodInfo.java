@@ -1,8 +1,10 @@
 package org.intellij.sequencer.diagram;
 
+import com.intellij.ui.JBColor;
 import org.intellij.sequencer.Constants;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.List;
 
 public class MethodInfo extends Info {
@@ -11,14 +13,14 @@ public class MethodInfo extends Info {
     private Numbering _numbering;
     private String _name;
     private String _returnType;
-    private List _argNames;
-    private List _argTypes;
+    private List<String> _argNames;
+    private List<String> _argTypes;
     private int _startSeq;
     private int _endSeq;
     private String _htmlDescription;
 
-    public MethodInfo(ObjectInfo obj, Numbering numbering, List attributes,
-                      String method, String returnType, List argNames, List argTypes,
+    public MethodInfo(ObjectInfo obj, Numbering numbering, List<String> attributes,
+                      String method, String returnType, List<String> argNames, List<String> argTypes,
                       int startSeq, int endSeq) {
         super(attributes);
         _objectInfo = obj;
@@ -47,8 +49,8 @@ public class MethodInfo extends Info {
         sb.append(name).append("(");
         for (int i = 0; i < _argNames.size(); i++) {
             if (i > 0) sb.append(", ");
-            String argName = (String) _argNames.get(i);
-            String argType = (String) _argTypes.get(i);
+            String argName = _argNames.get(i);
+            String argType = _argTypes.get(i);
             argType = shortTypeName(argType);
             sb.append(argName).append(": ").append(argType);
         }
@@ -76,12 +78,16 @@ public class MethodInfo extends Info {
         return Constants.CONSTRUCTOR_METHOD_NAME.equals(_name)? "&lt;constructor&gt;": _name;
     }
 
-    public List getArgNames() {
+    public List<String> getArgNames() {
         return _argNames;
     }
 
-    public List getArgTypes() {
+    public List<String> getArgTypes() {
         return _argTypes;
+    }
+
+    public String getReturnType() {
+        return  _returnType;
     }
 
     public int getStartSeq() {
@@ -107,12 +113,12 @@ public class MethodInfo extends Info {
             }
             appendTitleValue(buffer, "No", getNumbering().getName());
 
-            buffer.append("<tr><td colspan=2><b><font color=black>Arguments:</font></b>");
+            buffer.append("<tr><td colspan=2><b>Arguments:</b>");
             if(!getArgNames().isEmpty()) {
                 buffer.append("</td>");
                 for(int i = 0; i < getArgNames().size(); i++) {
-                    appendArgValue(buffer, (String)getArgNames().get(i),
-                          (String)getArgTypes().get(i));
+                    appendArgValue(buffer, getArgNames().get(i),
+                            getArgTypes().get(i));
                 }
             }
             else
@@ -125,7 +131,7 @@ public class MethodInfo extends Info {
 
     private void appendArgValue(StringBuffer buffer, String argName, String argType) {
         buffer.append("<tr>");
-        buffer.append("<td><font color=blue><em>").append(argName).append("</em></font></td>");
+        buffer.append("<td><em>").append(argName).append("</em></td>");
         appendValue(buffer, argType);
         buffer.append("</tr>");
 
@@ -139,11 +145,13 @@ public class MethodInfo extends Info {
     }
 
     private void appendTitle(StringBuffer buffer, String title) {
-        buffer.append("<td><b><font color=black>" + title + ":</font></b></td>");
+        buffer.append("<td><b>").append(title).append(":</b></td>");
     }
 
     private void appendValue(StringBuffer buffer, String value) {
-        buffer.append("<td><font color=blue>").append(value).append("</font></td>");
+        String htmlValue = value.replace("\u003c","&lt;")
+                .replace("\u003e","&gt;").replace(",", ",<br>");
+        buffer.append("<td>").append(htmlValue).append("</td>");
     }
 
 

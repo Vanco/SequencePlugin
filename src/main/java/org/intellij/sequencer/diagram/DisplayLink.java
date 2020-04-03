@@ -3,6 +3,7 @@ package org.intellij.sequencer.diagram;
 import com.intellij.ui.JBColor;
 
 import java.awt.*;
+import java.awt.geom.GeneralPath;
 
 public class DisplayLink extends ScreenObject {
     private static final Paint TEXT_COLOR = JBColor.foreground();
@@ -15,13 +16,13 @@ public class DisplayLink extends ScreenObject {
           0.0f);
 
     protected Link _link;
-    protected DisplayObject _from = null;
-    protected DisplayObject _to = null;
-    protected TextBox _textBox = null;
+    protected DisplayObject _from;
+    protected DisplayObject _to;
+    protected TextBox _textBox;
     int _textXOffset = -1;
 
     int _y = -1;
-    int _seq = -1;
+    int _seq;
 
     int _lineStartX = -1;
     int _lineEndX = -1;
@@ -120,7 +121,11 @@ public class DisplayLink extends ScreenObject {
             g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         drawText(g2);
         drawLine(g2);
-        drawArrow(g2);
+        if (isReturnLink()) {
+            drawArrow(g2);
+        } else {
+            fillArrow(g2);
+        }
         g2.setStroke(oldStroke);
     }
  
@@ -168,6 +173,29 @@ public class DisplayLink extends ScreenObject {
 
         g2.drawLine(arrowTailX, getEndY() - 3, _lineEndX, getEndY());
         g2.drawLine(arrowTailX, getEndY() + 3, _lineEndX, getEndY());
+    }
+
+    void fillArrow(Graphics2D g2) {
+        int arrowTailX = _lineEndX;
+
+        if(_lineStartX < _lineEndX)
+            arrowTailX -= 4;
+        else
+            arrowTailX += 4;
+
+        int[] xPoints = {arrowTailX, _lineEndX, arrowTailX};
+        int[] yPoints = {getEndY() - 3, getEndY(), getEndY() + 3};
+        fillPolygon(g2, xPoints, yPoints);
+    }
+
+    protected void fillPolygon(Graphics2D g2, int[] xPoints, int[] yPoints) {
+        GeneralPath filledPolygon = new GeneralPath();
+        filledPolygon.moveTo(xPoints[0], yPoints[0]);
+        for (int idx = 1; idx < xPoints.length; idx ++ ) {
+            filledPolygon.lineTo(xPoints[idx], yPoints[idx]);
+        }
+        filledPolygon.closePath();
+        g2.fill(filledPolygon);
     }
 
     public boolean isReturnLink() {

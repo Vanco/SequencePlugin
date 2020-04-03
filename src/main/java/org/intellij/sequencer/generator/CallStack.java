@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class CallStack {
-    private MethodDescription _method;
+    private final MethodDescription _method;
     private CallStack _parent;
-    private List _calls = new ArrayList();
+    private final List<CallStack> _calls = new ArrayList<>();
 
     public CallStack(MethodDescription method) {
         _method = method;
@@ -24,7 +24,7 @@ public class CallStack {
         return callStack;
     }
 
-    public boolean isReqursive(MethodDescription method) {
+    public boolean isRecursive(MethodDescription method) {
         CallStack current = this;
         while(current != null) {
             if(current._method.equals(method))
@@ -46,8 +46,8 @@ public class CallStack {
 
     private void generate(StringBuffer buffer) {
         buffer.append('(').append(_method.toJson()).append(' ');
-        for(Iterator iterator = _calls.iterator(); iterator.hasNext();) {
-            CallStack callStack = (CallStack)iterator.next();
+        for(Iterator<CallStack> iterator = _calls.iterator(); iterator.hasNext();) {
+            CallStack callStack = iterator.next();
             callStack.generate(buffer);
             if(iterator.hasNext()) {
                 buffer.append(' ');
@@ -68,9 +68,8 @@ public class CallStack {
             buffer.append("    ");
         }
         buffer.append(_method.toJson()).append('\n');
-        for(Iterator iterator = _calls.iterator(); iterator.hasNext();) {
-            CallStack callStack = (CallStack)iterator.next();
-            callStack.generateFormatStr(buffer, deep + 1 );
+        for (CallStack callStack : _calls) {
+            callStack.generateFormatStr(buffer, deep + 1);
         }
     }
 

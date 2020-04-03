@@ -23,6 +23,7 @@ import icons.SequencePluginIcons;
 import org.intellij.sequencer.SequencePanel;
 import org.intellij.sequencer.SequenceService;
 import org.intellij.sequencer.generator.SequenceParams;
+import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.intellij.sequencer.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,7 @@ public class SequenceServiceImpl implements SequenceService {
     private static final Icon S_ICON = SequencePluginIcons.SEQUENCE_ICON_13;
 
     private final Project _project;
-    private ToolWindow _toolWindow;
+    private final ToolWindow _toolWindow;
 
     public SequenceServiceImpl(Project project) {
 
@@ -63,7 +64,7 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public void showSequence(SequenceParams params) {
         PsiMethod enclosingPsiMethod = getCurrentPsiMethod();
-        if(enclosingPsiMethod == null)
+        if (enclosingPsiMethod == null)
             return;
         _toolWindow.setAvailable(true, null);
 
@@ -72,7 +73,7 @@ public class SequenceServiceImpl implements SequenceService {
             sequencePanel.generate();
             addSequencePanel(sequencePanel);
         };
-        if(_toolWindow.isActive())
+        if (_toolWindow.isActive())
             _toolWindow.show(postAction);
         else
             _toolWindow.activate(postAction);
@@ -82,15 +83,15 @@ public class SequenceServiceImpl implements SequenceService {
     public void openClassInEditor(final String className) {
         Query<PsiClass> search = AllClassesSearch.search(GlobalSearchScope.projectScope(_project), _project, className::endsWith);
         PsiClass psiClass = search.findFirst();
-        if(psiClass == null)
+        if (psiClass == null)
             return;
         openInEditor(psiClass, psiClass);
     }
 
     @Override
-    public void openMethodInEditor(String className, String methodName, List argTypes) {
-        PsiMethod psiMethod = PsiUtil.findPsiMethod(_project, getPsiManager(), className, methodName, argTypes);
-        if(psiMethod == null)
+    public void openMethodInEditor(String className, String methodName, List<String> argTypes) {
+        PsiMethod psiMethod = PsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
+        if (psiMethod == null)
             return;
         openInEditor(psiMethod.getContainingClass(), psiMethod);
     }
@@ -101,27 +102,72 @@ public class SequenceServiceImpl implements SequenceService {
     }
 
     @Override
-    public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List fromArgTypes,
-                                       String toClass, String toMethod, List toArgType, int callNo) {
-        PsiMethod fromPsiMethod = PsiUtil.findPsiMethod(_project, getPsiManager(), fromClass, fromMethod, fromArgTypes);
-        if(fromPsiMethod == null)
+    public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes,
+                                       String toClass, String toMethod, List<String> toArgType, int callNo) {
+
+        PsiMethod fromPsiMethod = PsiUtil.findPsiMethod(getPsiManager(), fromClass, fromMethod, fromArgTypes);
+        if (fromPsiMethod == null) {
             return;
-        PsiMethod toPsiMethod = PsiUtil.findPsiMethod(_project, getPsiManager(), toClass, toMethod, toArgType);
-        if(toPsiMethod == null)
+        }
+        PsiMethod toPsiMethod = PsiUtil.findPsiMethod(getPsiManager(), toClass, toMethod, toArgType);
+        if (toPsiMethod == null) {
             return;
+        }
+
         PsiElement psiElement = PsiUtil.findPsiCallExpression(filter, fromPsiMethod, toPsiMethod, callNo);
-        if(psiElement == null)
+        if (psiElement == null) {
             return;
-        openInEditor(fromPsiMethod.getContainingClass(), psiElement);
+        }
+        PsiClass containingClass = fromPsiMethod.getContainingClass();
+
+        openInEditor(containingClass, psiElement);
+    }
+
+    @Override
+    public void openLambdaExprInEditor(String fromClass, String methodName, List<String> methodArgTypes, List<String> argTypes, String returnType) {
+        PsiClass containingClass = PsiUtil.findPsiClass(getPsiManager(), fromClass);
+
+        PsiMethod psiMethod = PsiUtil.findPsiMethod(containingClass, methodName, methodArgTypes);
+        if (psiMethod == null) return;
+
+        PsiElement psiElement = PsiUtil.findLambdaExpression(psiMethod, argTypes, returnType);
+
+        openInEditor(containingClass, psiElement);
+
+    }
+
+    @Override
+    public void openMethodCallInsideLambdaExprInEditor(CompositeMethodFilter methodFilter, String fromClass,
+                                                       String enclosedMethodName, List<String> enclosedMethodArgTypes,
+                                                       List<String> argTypes, String returnType,
+                                                       String toClass, String toMethod, List<String> toArgTypes, int callNo) {
+        PsiClass containingClass = PsiUtil.findPsiClass(getPsiManager(), fromClass);
+
+        PsiMethod psiMethod = PsiUtil.findPsiMethod(containingClass, enclosedMethodName, enclosedMethodArgTypes);
+        if (psiMethod == null) return;
+
+        PsiLambdaExpression lambdaPsiElement = (PsiLambdaExpression) PsiUtil.findLambdaExpression(psiMethod, argTypes, returnType);
+
+        PsiMethod toPsiMethod = PsiUtil.findPsiMethod(getPsiManager(), toClass, toMethod, toArgTypes);
+        if (toPsiMethod == null) {
+            return;
+        }
+
+        PsiElement psiElement = PsiUtil.findPsiCallExpression(methodFilter, lambdaPsiElement, toPsiMethod, callNo);
+        if (psiElement == null) {
+            return;
+        }
+
+        openInEditor(containingClass, psiElement);
     }
 
     @Override
     public List<String> findImplementations(String className) {
-        PsiClass psiClass = PsiUtil.findPsiClass(_project, getPsiManager(), className);
+        PsiClass psiClass = PsiUtil.findPsiClass(getPsiManager(), className);
 
         if (PsiUtil.isAbstract(psiClass)) {
             PsiElement[] psiElements = DefinitionsScopedSearch.search(psiClass).toArray(PsiElement.EMPTY_ARRAY);
-            ArrayList<String> result = new ArrayList<String>();
+            ArrayList<String> result = new ArrayList<>();
 
             for (PsiElement element : psiElements) {
                 if (element instanceof PsiClass) {
@@ -132,20 +178,23 @@ public class SequenceServiceImpl implements SequenceService {
 
             return result;
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
 
     }
 
     @Override
-    public List<String> findImplementations(String className, String methodName, List argTypes) {
-        PsiMethod psiMethod = PsiUtil.findPsiMethod(_project, getPsiManager(), className, methodName, argTypes);
+    public List<String> findImplementations(String className, String methodName, List<String> argTypes) {
+        ArrayList<String> result = new ArrayList<>();
+
+        PsiMethod psiMethod = PsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
+        if (psiMethod == null) return result;
+
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
         }
         if (PsiUtil.isAbstract(containingClass)) {
             PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
-            ArrayList<String> result = new ArrayList<String>();
 
             for (PsiElement element : psiElements) {
                 if (element instanceof PsiMethod) {
@@ -155,21 +204,23 @@ public class SequenceServiceImpl implements SequenceService {
                     if (implClass == null) {
                         implClass = (PsiClass) method.getParent().getContext();
                     }
-                    result.add(implClass.getQualifiedName());
+                    if (implClass != null) {
+                        result.add(implClass.getQualifiedName());
+                    }
                 }
             }
 
             return result;
         }
-        return new ArrayList<>();
+        return result;
     }
 
     private PsiMethod getCurrentPsiMethod() {
         Editor editor = getSelectedEditor();
-        if(editor == null)
+        if (editor == null)
             return null;
         VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(editor.getDocument());
-        if(virtualFile == null)
+        if (virtualFile == null)
             return null;
         PsiFile psiFile = getPsiFile(virtualFile);
         return PsiUtil.getEnclosingMethod(psiFile, editor.getCaretModel().getOffset());
@@ -199,7 +250,7 @@ public class SequenceServiceImpl implements SequenceService {
 
     private void openInEditor(PsiClass psiClass, PsiElement psiElement) {
         VirtualFile virtualFile = PsiUtil.findVirtualFile(psiClass);
-        if(virtualFile == null)
+        if (virtualFile == null)
             return;
         getFileEditorManager().openTextEditor(new OpenFileDescriptor(_project,
                 virtualFile, psiElement.getTextOffset()), true);

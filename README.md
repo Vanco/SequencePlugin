@@ -86,10 +86,12 @@ SequenceDiagram **ONLY** generate sequence diagram for the **CURRENT** method of
 Place the cursor inside the method, trigger it from `Tools` menu or `context` menu > `Sequence Diagram...`
 
 ## Version History
-**Current Verison 1.3**
+**Current Verison 2.0**
 
-older:
+versions:
 <dl>
+        <dt>2.0</dt>
+        <dd>Support new IDEA 2020.x Dynamic Plugins. fix issue #47, #50</dd>
         <dt>1.3</dt>
         <dd>Lambda Expression. #38</dd>
         <dt>1.2</dt>

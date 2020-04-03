@@ -5,11 +5,11 @@ import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 
 public class CallFinder extends JavaElementVisitor {
-    private final Stack<PsiCallExpression> _exprStack = new Stack<PsiCallExpression>();
+    private final Stack<PsiCallExpression> _exprStack = new Stack<>();
 
     private int _callsLeft;
-    private MethodFilter _methodFilter;
-    private PsiMethod _psiMethod;
+    private final MethodFilter _methodFilter;
+    private final PsiMethod _psiMethod;
     private PsiElement _psiElement;
 
     public CallFinder(int callsLeft, MethodFilter methodFilter, PsiMethod psiMethod) {

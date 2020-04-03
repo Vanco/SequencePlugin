@@ -2,8 +2,11 @@ package org.intellij.sequencer.diagram;
 
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
+import org.intellij.sequencer.Constants;
 import org.intellij.sequencer.generator.ClassDescription;
+import org.intellij.sequencer.generator.LambdaExprDescription;
 import org.intellij.sequencer.generator.MethodDescription;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.PushbackReader;
@@ -14,17 +17,13 @@ public class Parser {
 
     private static final Logger LOGGER = Logger.getLogger(Parser.class);
 
-    private CallStack _callStack = new CallStack();
-    private List _linkList = new ArrayList();
-    private List _objList = new ArrayList();
+    private final CallInfoStack _callInfoStack = new CallInfoStack();
+    private final List<Link> _linkList = new ArrayList<>();
+    private final List<ObjectInfo> _objList = new ArrayList<>();
     private int _currentHorizontalSeq = 0;
     private int _currentVerticalSeq = 0;
 
     public Parser() {
-//        ObjectInfo objectInfo = new ObjectInfo(ObjectInfo.ACTOR_NAME, Collections.EMPTY_LIST, _currentHorizontalSeq);
-//        ++_currentHorizontalSeq;
-//        _objList.add(objectInfo);
-//        _callStack.push(new CallInfo(objectInfo, "aMethod", _currentVerticalSeq));
     }
 
     public void parse(String sequenceStr) throws IOException {
@@ -50,38 +49,42 @@ public class Parser {
     }
 
     private void resolveBackCalls() {
-        HashMap callsMap = new HashMap();
-        for (Iterator iterator = _linkList.iterator(); iterator.hasNext(); ) {
-            Link link = (Link) iterator.next();
+        HashMap<Numbering, MethodInfo> callsMap = new HashMap<Numbering, MethodInfo>();
+        for (Link link : _linkList) {
             if (!(link instanceof Call))
                 continue;
             callsMap.put(link.getMethodInfo().getNumbering(), link.getMethodInfo());
         }
-        for (Iterator iterator = _linkList.iterator(); iterator.hasNext(); ) {
-            Link link = (Link) iterator.next();
+        for (Link link : _linkList) {
             Numbering numbering = link.getMethodInfo().getNumbering().getPreviousNumbering();
             if (numbering != null)
-                link.setCallerMethodInfo((MethodInfo) callsMap.get(numbering));
+                link.setCallerMethodInfo(callsMap.get(numbering));
         }
     }
 
-    public List getLinks() {
+    public List<Link> getLinks() {
         return _linkList;
     }
 
-    public List getObjects() {
+    public List<ObjectInfo> getObjects() {
         return _objList;
     }
 
     private void addCall(String calledMethod) {
         Gson gson = new Gson();
         MethodDescription m = gson.fromJson(calledMethod, MethodDescription.class);
+        boolean isLambda = Objects.equals(m.getMethodName(), Constants.Lambda_Invoke);
+
+        if (isLambda) {
+            m = gson.fromJson(calledMethod, LambdaExprDescription.class);
+        }
+
         ClassDescription c = m.getClassDescription();
         if (_objList.isEmpty()) {
-            ObjectInfo objectInfo = new ObjectInfo(ObjectInfo.ACTOR_NAME, Collections.EMPTY_LIST, _currentHorizontalSeq);
+            ObjectInfo objectInfo = new ObjectInfo(ObjectInfo.ACTOR_NAME, new ArrayList<>(), _currentHorizontalSeq);
             ++_currentHorizontalSeq;
             _objList.add(objectInfo);
-            _callStack.push(new CallInfo(objectInfo, "aMethod", _currentVerticalSeq));
+            _callInfoStack.push(new CallInfo(objectInfo, "aMethod", _currentVerticalSeq));
         }
         ObjectInfo objectInfo = new ObjectInfo(c.getClassName(), c.getAttributes(), _currentHorizontalSeq);
         int i = _objList.indexOf(objectInfo);
@@ -89,22 +92,19 @@ public class Parser {
             ++_currentHorizontalSeq;
             _objList.add(objectInfo);
         } else {
-            objectInfo = (ObjectInfo) _objList.get(i);
+            objectInfo = _objList.get(i);
         }
 
-        CallInfo callInfo = new CallInfo(objectInfo, m, _currentVerticalSeq);
+        CallInfo callInfo = isLambda ? new LambdaInfo(objectInfo, m, _currentVerticalSeq)
+                : new CallInfo(objectInfo, m, _currentVerticalSeq);
 
-        MethodInfo methodInfo = new MethodInfo(callInfo.getObj(),
-                callInfo.getNumbering(), callInfo.getAttributes(),
-                callInfo.getMethod(), callInfo.getReturnType(),
-                callInfo.getArgNames(), callInfo.getArgTypes(),
-                callInfo.getStartingVerticalSeq(), _currentVerticalSeq);
+        MethodInfo methodInfo = createMethodInfo(isLambda, callInfo);
 
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("addCall(...) calling " + callInfo + " seq is " + _currentVerticalSeq);
 
-        if (!_callStack.isEmpty()) {
-            CallInfo currentInfo = _callStack.peek();
+        if (!_callInfoStack.isEmpty()) {
+            CallInfo currentInfo = _callInfoStack.peek();
             //currentInfo.getCall().setMethodInfo(methodInfo);
             callInfo.setNumbering();
             Call call = currentInfo.createCall(callInfo);
@@ -113,24 +113,42 @@ public class Parser {
             _linkList.add(call);
         }
 
-        _callStack.push(callInfo);
+        _callInfoStack.push(callInfo);
+    }
+
+    @NotNull
+    private MethodInfo createMethodInfo(boolean isLambda, CallInfo callInfo) {
+        return isLambda ?
+                new LambdaExprInfo(
+                        callInfo.getObj(),
+                        callInfo.getNumbering(), callInfo.getAttributes(),
+                        callInfo.getMethod(), callInfo.getReturnType(),
+                        callInfo.getArgNames(), callInfo.getArgTypes(),
+                        callInfo.getStartingVerticalSeq(), _currentVerticalSeq,
+                        ((LambdaInfo) callInfo).getEnclosedMethodName(),
+                        ((LambdaInfo) callInfo).getEnclosedMethodArgTypes()
+                ) :
+                new MethodInfo(callInfo.getObj(),
+                        callInfo.getNumbering(), callInfo.getAttributes(),
+                        callInfo.getMethod(), callInfo.getReturnType(),
+                        callInfo.getArgNames(), callInfo.getArgTypes(),
+                        callInfo.getStartingVerticalSeq(), _currentVerticalSeq);
     }
 
     private void addReturn() {
-        CallInfo callInfo = _callStack.pop();
+        CallInfo callInfo = _callInfoStack.pop();
 
-        MethodInfo methodInfo = new MethodInfo(callInfo.getObj(),
-                callInfo.getNumbering(), callInfo.getAttributes(),
-                callInfo.getMethod(), callInfo.getReturnType(),
-                callInfo.getArgNames(), callInfo.getArgTypes(),
-                callInfo.getStartingVerticalSeq(), _currentVerticalSeq);
+        boolean isLambda = callInfo instanceof LambdaInfo;
+
+        MethodInfo methodInfo = createMethodInfo(isLambda, callInfo);
+
         callInfo.getObj().addMethod(methodInfo);
 
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("addReturn(...) returning from " + callInfo + " seq is " + _currentVerticalSeq);
 
-        if (!_callStack.isEmpty()) {
-            CallInfo currentInfo = _callStack.peek();
+        if (!_callInfoStack.isEmpty()) {
+            CallInfo currentInfo = _callInfoStack.peek();
             currentInfo.getCall().setMethodInfo(methodInfo);
             CallReturn call = new CallReturn(callInfo.getObj(), currentInfo.getObj());
             call.setMethodInfo(methodInfo);
@@ -213,8 +231,8 @@ public class Parser {
         return sb.toString();
     }
 
-    private class CallStack {
-        private Stack stack = new Stack();
+    private class CallInfoStack {
+        private Stack<CallInfo> stack = new Stack<>();
         private CallInfo nPointerCallInfo;
         private int nPointerCounter;
 
@@ -226,7 +244,7 @@ public class Parser {
         }
 
         public CallInfo pop() {
-            CallInfo result = (CallInfo) stack.pop();
+            CallInfo result = stack.pop();
             nPointerCallInfo = result;
             return result;
         }
@@ -238,7 +256,7 @@ public class Parser {
         }
 
         public CallInfo peek() {
-            return (CallInfo) stack.peek();
+            return stack.peek();
         }
 
         public int size() {
@@ -251,11 +269,11 @@ public class Parser {
     }
 
     private class CallInfo {
-        private ObjectInfo _obj;
-        private String _method;
-        private List _argNames = new ArrayList();
-        private List _argTypes = new ArrayList();
-        private List _attributes = new ArrayList();
+        private final ObjectInfo _obj;
+        private final String _method;
+        private final List<String> _argNames = new ArrayList<>();
+        private final List<String> _argTypes = new ArrayList<>();
+        private final List<String> _attributes = new ArrayList<>();
         private String _returnType;
 
         private Numbering _numbering;
@@ -279,8 +297,8 @@ public class Parser {
         }
 
         void setNumbering() {
-            int stackLevel = _callStack.size() - 1;
-            Numbering numbering = _callStack.getNumbering();
+            int stackLevel = _callInfoStack.size() - 1;
+            Numbering numbering = _callInfoStack.getNumbering();
             _numbering = new Numbering(numbering);
             if (_numbering.level() <= stackLevel)
                 _numbering.addNewLevel();
@@ -301,7 +319,7 @@ public class Parser {
             return _obj;
         }
 
-        public List getAttributes() {
+        public List<String> getAttributes() {
             return _attributes;
         }
 
@@ -313,11 +331,11 @@ public class Parser {
             return _returnType;
         }
 
-        public List getArgNames() {
+        public List<String> getArgNames() {
             return _argNames;
         }
 
-        public List getArgTypes() {
+        public List<String> getArgTypes() {
             return _argTypes;
         }
 
@@ -331,6 +349,26 @@ public class Parser {
 
         public String toString() {
             return "Calling " + _method + " on " + _obj;
+        }
+    }
+
+    private class LambdaInfo extends CallInfo {
+        private final String _enclosedMethodName;
+        private final List<String> _enclosedMethodArgTypes;
+
+        public LambdaInfo(ObjectInfo obj, MethodDescription m, int startingSeq) {
+            super(obj, m, startingSeq);
+            LambdaExprDescription lm = (LambdaExprDescription) m;
+            this._enclosedMethodName = lm.getEnclosedMethodName();
+            this._enclosedMethodArgTypes = lm.getEnclosedMethodArgTypes();
+        }
+
+        public String getEnclosedMethodName() {
+            return _enclosedMethodName;
+        }
+
+        public List<String> getEnclosedMethodArgTypes() {
+            return _enclosedMethodArgTypes;
         }
     }
 }

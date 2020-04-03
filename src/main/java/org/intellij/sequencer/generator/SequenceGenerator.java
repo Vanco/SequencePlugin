@@ -2,7 +2,6 @@ package org.intellij.sequencer.generator;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.tree.java.PsiMethodCallExpressionImpl;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.diagram.Info;
@@ -12,17 +11,18 @@ import org.intellij.sequencer.util.PsiUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class SequenceGenerator extends JavaElementVisitor {
-    private final Stack<PsiCallExpression> _exprStack = new Stack<PsiCallExpression>();
-    private final Stack<CallStack> _callStack = new Stack<CallStack>();
+    private final Stack<PsiCallExpression> _exprStack = new Stack<>();
+    private final Stack<CallStack> _callStack = new Stack<>();
     private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class.getName());
 
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
     private CallStack topStack;
     private CallStack currentStack;
     private int depth;
-    private SequenceParams params;
+    private final SequenceParams params;
 
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
@@ -32,6 +32,10 @@ public class SequenceGenerator extends JavaElementVisitor {
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
+        }
+
+        if (containingClass == null) {
+            return topStack;
         }
 
         // follow implementation
@@ -52,8 +56,10 @@ public class SequenceGenerator extends JavaElementVisitor {
             }
         } else {
             // resolve variable initializer
-            if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass))
+            if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass)){
                 containingClass.accept(implementationFinder);
+            }
+
             psiMethod.accept(this);
         }
         return topStack;
@@ -61,7 +67,7 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     private boolean alreadyInStack(PsiMethod psiMethod) {
         MethodDescription method = createMethod(psiMethod);
-        return currentStack.isReqursive(method);
+        return currentStack.isRecursive(method);
     }
 
     private void methodAccept(PsiElement psiElement) {
@@ -82,14 +88,7 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     public void visitMethod(PsiMethod psiMethod) {
         MethodDescription method = createMethod(psiMethod);
-        if (topStack == null) {
-            topStack = new CallStack(method);
-            currentStack = topStack;
-        } else {
-            if (!params.isAllowRecursion() && currentStack.isReqursive(method))
-                return;
-            currentStack = currentStack.methodCall(method);
-        }
+        if (makeMethodCallExceptCurrentStackIsRecursive(method)) return;
         super.visitMethod(psiMethod);
     }
 
@@ -133,15 +132,27 @@ public class SequenceGenerator extends JavaElementVisitor {
     /**
      * If the psiMethod's containing class is Interface or abstract, then try to find it's implement class.
      *
-     * @param callExpression
-     * @param psiMethod
+     * @param callExpression expression
+     * @param psiMethod method
      */
     private void findAbstractImplFilter(PsiCallExpression callExpression, PsiMethod psiMethod) {
         try {
             PsiClass containingClass = psiMethod.getContainingClass();
             if (PsiUtil.isAbstract(containingClass)) {
                 String type = containingClass.getQualifiedName();
-                String impl = ((PsiMethodCallExpressionImpl) callExpression).getMethodExpression().getQualifierExpression().getType().getCanonicalText();
+                if (type == null) return;
+
+                PsiMethodCallExpression psiMethodCallExpression = (PsiMethodCallExpression) callExpression;
+                PsiExpression qualifierExpression = psiMethodCallExpression.getMethodExpression().getQualifierExpression();
+
+                if (qualifierExpression == null) return;
+
+                PsiType psiType = qualifierExpression.getType();
+
+                if (psiType == null) return;
+
+                String impl = psiType.getCanonicalText();
+
                 if (!impl.startsWith(type))
                     params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
             }
@@ -151,11 +162,10 @@ public class SequenceGenerator extends JavaElementVisitor {
     }
 
     private void methodCall(PsiMethod psiMethod) {
-        if (psiMethod == null)
-            return;
-        if (!params.getMethodFilter().allow(psiMethod))
-            return;
-        else if (depth < params.getMaxDepth() - 1) {
+        if (psiMethod == null) return;
+        if (!params.getMethodFilter().allow(psiMethod)) return;
+
+        if (depth < params.getMaxDepth() - 1) {
             CallStack oldStack = currentStack;
             depth++;
             LOGGER.debug("+ depth = " + depth + " method = " + psiMethod.getName());
@@ -168,28 +178,41 @@ public class SequenceGenerator extends JavaElementVisitor {
     }
 
     private MethodDescription createMethod(PsiMethod psiMethod) {
-        PsiParameter[] parameters = psiMethod.getParameterList().getParameters();
-        List argNames = new ArrayList();
-        List argTypes = new ArrayList();
-        for (int i = 0; i < parameters.length; i++) {
-            PsiParameter parameter = parameters[i];
-            argNames.add(parameter.getName());
-            PsiType psiType = parameter.getType();
-            argTypes.add(psiType == null ? null : psiType.getCanonicalText());
-        }
+
+        ParamPair paramPair = extractParameters(psiMethod.getParameterList());
+
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
         }
-        List attributes = createAttributes(psiMethod.getModifierList(), PsiUtil.isExternal(containingClass));
+
+        Objects.requireNonNull(containingClass);
+
+        List<String> attributes = createAttributes(psiMethod.getModifierList(), PsiUtil.isExternal(containingClass));
         if (psiMethod.isConstructor())
             return MethodDescription.createConstructorDescription(
                     createClassDescription(containingClass),
-                    attributes, argNames, argTypes);
+                    attributes, paramPair.argNames, paramPair.argTypes);
+
+        PsiType returnType = psiMethod.getReturnType();
+        Objects.requireNonNull(returnType);
+
         return MethodDescription.createMethodDescription(
                 createClassDescription(containingClass),
-                attributes, psiMethod.getName(), psiMethod.getReturnType().getCanonicalText(),
-                argNames, argTypes);
+                attributes, psiMethod.getName(), returnType.getCanonicalText(),
+                paramPair.argNames, paramPair.argTypes);
+    }
+
+    private ParamPair extractParameters(PsiParameterList parameterList) {
+        PsiParameter[] parameters = parameterList.getParameters();
+        List<String> argNames = new ArrayList<>();
+        List<String> argTypes = new ArrayList<>();
+        for (PsiParameter parameter : parameters) {
+            argNames.add(parameter.getName());
+            PsiType psiType = parameter.getType();
+            argTypes.add(psiType.getCanonicalText());
+        }
+        return new ParamPair(argNames, argTypes);
     }
 
     private ClassDescription createClassDescription(PsiClass psiClass) {
@@ -197,10 +220,11 @@ public class SequenceGenerator extends JavaElementVisitor {
                 createAttributes(psiClass.getModifierList(), PsiUtil.isExternal(psiClass)));
     }
 
-    private List createAttributes(PsiModifierList psiModifierList, boolean external) {
+    private List<String> createAttributes(PsiModifierList psiModifierList, boolean external) {
         if (psiModifierList == null)
-            return Collections.EMPTY_LIST;
-        List attributes = new ArrayList();
+            return Collections.emptyList();
+
+        List<String> attributes = new ArrayList<>();
         for (int i = 0; i < Info.RECOGNIZED_METHOD_ATTRIBUTES.length; i++) {
             String attribute = Info.RECOGNIZED_METHOD_ATTRIBUTES[i];
             if (psiModifierList.hasModifierProperty(attribute))
@@ -216,31 +240,39 @@ public class SequenceGenerator extends JavaElementVisitor {
     @Override
     public void visitLocalVariable(PsiLocalVariable variable) {
         PsiJavaCodeReferenceElement referenceElement = variable.getTypeElement().getInnermostComponentReferenceElement();
+
+        variableImplementationFinder(referenceElement, variable.getType(), variable.getInitializer());
+
+        super.visitLocalVariable(variable);
+    }
+
+    private void variableImplementationFinder(PsiJavaCodeReferenceElement referenceElement, PsiType psiType, PsiExpression initializer) {
         if (referenceElement != null) {
             PsiClass psiClass = (PsiClass) referenceElement.resolve();
 
             if (PsiUtil.isAbstract(psiClass)) {
-                String type = variable.getType().getCanonicalText();
-                PsiExpression initializer = variable.getInitializer();
+                String type = psiType.getCanonicalText();
                 if (initializer instanceof PsiNewExpression) {
-                    String impl = initializer.getType().getCanonicalText();
-                    if (!type.equals(impl)) {
-                        params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                    PsiType initializerType = initializer.getType();
+                    if (initializerType != null) {
+                        String impl = initializerType.getCanonicalText();
+                        if (!type.equals(impl)) {
+                            params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                        }
                     }
+
                 }
             }
-
         }
-
-        super.visitLocalVariable(variable);
     }
 
     @Override
     public void visitAssignmentExpression(PsiAssignmentExpression expression) {
         PsiExpression re = expression.getRExpression();
         if (params.isSmartInterface() && re instanceof PsiNewExpression) {
-            String face = expression.getType().getCanonicalText();
-            String impl = expression.getRExpression().getType().getCanonicalText();
+            String face = Objects.requireNonNull(expression.getType()).getCanonicalText();
+            PsiType psiType = Objects.requireNonNull(expression.getRExpression()).getType();
+            String impl = Objects.requireNonNull(psiType).getCanonicalText();
 
             params.getInterfaceImplFilter().put(face, new ImplementClassFilter(impl));
 
@@ -251,27 +283,26 @@ public class SequenceGenerator extends JavaElementVisitor {
     @Override
     public void visitLambdaExpression(PsiLambdaExpression expression) {
         MethodDescription method = createMethod(expression);
+        if (makeMethodCallExceptCurrentStackIsRecursive(method)) return;
+        super.visitLambdaExpression(expression);
+    }
+
+    private boolean makeMethodCallExceptCurrentStackIsRecursive(MethodDescription method) {
         if (topStack == null) {
             topStack = new CallStack(method);
             currentStack = topStack;
         } else {
-            if (!params.isAllowRecursion() && currentStack.isReqursive(method))
-                return;
+            if (params.isNotAllowRecursion() && currentStack.isRecursive(method))
+                return true;
             currentStack = currentStack.methodCall(method);
         }
-        super.visitLambdaExpression(expression);
+        return false;
     }
 
     private MethodDescription createMethod(PsiLambdaExpression expression) {
-        PsiParameter[] parameters = expression.getParameterList().getParameters();
-        List argNames = new ArrayList();
-        List argTypes = new ArrayList();
-        for (int i = 0; i < parameters.length; i++) {
-            PsiParameter parameter = parameters[i];
-            argNames.add(parameter.getName());
-            PsiType psiType = parameter.getType();
-            argTypes.add(psiType == null ? null : psiType.getCanonicalText());
-        }
+
+        ParamPair paramPair = extractParameters(expression.getParameterList());
+
         String returnType;
         PsiType functionalInterfaceType = expression.getFunctionalInterfaceType();
         if (functionalInterfaceType == null) {
@@ -280,14 +311,11 @@ public class SequenceGenerator extends JavaElementVisitor {
             returnType = functionalInterfaceType.getCanonicalText();
         }
 
-        PsiMethod psiMethod = PsiUtil.findEncolsedPsiMethod(expression);
-        PsiClass containingClass = psiMethod.getContainingClass();
-        if (containingClass == null) {
-            containingClass = (PsiClass) psiMethod.getParent().getContext();
-        }
+        PsiMethod psiMethod = PsiUtil.findEnclosedPsiMethod(expression);
 
-        return MethodDescription.createLambdaDescription(
-                createClassDescription(containingClass), argNames, argTypes, returnType);
+        MethodDescription enclosedMethod = createMethod(psiMethod);
+
+        return new LambdaExprDescription(enclosedMethod, returnType, paramPair.argNames, paramPair.argTypes);
     }
 
     @Override
@@ -314,20 +342,7 @@ public class SequenceGenerator extends JavaElementVisitor {
             PsiTypeElement typeElement = field.getTypeElement();
             if (typeElement != null) {
                 PsiJavaCodeReferenceElement referenceElement = typeElement.getInnermostComponentReferenceElement();
-                if (referenceElement != null) {
-                    PsiClass psiClass = (PsiClass) referenceElement.resolve();
-                    if (PsiUtil.isAbstract(psiClass)) {
-                        String type = field.getType().getCanonicalText();
-                        PsiExpression initializer = field.getInitializer();
-                        if (initializer != null && initializer instanceof PsiNewExpression) {
-                            String impl = initializer.getType().getCanonicalText();
-                            if (!type.equals(impl)) {
-                                params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
-                            }
-                        }
-                    }
-
-                }
+                variableImplementationFinder(referenceElement, field.getType(), field.getInitializer());
             }
 
             super.visitField(field);
@@ -346,8 +361,8 @@ public class SequenceGenerator extends JavaElementVisitor {
         public void visitAssignmentExpression(PsiAssignmentExpression expression) {
             PsiExpression re = expression.getRExpression();
             if (re instanceof PsiNewExpression) {
-                String face = expression.getType().getCanonicalText();
-                String impl = expression.getRExpression().getType().getCanonicalText();
+                String face = Objects.requireNonNull(expression.getType()).getCanonicalText();
+                String impl = Objects.requireNonNull(expression.getRExpression().getType()).getCanonicalText();
 
                 params.getInterfaceImplFilter().put(face, new ImplementClassFilter(impl));
 
@@ -359,5 +374,15 @@ public class SequenceGenerator extends JavaElementVisitor {
             psiElement.acceptChildren(this);
         }
 
+    }
+
+    private static class ParamPair {
+        final List<String> argNames;
+        final List<String> argTypes;
+
+        public ParamPair(List<String> argNames, List<String> argTypes) {
+            this.argNames = argNames;
+            this.argTypes = argTypes;
+        }
     }
 }

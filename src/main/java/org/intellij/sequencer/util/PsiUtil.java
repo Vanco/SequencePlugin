@@ -1,20 +1,18 @@
 package org.intellij.sequencer.util;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.ClassUtil;
 import org.intellij.sequencer.generator.filters.MethodFilter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class PsiUtil {
 
     private PsiUtil() {
-    }
-
-    public static boolean isInsideAMethod(PsiFile psiFile, int position) {
-        return getEnclosingMethod(psiFile, position) != null;
     }
 
     public static PsiMethod getEnclosingMethod(PsiFile psiFile, int position) {
@@ -49,36 +47,26 @@ public class PsiUtil {
         return containingFile.getVirtualFile();
     }
 
-    public static PsiMethod findPsiMethod(PsiMethod[] psiMethods, String methodName, List argTypes) {
-        for (int i = 0; i < psiMethods.length; i++) {
-            PsiMethod psiMethod = psiMethods[i];
+    public static PsiMethod findPsiMethod(PsiMethod[] psiMethods, String methodName, List<String> argTypes) {
+        for (PsiMethod psiMethod : psiMethods) {
             if (PsiUtil.isMethod(psiMethod, methodName, argTypes))
                 return psiMethod;
         }
         return null;
     }
 
-    public static boolean isMethod(PsiMethod psiMethod, String methodName, List argTypes) {
+    public static boolean isMethod(PsiMethod psiMethod, String methodName, List<String> argTypes) {
         if (!psiMethod.getName().equals(methodName))
             return false;
         PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
-        if (psiParameters.length != argTypes.size())
-            return false;
-        for (int i = 0; i < psiParameters.length; i++) {
-            PsiParameter psiParameter = psiParameters[i];
-            if (psiParameter.getType() == null)
-                return false;
-            if (!psiParameter.getType().getCanonicalText().equals(argTypes.get(i)))
-                return false;
-        }
-        return true;
+        return parameterEquals(psiParameters, argTypes);
     }
 
     public static boolean isAbstract(PsiClass psiClass) {
         return psiClass != null
                 && (psiClass.isInterface()
                         || psiClass.getModifierList() != null
-                        && psiClass.getModifierList().hasModifierProperty("abstract")
+                        && psiClass.getModifierList().hasModifierProperty(PsiModifier.ABSTRACT)
         );
     }
 
@@ -86,28 +74,30 @@ public class PsiUtil {
         return isInClassFile(psiClass) || isInJarFileSystem(psiClass);
     }
 
-    public static PsiClass findPsiClass(Project project, PsiManager psiManager, String className) {
-        PsiClass psiClass = ClassUtil.findPsiClass(psiManager, className);
-        return psiClass;
+    public static PsiClass findPsiClass(PsiManager psiManager, String className) {
+        return ClassUtil.findPsiClass(psiManager, className);
     }
 
-    public static PsiMethod findPsiMethod(Project project, PsiManager psiManager,
-                                          final String className, String methodName, List argTypes) {
+    public static PsiMethod findPsiMethod(PsiManager psiManager,
+                                          final String className, String methodName, List<String> argTypes) {
         PsiClass psiClass = ClassUtil.findPsiClass(psiManager, className);
         if (psiClass == null)
             return null;
+        return findPsiMethod(psiClass, methodName, argTypes);
+    }
+
+    @Nullable
+    public static PsiMethod findPsiMethod(PsiClass psiClass, String methodName, List<String> argTypes) {
         PsiMethod[] psiMethods = psiClass.findMethodsByName(methodName, false);
-        if (psiMethods == null || psiMethods.length == 0)
+        if (psiMethods.length == 0)
             return null;
         return PsiUtil.findPsiMethod(psiMethods, methodName, argTypes);
     }
 
     public static PsiElement findPsiCallExpression(final MethodFilter methodFilter,
-                                                   PsiMethod fromPsiMethod,
+                                                   @NotNull PsiElement psiCodeBlock,
                                                    final PsiMethod toPsiMethod,
                                                    final int callNo) {
-        PsiCodeBlock psiCodeBlock = fromPsiMethod.getBody();
-        if (psiCodeBlock == null) return null;
         CallFinder callFinder = new CallFinder(callNo, methodFilter, toPsiMethod);
         psiCodeBlock.accept(callFinder);
         return callFinder.getPsiElement();
@@ -123,10 +113,6 @@ public class PsiUtil {
             psiElement = psiElement.getParent();
         }
         return null;
-    }
-
-    public static void acceptChildren(PsiElement psiElement, PsiElementVisitor visitor) {
-        psiElement.acceptChildren(visitor);
     }
 
     public static boolean isPipeline(PsiCallExpression callExpression) {
@@ -166,11 +152,40 @@ public class PsiUtil {
         return false;
     }
 
-    public static PsiMethod findEncolsedPsiMethod(PsiLambdaExpression expression) {
+    public static PsiMethod findEnclosedPsiMethod(PsiLambdaExpression expression) {
         PsiElement parent = expression.getParent();
         while (!(parent instanceof PsiMethod)) {
             parent = parent.getParent();
         }
         return (PsiMethod) parent;
+    }
+
+    public static boolean isLambdaExpression(PsiLambdaExpression expression, List<String> argTypes, String returnType) {
+        PsiType psiType = expression.getFunctionalInterfaceType();
+        if (psiType == null)
+            return false;
+        if (!Objects.equals(returnType, psiType.getCanonicalText())) {
+            return false;
+        }
+
+        PsiParameter[] psiParameters = expression.getParameterList().getParameters();
+        return parameterEquals(psiParameters, argTypes);
+    }
+
+    private static boolean parameterEquals(PsiParameter[] psiParameters, List<String> argTypes) {
+        if (psiParameters.length != argTypes.size())
+            return false;
+        for (int i = 0; i < psiParameters.length; i++) {
+            PsiParameter psiParameter = psiParameters[i];
+            if (!psiParameter.getType().getCanonicalText().equals(argTypes.get(i)))
+                return false;
+        }
+        return true;
+    }
+
+    public static PsiElement findLambdaExpression(PsiElement parent, List<String> argTypes, String returnType) {
+        LambdaFinder callFinder = new LambdaFinder(argTypes, returnType);
+        parent.accept(callFinder);
+        return callFinder.getPsiElement();
     }
 }

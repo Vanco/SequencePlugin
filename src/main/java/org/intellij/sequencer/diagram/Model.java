@@ -41,9 +41,9 @@ public class Model {
 
     public boolean readFromFile(File f) {
         try {
-            StringBuffer sb = new StringBuffer(1024);
+            StringBuilder sb = new StringBuilder(1024);
             BufferedReader br = new BufferedReader(new FileReader(f));
-            String s = null;
+            String s;
             while((s = br.readLine()) != null) {
                 sb.append(s);
                 sb.append("\n");
@@ -63,7 +63,7 @@ public class Model {
         try {
             PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
             BufferedReader br = new BufferedReader(new StringReader(getText()));
-            String s = null;
+            String s;
             while((s = br.readLine()) != null) {
                 out.println(s);
             }

@@ -1,6 +1,7 @@
 package org.intellij.sequencer.diagram;
 
-import com.intellij.util.ui.UIUtil;
+import com.intellij.ui.JBColor;
+import com.intellij.util.ui.ImageUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,10 +50,10 @@ public class PreviewPanel extends JPanel {
         if(_yScale > 1.)
             _yScale = 1.;
 //        _xScale = _yScale = Math.min(_xScale, _yScale);
-        _image = UIUtil.createImage(getWidth(), getHeight(), BufferedImage.TYPE_USHORT_555_RGB);
+        _image = ImageUtil.createImage(getWidth(), getHeight(), BufferedImage.TYPE_USHORT_555_RGB);
         Graphics2D g2 = _image.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(Color.white);
+        g2.setColor(JBColor.WHITE);
         g2.fillRect(0, 0, getWidth(), getHeight());
         AffineTransform at = AffineTransform.getScaleInstance(_xScale, _yScale);
         g2.setTransform(at);
@@ -68,12 +69,12 @@ public class PreviewPanel extends JPanel {
         newX -= eW / 2;
         newY -= eH / 2;
 
-        newX = newX < 0 ? 0 : newX;
-        newY = newY < 0 ? 0 : newY;
+        newX = Math.max(newX, 0);
+        newY = Math.max(newY, 0);
 
         Dimension fullSize = _display.getFullSize();
-        newX = newX > fullSize.width - eW ? fullSize.width - eW : newX;
-        newY = newY > fullSize.height - eH ? fullSize.height - eH : newY;
+        newX = Math.min(newX, fullSize.width - eW);
+        newY = Math.min(newY, fullSize.height - eH);
 
         if(eW >= fullSize.width)
             newX = 0;

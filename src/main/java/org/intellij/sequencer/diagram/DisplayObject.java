@@ -1,15 +1,11 @@
 package org.intellij.sequencer.diagram;
 
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
-import com.intellij.util.ui.UIUtil;
 import org.apache.log4j.Logger;
 import org.intellij.sequencer.config.Configuration;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class DisplayObject extends ScreenObject {
@@ -34,9 +30,9 @@ public class DisplayObject extends ScreenObject {
     private int _fullWidth;
     private ObjectInfo _objectInfo;
 
-    private List _calls = new ArrayList();
-    private List _returns = new ArrayList();
-    private List _methods = new ArrayList();
+    private List<DisplayLink> _calls = new ArrayList<>();
+    private List<DisplayLink> _returns = new ArrayList<DisplayLink>();
+    private List<DisplayMethod> _methods = new ArrayList<>();
 
     DisplayObject(ObjectInfo objectInfo) {
         _objectInfo = objectInfo;
@@ -45,11 +41,11 @@ public class DisplayObject extends ScreenObject {
 
     void initializeGraphics(Graphics2D g2) {
         _textBox.init(g2);
-        for(Iterator it = _calls.iterator(); it.hasNext();) {
-            ((DisplayLink)it.next()).initOne(g2);
+        for (DisplayLink call : _calls) {
+            call.initOne(g2);
         }
-        for(Iterator it = _returns.iterator(); it.hasNext();) {
-            ((DisplayLink)it.next()).initOne(g2);
+        for (DisplayLink aReturn : _returns) {
+            aReturn.initOne(g2);
         }
     }
 
@@ -67,7 +63,7 @@ public class DisplayObject extends ScreenObject {
         _calls.add(c);
     }
 
-    List getCalls() {
+    List<DisplayLink> getCalls() {
         return _calls;
     }
 
@@ -86,10 +82,9 @@ public class DisplayObject extends ScreenObject {
             displayMethod.setHorizontalSeq(0);
         } else {
             int enclosingCount = 0;
-            for(Iterator it = _methods.iterator(); it.hasNext();) {
-                DisplayMethod otherMb = (DisplayMethod)it.next();
-                if((otherMb.getStartSeq() < displayMethod.getStartSeq()) &&
-                      (otherMb.getEndSeq() > displayMethod.getEndSeq()))
+            for (DisplayMethod otherMb : _methods) {
+                if ((otherMb.getStartSeq() < displayMethod.getStartSeq()) &&
+                        (otherMb.getEndSeq() > displayMethod.getEndSeq()))
                     ++enclosingCount;
             }
             displayMethod.setHorizontalSeq(enclosingCount);
@@ -185,9 +180,8 @@ public class DisplayObject extends ScreenObject {
         if(LOGGER.isDebugEnabled())
             LOGGER.debug("getMethodDepth(" + seq + ")");
         int depth = 0;
-        for(Iterator it = _methods.iterator(); it.hasNext();) {
-            DisplayMethod displayMethod = (DisplayMethod)it.next();
-            if((displayMethod.getStartSeq() <= seq) && (displayMethod.getEndSeq() >= seq))
+        for (DisplayMethod displayMethod : _methods) {
+            if ((displayMethod.getStartSeq() <= seq) && (displayMethod.getEndSeq() >= seq))
                 ++depth;
         }
         return depth;
@@ -195,10 +189,9 @@ public class DisplayObject extends ScreenObject {
 
     public DisplayMethod findMethod(int x, int y) {
         DisplayMethod selectedMethodBox = null;
-        for(Iterator iterator = _methods.iterator(); iterator.hasNext();) {
-            DisplayMethod methodBox = (DisplayMethod)iterator.next();
-            if(methodBox.isInRange(x, y))
-                if((selectedMethodBox == null || selectedMethodBox.getX() < methodBox.getX()))
+        for (DisplayMethod methodBox : _methods) {
+            if (methodBox.isInRange(x, y))
+                if ((selectedMethodBox == null || selectedMethodBox.getX() < methodBox.getX()))
                     selectedMethodBox = methodBox;
         }
         return selectedMethodBox;
@@ -212,30 +205,26 @@ public class DisplayObject extends ScreenObject {
             g2.drawLine(getCenterX(), 0, getCenterX(), _fullHeight);
             g2.setStroke(oldStroke);
 
-            for(Iterator it = _methods.iterator(); it.hasNext();) {
-                DisplayMethod methodBox = (DisplayMethod)it.next();
+            for (DisplayMethod methodBox : _methods) {
                 methodBox.paint(g2);
             }
         }
 
-        for(Iterator it = _calls.iterator(); it.hasNext();) {
-            DisplayLink displayLink = (DisplayLink)it.next();
-            if(displayLink.getLink().isBootstrap())
-                continue;
+        for (DisplayLink displayLink : _calls) {
+//            if (displayLink.getLink().isBootstrap())
+//                continue;
             displayLink.paint(g2);
         }
-        for(Iterator it = _returns.iterator(); it.hasNext();) {
-            DisplayLink displayLink = (DisplayLink)it.next();
+        for (DisplayLink displayLink : _returns) {
             // todo make it configurable
-            if(displayLink instanceof DisplaySelfCallReturn || displayLink.getLink().isBootstrap())
+            if (displayLink instanceof DisplaySelfCallReturn /*|| displayLink.getLink().isBootstrap()*/)
                 continue;
-            if(!Configuration.getInstance().SHOW_RETURN_ARROWS && displayLink instanceof DisplayCallReturn)
+            if (!Configuration.getInstance().SHOW_RETURN_ARROWS && displayLink instanceof DisplayCallReturn)
                 continue;
-            if(displayLink.getTo().getObjectInfo().getName().equals(ObjectInfo.ACTOR_NAME))
+            if (displayLink.getTo().getObjectInfo().getName().equals(ObjectInfo.ACTOR_NAME))
                 continue;
             displayLink.paint(g2);
         }
-        return;
     }
 
     private boolean isInClipArea(Graphics2D g2, int height) {

@@ -1,7 +1,6 @@
 package org.intellij.sequencer;
 
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
@@ -15,21 +14,21 @@ import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.generator.filters.SingleClassFilter;
 import org.intellij.sequencer.generator.filters.SingleMethodFilter;
 import org.intellij.sequencer.ui.MyButtonlessScrollBarUI;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Objects;
 
 public class SequencePanel extends JPanel {
-    private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
+    //private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
 
     private Display _display;
     private Model _model;
@@ -59,11 +58,7 @@ public class SequencePanel extends JPanel {
 
         MyButton birdViewButton = new MyButton(SequencePluginIcons.PREVIEW_ICON_13);
         birdViewButton.setToolTipText("Bird view");
-        birdViewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showBirdView();
-            }
-        });
+        birdViewButton.addActionListener(e -> showBirdView());
 
         _jScrollPane = new JBScrollPane(_display);
         _jScrollPane.setVerticalScrollBar(new MyScrollBar(Adjustable.VERTICAL));
@@ -140,23 +135,61 @@ public class SequencePanel extends JPanel {
     private void gotoMethod(MethodInfo methodInfo) {
         String className = methodInfo.getObjectInfo().getFullName();
         String methodName = methodInfo.getRealName();
-        List argTypes = methodInfo.getArgTypes();
+        List<String> argTypes = methodInfo.getArgTypes();
         _plugin.openMethodInEditor(className, methodName, argTypes);
     }
 
     private void gotoCall(MethodInfo fromMethodInfo, MethodInfo toMethodInfo) {
-        if (fromMethodInfo == null || toMethodInfo == null)
+        if (toMethodInfo == null) {
             return;
-        _plugin.openMethodCallInEditor(
-                _sequenceParams.getMethodFilter(),
-                fromMethodInfo.getObjectInfo().getFullName(),
-                fromMethodInfo.getRealName(),
-                fromMethodInfo.getArgTypes(),
-                toMethodInfo.getObjectInfo().getFullName(),
-                toMethodInfo.getRealName(),
-                toMethodInfo.getArgTypes(),
-                toMethodInfo.getNumbering().getTopLevel()
-        );
+        }
+
+        // Only first call from Actor, the fromMethodInfo is null
+        if (fromMethodInfo == null) {
+            gotoMethod(toMethodInfo);
+            return;
+        }
+
+        if (isLambdaCall(toMethodInfo)) {
+            _plugin.openLambdaExprInEditor(
+                    fromMethodInfo.getObjectInfo().getFullName(),
+                    fromMethodInfo.getRealName(),
+                    fromMethodInfo.getArgTypes(),
+                    toMethodInfo.getArgTypes(),
+                    toMethodInfo.getReturnType()
+            );
+        } else if (isLambdaCall(fromMethodInfo)) {
+            LambdaExprInfo lambdaExprInfo = (LambdaExprInfo) fromMethodInfo;
+            _plugin.openMethodCallInsideLambdaExprInEditor(
+                    _sequenceParams.getMethodFilter(),
+                    lambdaExprInfo.getObjectInfo().getFullName(),
+                    lambdaExprInfo.getEnclosedMethodName(),
+                    lambdaExprInfo.getEnclosedMethodArgTypes(),
+                    lambdaExprInfo.getArgTypes(),
+                    lambdaExprInfo.getReturnType(),
+                    toMethodInfo.getObjectInfo().getFullName(),
+                    toMethodInfo.getRealName(),
+                    toMethodInfo.getArgTypes(),
+                    toMethodInfo.getNumbering().getTopLevel()
+            );
+        } else if (fromMethodInfo.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && fromMethodInfo.hasAttribute(Info.ABSTRACT_ATTRIBUTE)) {
+            gotoMethod(toMethodInfo);
+        } else {
+            _plugin.openMethodCallInEditor(
+                    _sequenceParams.getMethodFilter(),
+                    fromMethodInfo.getObjectInfo().getFullName(),
+                    fromMethodInfo.getRealName(),
+                    fromMethodInfo.getArgTypes(),
+                    toMethodInfo.getObjectInfo().getFullName(),
+                    toMethodInfo.getRealName(),
+                    toMethodInfo.getArgTypes(),
+                    toMethodInfo.getNumbering().getTopLevel()
+            );
+        }
+    }
+
+    private boolean isLambdaCall(MethodInfo methodInfo) {
+        return Objects.equals(methodInfo.getRealName(), Constants.Lambda_Invoke);
     }
 
 
@@ -165,7 +198,7 @@ public class SequencePanel extends JPanel {
             super("ReGenerate", "Regenerate diagram", SequencePluginIcons.REFRESH_ICON);
         }
 
-        public void actionPerformed(AnActionEvent anActionEvent) {
+        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             generate();
 
         }
@@ -176,7 +209,7 @@ public class SequencePanel extends JPanel {
             super("Export", "Export image to file", SequencePluginIcons.EXPORT_ICON);
         }
 
-        public void actionPerformed(AnActionEvent event) {
+        public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
@@ -207,8 +240,9 @@ public class SequencePanel extends JPanel {
         public ExportTextAction() {
             super("ExportTextFile", "Export call stack as text file", SequencePluginIcons.EXPORT_TEXT_ICON);
         }
+
         @Override
-        public void actionPerformed(AnActionEvent event) {
+        public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
@@ -236,41 +270,41 @@ public class SequencePanel extends JPanel {
     }
 
     private class GotoSourceAction extends AnAction {
-        private ScreenObject _screenObject;
+        private final ScreenObject _screenObject;
 
         public GotoSourceAction(ScreenObject screenObject) {
             super("Go to Source");
             _screenObject = screenObject;
         }
 
-        public void actionPerformed(AnActionEvent anActionEvent) {
+        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             gotoSourceCode(_screenObject);
         }
     }
 
     private class RemoveClassAction extends AnAction {
-        private ObjectInfo _objectInfo;
+        private final ObjectInfo _objectInfo;
 
         public RemoveClassAction(ObjectInfo objectInfo) {
             super("Remove Class '" + objectInfo.getName() + "'");
             _objectInfo = objectInfo;
         }
 
-        public void actionPerformed(AnActionEvent anActionEvent) {
+        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             _sequenceParams.getMethodFilter().addFilter(new SingleClassFilter(_objectInfo.getFullName()));
             generate();
         }
     }
 
     private class RemoveMethodAction extends AnAction {
-        private MethodInfo _methodInfo;
+        private final MethodInfo _methodInfo;
 
         public RemoveMethodAction(MethodInfo methodInfo) {
             super("Remove Method '" + methodInfo.getRealName() + "()'");
             _methodInfo = methodInfo;
         }
 
-        public void actionPerformed(AnActionEvent anActionEvent) {
+        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             _sequenceParams.getMethodFilter().addFilter(new SingleMethodFilter(
                     _methodInfo.getObjectInfo().getFullName(),
                     _methodInfo.getRealName(),
@@ -282,8 +316,8 @@ public class SequencePanel extends JPanel {
     }
 
     private class ExpendInterfaceAction extends AnAction {
-        private String face;
-        private String impl;
+        private final String face;
+        private final String impl;
 
         public ExpendInterfaceAction(String face, String impl) {
             super(impl);
@@ -292,7 +326,7 @@ public class SequencePanel extends JPanel {
         }
 
         @Override
-        public void actionPerformed(AnActionEvent anActionEvent) {
+        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             _sequenceParams.getInterfaceImplFilter().put(
                     face,
                     new ImplementClassFilter(impl)
@@ -317,23 +351,23 @@ public class SequencePanel extends JPanel {
                     List<String> impls = _plugin.findImplementations(className);
                     actionGroup.addSeparator();
                     for (String impl : impls) {
-                        actionGroup.add(new ExpendInterfaceAction(className,impl));
+                        actionGroup.add(new ExpendInterfaceAction(className, impl));
                     }
                     actionGroup.addSeparator();
                 }
-               actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
+                actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
             } else if (screenObject instanceof DisplayMethod) {
                 DisplayMethod displayMethod = (DisplayMethod) screenObject;
                 if (displayMethod.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && !_sequenceParams.isSmartInterface()) {
 
                     String className = displayMethod.getObjectInfo().getFullName();
                     String methodName = displayMethod.getMethodInfo().getRealName();
-                    List argTypes = displayMethod.getMethodInfo().getArgTypes();
+                    List<String> argTypes = displayMethod.getMethodInfo().getArgTypes();
                     List<String> impls = _plugin.findImplementations(className, methodName, argTypes);
 
                     actionGroup.addSeparator();
                     for (String impl : impls) {
-                        actionGroup.add(new ExpendInterfaceAction(className,impl));
+                        actionGroup.add(new ExpendInterfaceAction(className, impl));
                     }
                     actionGroup.addSeparator();
 
@@ -351,7 +385,7 @@ public class SequencePanel extends JPanel {
         }
     }
 
-    private class MyScrollBar extends JBScrollBar {
+    private static class MyScrollBar extends JBScrollBar {
         public MyScrollBar(int orientation) {
             super(orientation);
         }
@@ -364,7 +398,7 @@ public class SequencePanel extends JPanel {
 
     }
 
-    private class MyButton extends JButton {
+    private static class MyButton extends JButton {
 
         public MyButton(Icon icon) {
             super(icon);

@@ -1,5 +1,7 @@
 package org.intellij.sequencer.ui;
 
+import com.intellij.ui.JBColor;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
@@ -34,7 +36,7 @@ public class PlasticTabbedPaneUI  extends MetalTabbedPaneUI {
      * Used in mark content borders mode to paint the content border
      * that may be otherwise difficult to see.
      */
-    private static Color MARK_CONTENT_BORDER_COLOR = Color.magenta;
+    private static Color MARK_CONTENT_BORDER_COLOR = JBColor.MAGENTA;
 
     /**
      * Describes if we paint no content border or not; is false by default.

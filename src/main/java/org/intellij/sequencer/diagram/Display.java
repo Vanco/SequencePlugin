@@ -1,7 +1,7 @@
 package org.intellij.sequencer.diagram;
 
 import com.intellij.ui.JBColor;
-import com.intellij.util.ui.UIUtil;
+import com.intellij.util.ui.ImageUtil;
 import org.intellij.sequencer.config.ConfigListener;
 import org.intellij.sequencer.config.Configuration;
 
@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class Display extends JComponent implements ModelTextListener, Scrollable, ConfigListener {
     private int _inset = 5;
 
-    private Model _model = null;
+    private Model _model;
     private SequenceListener _listener;
 
     private boolean _initialized = false;
@@ -83,7 +83,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         Configuration configuration = Configuration.getInstance();
         g2.setFont(new Font(configuration.FONT_NAME, Font.PLAIN, configuration.FONT_SIZE));
         if (configuration.USE_ANTIALIASING) {
-            HashMap hintsMap = new HashMap();
+            HashMap<Object, Object> hintsMap = new HashMap<>();
             hintsMap.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.addRenderingHints(hintsMap);
         }
@@ -186,7 +186,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
     public void saveImageToFile(File file) throws IOException {
         Dimension size = getFullSize();
-        BufferedImage image = UIUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = ImageUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
         try {
             String systemLookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
@@ -280,7 +280,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         }
     }
 
-    private class NullListener implements SequenceListener {
+    private static class NullListener implements SequenceListener {
         public void selectedScreenObject(ScreenObject screenObject) {
         }
 

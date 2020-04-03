@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class ConfigurationUI implements ActionListener {
     public static final String[] FONT_SIZES =
@@ -18,8 +19,8 @@ public class ConfigurationUI implements ActionListener {
     private JButton _externalClassColor;
     private JButton _methodBarColor;
     private JButton _selectedMethodBarColor;
-    private JComboBox _fontName;
-    private JComboBox _fondSize;
+    private JComboBox<String> _fontName;
+    private JComboBox<String> _fondSize;
     private JCheckBox _antialiasing;
     private JCheckBox _use3dView;
     private JCheckBox _showReturnArrows;
@@ -35,11 +36,11 @@ public class ConfigurationUI implements ActionListener {
     public ConfigurationUI() {
         GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
         String[] fonts = environment.getAvailableFontFamilyNames();
-        for(int i = 0; i < fonts.length; i++) {
-            _fontName.addItem(fonts[i]);
+        for (String font : fonts) {
+            _fontName.addItem(font);
         }
-        for(int i = 0; i < FONT_SIZES.length; i++) {
-            _fondSize.addItem(FONT_SIZES[i]);
+        for (String fontSize : FONT_SIZES) {
+            _fondSize.addItem(fontSize);
         }
         _classColor.addActionListener(this);
         _externalClassColor.addActionListener(this);
@@ -86,9 +87,9 @@ public class ConfigurationUI implements ActionListener {
             return true;
         if(configuration.USE_3D_VIEW != _use3dView.isSelected())
             return true;
-        if(!_fontName.getSelectedItem().equals(configuration.FONT_NAME))
+        if(!Objects.equals(_fontName.getSelectedItem(), configuration.FONT_NAME))
             return true;
-        if(configuration.FONT_SIZE != Integer.parseInt((String)_fondSize.getSelectedItem()))
+        if(configuration.FONT_SIZE != Integer.parseInt((String) Objects.requireNonNull(_fondSize.getSelectedItem())))
             return true;
         if(_excludeTableModel.isChanged())
             return true;
@@ -107,7 +108,7 @@ public class ConfigurationUI implements ActionListener {
         configuration.SHOW_SIMPLIFY_CALL_NAME = _showSimplifyCallName.isSelected();
         configuration.USE_3D_VIEW = _use3dView.isSelected();
         configuration.FONT_NAME = (String)_fontName.getSelectedItem();
-        configuration.FONT_SIZE = Integer.parseInt(((String)_fondSize.getSelectedItem()));
+        configuration.FONT_SIZE = Integer.parseInt(((String) Objects.requireNonNull(_fondSize.getSelectedItem())));
         configuration.setExcludeList(_excludeTableModel.getExcludeList());
     }
 
@@ -124,7 +125,7 @@ public class ConfigurationUI implements ActionListener {
         _use3dView.setSelected(configuration.USE_3D_VIEW);
         _fontName.setSelectedItem(configuration.FONT_NAME);
         _fondSize.setSelectedItem(String.valueOf(configuration.FONT_SIZE));
-        _excludeTableModel.setExcludeList(new ArrayList(configuration.getExcludeList()));
+        _excludeTableModel.setExcludeList(new ArrayList<>(configuration.getExcludeList()));
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -154,7 +155,7 @@ public class ConfigurationUI implements ActionListener {
     }
 
     private class ExcludeTableModel extends AbstractTableModel {
-        private java.util.List _excludeList = new ArrayList();
+        private java.util.List<ExcludeEntry> _excludeList = new ArrayList<ExcludeEntry>();
         private boolean _isChanged;
 
         public int getRowCount() {
@@ -174,8 +175,8 @@ public class ConfigurationUI implements ActionListener {
         }
 
         private boolean isAlreadyThere(String excludeName) {
-            for (Iterator iterator = _excludeList.iterator(); iterator.hasNext();) {
-                ExcludeEntry excludeEntry = (ExcludeEntry) iterator.next();
+            for (Iterator<ExcludeEntry> iterator = _excludeList.iterator(); iterator.hasNext();) {
+                ExcludeEntry excludeEntry = iterator.next();
                 if(excludeEntry.getExcludeName().equals(excludeName))
                     return true;
             }
@@ -191,10 +192,10 @@ public class ConfigurationUI implements ActionListener {
         public Object getValueAt(int rowIndex, int columnIndex) {
             if(rowIndex >= _excludeList.size() || rowIndex < 0)
                 return null;
-            ExcludeEntry entry = (ExcludeEntry)_excludeList.get(rowIndex);
+            ExcludeEntry entry = _excludeList.get(rowIndex);
             switch(columnIndex) {
                 case 0: return entry.getExcludeName();
-                case 1: return new Boolean(entry.isEnabled());
+                case 1: return entry.isEnabled();
                 default: return null;
             }
         }
@@ -218,7 +219,7 @@ public class ConfigurationUI implements ActionListener {
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if(rowIndex >= _excludeList.size() || rowIndex < 0)
                 return;
-            ExcludeEntry excludeEntry = (ExcludeEntry)_excludeList.get(rowIndex);
+            ExcludeEntry excludeEntry = _excludeList.get(rowIndex);
             switch(columnIndex) {
                 case 0:
                     String excludeName = (String)aValue;
@@ -236,7 +237,7 @@ public class ConfigurationUI implements ActionListener {
             _isChanged = true;
         }
 
-        public java.util.List getExcludeList() {
+        public java.util.List<ExcludeEntry> getExcludeList() {
             return _excludeList;
         }
 
@@ -248,7 +249,7 @@ public class ConfigurationUI implements ActionListener {
             return true;
         }
 
-        public void setExcludeList(java.util.List excludeList) {
+        public void setExcludeList(java.util.List<ExcludeEntry> excludeList) {
             _excludeList = excludeList;
             _isChanged = false;
             fireTableDataChanged();

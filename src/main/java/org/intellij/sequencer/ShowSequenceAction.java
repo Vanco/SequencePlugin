@@ -6,12 +6,13 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import org.intellij.sequencer.diagram.app.Sequence;
+import com.intellij.util.ui.JBUI;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.NoConstructorsFilter;
 import org.intellij.sequencer.generator.filters.NoGetterSetterFilter;
 import org.intellij.sequencer.generator.filters.NoPrivateMethodsFilter;
 import org.intellij.sequencer.generator.filters.ProjectOnlyFilter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +28,7 @@ public class ShowSequenceAction extends AnAction {
     public ShowSequenceAction() {
     }
 
-    public void update(AnActionEvent event) {
+    public void update(@NotNull AnActionEvent event) {
         super.update(event);
 
         Presentation presentation = event.getPresentation();
@@ -35,7 +36,7 @@ public class ShowSequenceAction extends AnAction {
         presentation.setEnabled(plugin != null && plugin.isInsideAMethod());
     }
 
-    public void actionPerformed(AnActionEvent event) {
+    public void actionPerformed(@NotNull AnActionEvent event) {
         SequenceService plugin = getPlugin(event);
         OptionsDialogWrapper dialogWrapper = new OptionsDialogWrapper(getProject(event));
         dialogWrapper.show();
@@ -54,7 +55,9 @@ public class ShowSequenceAction extends AnAction {
             params.getMethodFilter().addFilter(new NoGetterSetterFilter(_noGetterSetters));
             params.getMethodFilter().addFilter(new NoPrivateMethodsFilter(_noPrivateMethods));
             params.getMethodFilter().addFilter(new NoConstructorsFilter(_noConstructors));
-            plugin.showSequence(params);
+            if (plugin != null) {
+                plugin.showSequence(params);
+            }
         }
     }
 
@@ -87,7 +90,7 @@ public class ShowSequenceAction extends AnAction {
             GridBagConstraints gc = new GridBagConstraints();
             gc.gridx = 0;
             gc.gridy = 0;
-            gc.insets = new Insets(5, 5, 5, 5);
+            gc.insets = JBUI.insets(5);
             gc.anchor = GridBagConstraints.WEST;
             JLabel jLabel = new JLabel("Call depth:");
             add(jLabel, gc);
@@ -102,7 +105,7 @@ public class ShowSequenceAction extends AnAction {
             gc.gridy = 1;
             gc.anchor = GridBagConstraints.WEST;
             gc.gridwidth = 2;
-            gc.insets = new Insets(0, 0, 0, 0);
+            gc.insets = JBUI.emptyInsets();
             jCheckBoxPFO = new JCheckBox("Display only project classes", _projectClassesOnly);
             add(jCheckBoxPFO, gc);
 
@@ -110,7 +113,7 @@ public class ShowSequenceAction extends AnAction {
             gc.gridy = 2;
             gc.anchor = GridBagConstraints.WEST;
             gc.gridwidth = 2;
-            gc.insets = new Insets(0, 0, 0, 0);
+            gc.insets = JBUI.emptyInsets();
             jCheckBoxNGS = new JCheckBox("Skip getters/setters", _noGetterSetters);
             add(jCheckBoxNGS, gc);
 
@@ -118,7 +121,7 @@ public class ShowSequenceAction extends AnAction {
             gc.gridy = 3;
             gc.anchor = GridBagConstraints.WEST;
             gc.gridwidth = 2;
-            gc.insets = new Insets(0, 0, 0, 0);
+            gc.insets = JBUI.emptyInsets();
             jCheckBoxSI = new JCheckBox("Smart interface (experimental)", _smartInterface);
             add(jCheckBoxSI, gc);
 
@@ -126,7 +129,7 @@ public class ShowSequenceAction extends AnAction {
             gc.gridy = 1;
             gc.anchor = GridBagConstraints.WEST;
             gc.gridwidth = 2;
-            gc.insets = new Insets(0, 0, 0, 0);
+            gc.insets = JBUI.emptyInsets();
             jCheckBoxNPM = new JCheckBox("Skip private methods", _noPrivateMethods);
             add(jCheckBoxNPM, gc);
 
@@ -134,7 +137,7 @@ public class ShowSequenceAction extends AnAction {
             gc.gridy = 2;
             gc.anchor = GridBagConstraints.WEST;
             gc.gridwidth = 2;
-            gc.insets = new Insets(0, 0, 0, 0);
+            gc.insets = JBUI.emptyInsets();
             jCheckBoxNC = new JCheckBox("Skip constructors", _noConstructors);
             add(jCheckBoxNC, gc);
         }

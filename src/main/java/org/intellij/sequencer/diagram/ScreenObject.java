@@ -17,10 +17,8 @@ public abstract class ScreenObject {
     public abstract int getHeight();
 
     public boolean isInRange(int x, int y) {
-        if(getX() <= x && x <= getX() + getWidth() &&
-              getY() <= y && y <= getY() + getHeight())
-            return true;
-        return false;
+        return getX() <= x && x <= getX() + getWidth() &&
+                getY() <= y && y <= getY() + getHeight();
     }
 
     public boolean isSelected() {

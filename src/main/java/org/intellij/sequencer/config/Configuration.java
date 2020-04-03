@@ -7,11 +7,11 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.util.xmlb.annotations.Transient;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -36,7 +36,7 @@ public class Configuration implements PersistentStateComponent<Configuration> {
     public int FONT_SIZE = 11;
 
     @Transient
-    private java.util.List _listeners = new ArrayList();
+    private List<ConfigListener> _listeners = new ArrayList<>();
     private java.util.List<ExcludeEntry> _excludeList = new Vector<ExcludeEntry>();
 
     public Configuration() {}
@@ -62,8 +62,7 @@ public class Configuration implements PersistentStateComponent<Configuration> {
     }
 
     public void fireConfigChanged() {
-        for(Iterator iterator = _listeners.iterator(); iterator.hasNext();) {
-            ConfigListener configListener = (ConfigListener)iterator.next();
+        for (ConfigListener configListener : _listeners) {
             configListener.configChanged();
         }
     }
@@ -75,7 +74,7 @@ public class Configuration implements PersistentStateComponent<Configuration> {
     }
 
     @Override
-    public void loadState(Configuration configuration) {
+    public void loadState(@NotNull Configuration configuration) {
         XmlSerializerUtil.copyBean(configuration, this);
     }
 

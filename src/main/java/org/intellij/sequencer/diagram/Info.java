@@ -29,9 +29,9 @@ public class Info {
      */
     public static final String INTERFACE_ATTRIBUTE = "interface";
 
-    protected List _attributes;
+    protected List<String> _attributes;
 
-    public Info(List attributes) {
+    public Info(List<String> attributes) {
         _attributes = attributes;
     }
 
@@ -40,9 +40,9 @@ public class Info {
     }
 
     protected String getAttributesStr() {
-        StringBuffer buffer = new StringBuffer();
-        for(Iterator iterator = _attributes.iterator(); iterator.hasNext();) {
-            String attribute = (String)iterator.next();
+        StringBuilder buffer = new StringBuilder();
+        for(Iterator<String> iterator = _attributes.iterator(); iterator.hasNext();) {
+            String attribute = iterator.next();
             buffer.append(attribute);
             if(iterator.hasNext())
                 buffer.append(", ");
