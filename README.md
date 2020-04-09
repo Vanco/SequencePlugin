@@ -117,6 +117,11 @@ versions:
         <dd>fixbug: method name with generic type.</dd>
 </dl>
 
+## Download Chart
+**63,000+** unique Downloads since 1.x version released April 2016.
+
+![SequenceDiagram downloads](imges/sd1x.svg)
+
 ## Acknowledgement
 
 #### Name history

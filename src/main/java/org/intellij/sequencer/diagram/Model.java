@@ -18,7 +18,7 @@ public class Model {
     private File _file = null;
     private boolean _modified = false;
 
-    private EventListenerList _listenerList = new EventListenerList();
+    private final EventListenerList _listenerList = new EventListenerList();
 
     public Model() {
         _changeSupport = new SwingPropertyChangeSupport(this);

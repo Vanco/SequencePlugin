@@ -30,13 +30,13 @@ import java.util.Objects;
 public class SequencePanel extends JPanel {
     //private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
 
-    private Display _display;
-    private Model _model;
+    private final Display _display;
+    private final Model _model;
     private final SequenceService _plugin;
-    private SequenceParams _sequenceParams;
+    private final SequenceParams _sequenceParams;
     private PsiMethod _psiMethod;
     private String _titleName;
-    private JScrollPane _jScrollPane;
+    private final JScrollPane _jScrollPane;
 
     public SequencePanel(SequenceService plugin, PsiMethod psiMethod, SequenceParams sequenceParams) {
         super(new BorderLayout());

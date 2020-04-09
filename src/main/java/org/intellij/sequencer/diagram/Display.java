@@ -18,12 +18,12 @@ import java.util.HashMap;
 public class Display extends JComponent implements ModelTextListener, Scrollable, ConfigListener {
     private int _inset = 5;
 
-    private Model _model;
+    private final Model _model;
     private SequenceListener _listener;
 
     private boolean _initialized = false;
-    private DisplayHeader _displayHeader;
-    private Diagram _diagram;
+    private final DisplayHeader _displayHeader;
+    private final Diagram _diagram;
 
     public Display(Model model, SequenceListener listener) {
         _model = model;

@@ -27,6 +27,8 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <depends>com.intellij.modules.java</depends>
 
+    <depends>com.intellij.java</depends>
+
     <change-notes><![CDATA[
         <dl>
         <dt>2.0.1</dt>

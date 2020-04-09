@@ -77,12 +77,12 @@ public class ShowSequenceAction extends AnAction {
     }
 
     private class DialogPanel extends JPanel {
-        private JSpinner jSpinner;
-        private JCheckBox jCheckBoxPFO;
-        private JCheckBox jCheckBoxNGS;
-        private JCheckBox jCheckBoxNPM;
-        private JCheckBox jCheckBoxNC;
-        private JCheckBox jCheckBoxSI;
+        private final JSpinner jSpinner;
+        private final JCheckBox jCheckBoxPFO;
+        private final JCheckBox jCheckBoxNGS;
+        private final JCheckBox jCheckBoxNPM;
+        private final JCheckBox jCheckBoxNC;
+        private final JCheckBox jCheckBoxSI;
 
         public DialogPanel() {
             super(new GridBagLayout());
@@ -144,7 +144,7 @@ public class ShowSequenceAction extends AnAction {
     }
 
     private class OptionsDialogWrapper extends DialogWrapper {
-        private DialogPanel dialogPanel = new DialogPanel();
+        private final DialogPanel dialogPanel = new DialogPanel();
 
         public OptionsDialogWrapper(Project project) {
             super(project, false);
