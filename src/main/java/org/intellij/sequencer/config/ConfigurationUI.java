@@ -27,11 +27,15 @@ public class ConfigurationUI implements ActionListener {
     private JCheckBox _showCallNumbers;
     private JButton _addExcludeEntry;
     private JButton _removeExcludeEntry;
+    private JButton _addColorMapEntry;
+    private JButton _removeColorMapEntry;
     private JTable _excludeTable;
+    private JTable _colorMapTable;
     private JButton _interfaceColor;
     private JCheckBox _showSimplifyCallName;
 
     private ExcludeTableModel _excludeTableModel;
+    private ColorMapTableModel _colorMapTableModel;
 
     public ConfigurationUI() {
         GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -49,10 +53,21 @@ public class ConfigurationUI implements ActionListener {
         _interfaceColor.addActionListener(this);
         _addExcludeEntry.addActionListener(this);
         _removeExcludeEntry.addActionListener(this);
+        _addColorMapEntry.addActionListener(this);
+        _removeColorMapEntry.addActionListener(this);
 
         _excludeTableModel = new ExcludeTableModel();
         _excludeTable.setModel(_excludeTableModel);
         _excludeTable.getTableHeader().getColumnModel().getColumn(1).setMaxWidth(100);
+
+        _colorMapTableModel = new ColorMapTableModel();
+        _colorMapTable.setDefaultRenderer(Color.class,
+                new ColorSupport.ColorRenderer(true));
+        _colorMapTable.setDefaultEditor(Color.class,
+                new ColorSupport.ColorEditor());
+        _colorMapTable.setModel(_colorMapTableModel);
+        _colorMapTable.getTableHeader().getColumnModel().getColumn(1).setMaxWidth(100);
+
     }
 
     private void handleColor(JButton colorButton) {
@@ -93,6 +108,8 @@ public class ConfigurationUI implements ActionListener {
             return true;
         if(_excludeTableModel.isChanged())
             return true;
+        if(_colorMapTableModel.isChanged())
+            return true;
         return false;
     }
 
@@ -110,6 +127,7 @@ public class ConfigurationUI implements ActionListener {
         configuration.FONT_NAME = (String)_fontName.getSelectedItem();
         configuration.FONT_SIZE = Integer.parseInt(((String) Objects.requireNonNull(_fondSize.getSelectedItem())));
         configuration.setExcludeList(_excludeTableModel.getExcludeList());
+        configuration.setColorMappingList(_colorMapTableModel.getColorMapEntryList());
     }
 
     public void reset(Configuration configuration) {
@@ -126,6 +144,7 @@ public class ConfigurationUI implements ActionListener {
         _fontName.setSelectedItem(configuration.FONT_NAME);
         _fondSize.setSelectedItem(String.valueOf(configuration.FONT_SIZE));
         _excludeTableModel.setExcludeList(new ArrayList<>(configuration.getExcludeList()));
+        _colorMapTableModel.setColorMapEntryList(new ArrayList<>(configuration.getColorMappingList()));
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -150,6 +169,19 @@ public class ConfigurationUI implements ActionListener {
             int index = _excludeTable.getSelectedRow();
             if(index != -1) {
                 _excludeTableModel.removeExcludeEntry(index);
+            }
+        }
+        else if(e.getActionCommand().equals("addColorMapEntry")) {
+            String regex = JOptionPane.showInputDialog(_mainPanel,
+                    "Enter matcher for package or class name.\nFor example, java.lang.*", "Color Map Entry",
+                    JOptionPane.PLAIN_MESSAGE);
+            if(regex != null && regex.trim().length() != 0)
+                _colorMapTableModel.addColorMapEntry(regex, Color.ORANGE);
+        }
+        else if(e.getActionCommand().equals("removeColorMapEntry")) {
+            int index = _excludeTable.getSelectedRow();
+            if(index != -1) {
+                _colorMapTableModel.removeColorMapEntry(index);
             }
         }
     }
@@ -255,4 +287,108 @@ public class ConfigurationUI implements ActionListener {
             fireTableDataChanged();
         }
     }
+
+    private class ColorMapTableModel extends AbstractTableModel {
+        private java.util.List<ColorMapEntry> colorMapEntries = new ArrayList<ColorMapEntry>();
+        private boolean _isChanged;
+
+        public int getRowCount() {
+            return colorMapEntries.size();
+        }
+
+        public int getColumnCount() {
+            return 2;
+        }
+
+        public void addColorMapEntry(String regex, Color color) {
+            if(isAlreadyThere(regex))
+                return;
+            colorMapEntries.add(new ColorMapEntry(regex, color));
+            fireTableRowsInserted(colorMapEntries.size() - 1, colorMapEntries.size() - 1);
+            _isChanged = true;
+        }
+
+        private boolean isAlreadyThere(String regex) {
+            for (Iterator<ColorMapEntry> iterator = colorMapEntries.iterator(); iterator.hasNext();) {
+                ColorMapEntry entry = iterator.next();
+                if(entry.getRegex().equals(regex))
+                    return true;
+            }
+            return false;
+        }
+
+        public void removeColorMapEntry(int index) {
+            colorMapEntries.remove(index);
+            fireTableRowsDeleted(index, index);
+            _isChanged = true;
+        }
+
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            if(rowIndex >= colorMapEntries.size() || rowIndex < 0)
+                return null;
+            ColorMapEntry entry = colorMapEntries.get(rowIndex);
+            switch(columnIndex) {
+                case 0: return entry.getRegex();
+                case 1: return entry.getColor();
+                default: return null;
+            }
+        }
+
+        public Class getColumnClass(int columnIndex) {
+            switch(columnIndex) {
+                case 0: return String.class;
+                case 1: return Color.class;
+                default: return super.getColumnClass(columnIndex);
+            }
+        }
+
+        public String getColumnName(int column) {
+            switch(column) {
+                case 0: return "class or package (matcher pattern)";
+                case 1: return "Color";
+                default: return "";
+            }
+        }
+
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if(rowIndex >= colorMapEntries.size() || rowIndex < 0)
+                return;
+            ColorMapEntry colorMapEntry = colorMapEntries.get(rowIndex);
+            switch(columnIndex) {
+                case 0:
+                    String regex = (String)aValue;
+                    if(regex == null || regex.trim().length() == 0) {
+                        JOptionPane.showMessageDialog(_mainPanel, "Matcher cannot be empty.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    colorMapEntry.setRegex(regex);
+                    break;
+                case 1:
+                    Color newColor = (Color)aValue;
+                    colorMapEntry.setColor(newColor);
+                    break;
+            }
+            _isChanged = true;
+        }
+
+        public java.util.List<ColorMapEntry> getColorMapEntryList() {
+            return colorMapEntries;
+        }
+
+        public boolean isChanged() {
+            return _isChanged;
+        }
+
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return true;
+        }
+
+        public void setColorMapEntryList(java.util.List<ColorMapEntry> colorMapEntries) {
+            this.colorMapEntries = colorMapEntries;
+            _isChanged = false;
+            fireTableDataChanged();
+        }
+    }
+
 }

@@ -38,6 +38,7 @@ public class Configuration implements PersistentStateComponent<Configuration> {
     @Transient
     private List<ConfigListener> _listeners = new ArrayList<>();
     private java.util.List<ExcludeEntry> _excludeList = new Vector<ExcludeEntry>();
+    private java.util.List<ColorMapEntry> _colorMappingList = new Vector<>();
 
     public Configuration() {}
 
@@ -59,6 +60,14 @@ public class Configuration implements PersistentStateComponent<Configuration> {
 
     public void setExcludeList(List<ExcludeEntry> excludeList) {
         this._excludeList = excludeList;
+    }
+
+    public List<ColorMapEntry> getColorMappingList() {
+        return _colorMappingList;
+    }
+
+    public void setColorMappingList(List<ColorMapEntry> colorMappingList) {
+        this._colorMappingList = colorMappingList;
     }
 
     public void fireConfigChanged() {
