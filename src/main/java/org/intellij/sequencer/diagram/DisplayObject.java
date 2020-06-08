@@ -2,11 +2,14 @@ package org.intellij.sequencer.diagram;
 
 import com.intellij.ui.JBColor;
 import org.apache.log4j.Logger;
+import org.intellij.sequencer.config.ColorMapEntry;
+import org.intellij.sequencer.config.ColorSupport;
 import org.intellij.sequencer.config.Configuration;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class DisplayObject extends ScreenObject {
     private static final Logger LOGGER = Logger.getLogger(DisplayObject.class);
@@ -242,8 +245,7 @@ public class DisplayObject extends ScreenObject {
             g2.setPaint(SHADOW_COLOR);
             g2.fillRect(_x + 2, _y + 2, _textBox.getWidth(), _textBox.getHeight());
         }
-        g2.setPaint(_objectInfo.hasAttribute(Info.EXTERNAL_ATTRIBUTE) ?
-              configuration.EXTERNAL_CLASS_COLOR : _objectInfo.hasAttribute(Info.INTERFACE_ATTRIBUTE) ? configuration.INTERFACE_COLOR : configuration.CLASS_COLOR);
+        g2.setPaint(determineBackgroundPaintForObject(configuration));
         g2.fillRect(_x, _y, _textBox.getWidth(), _textBox.getHeight());
 
         g2.setPaint(BORDER_COLOR);
@@ -253,6 +255,14 @@ public class DisplayObject extends ScreenObject {
         }
         g2.drawRect(_x, _y, _textBox.getWidth() - 1, _textBox.getHeight() - 1);
         g2.setStroke(oldStroke);
+
+        ColorSupport.lookupMappedColorFor(configuration, _objectInfo.getFullName())
+        .ifPresent(paint->{
+            // draw a colored overlay, as per user's color mapping config
+            int overlayBoxSize = _textBox.getHeight()/2;
+            g2.setPaint(ColorSupport.withTransparency((Color)paint,0.8f));
+            g2.fillRect(_x-2, _y-2, overlayBoxSize, overlayBoxSize);
+        });
 
         g2.setPaint(TEXT_COLOR);
         Font oldFont = g2.getFont();
@@ -274,5 +284,15 @@ public class DisplayObject extends ScreenObject {
     public String toString() {
         return "DisplayObject " + _objectInfo.getName() + " seq " + _objectInfo.getSeq();
     }
+
+    private Paint determineBackgroundPaintForObject(Configuration configuration) {
+        return _objectInfo.hasAttribute(Info.EXTERNAL_ATTRIBUTE)
+                ? configuration.EXTERNAL_CLASS_COLOR
+                : _objectInfo.hasAttribute(Info.INTERFACE_ATTRIBUTE)
+                    ? configuration.INTERFACE_COLOR
+                    : configuration.CLASS_COLOR;
+    }
+
+
 }
 
