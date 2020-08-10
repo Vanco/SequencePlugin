@@ -21,13 +21,13 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 ]]></description>
     <version>1.2.4</version>
     <vendor>fanhuagang@gmail.com</vendor>
-    <idea-version since-build="141.1"/>
+    <idea-version since-build="201.5656"/>
 
     <depends>com.intellij.modules.platform</depends>
 
     <depends>com.intellij.modules.java</depends>
 
-    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
 
     <change-notes><![CDATA[
         <dl>
@@ -92,7 +92,12 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
                                  id="Settings.Sequence.Configuration"
                                  instance="org.intellij.sequencer.config.ConfigurationOptions"/>
         <applicationService serviceImplementation="org.intellij.sequencer.config.Configuration"/>
+        <toolWindow id="Sequence Diagram" icon="SequencePluginIcons.SEQUENCE_ICON_13" anchor="bottom"
+                    factoryClass="org.intellij.sequencer.SequenceToolWindowsFactory" canCloseContents="true"/>
+
         <projectService serviceInterface="org.intellij.sequencer.SequenceService"
                         serviceImplementation="org.intellij.sequencer.impl.SequenceServiceImpl"/>
+
+
     </extensions>
 </idea-plugin>

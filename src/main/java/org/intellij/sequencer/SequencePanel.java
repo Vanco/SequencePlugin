@@ -1,6 +1,7 @@
 package org.intellij.sequencer;
 
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
@@ -10,9 +11,7 @@ import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.CallStack;
 import org.intellij.sequencer.generator.SequenceGenerator;
 import org.intellij.sequencer.generator.SequenceParams;
-import org.intellij.sequencer.generator.filters.ImplementClassFilter;
-import org.intellij.sequencer.generator.filters.SingleClassFilter;
-import org.intellij.sequencer.generator.filters.SingleMethodFilter;
+import org.intellij.sequencer.generator.filters.*;
 import org.intellij.sequencer.ui.MyButtonlessScrollBarUI;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,9 +20,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,16 +28,22 @@ public class SequencePanel extends JPanel {
 
     private final Display _display;
     private final Model _model;
-    private final SequenceService _plugin;
+    private final SequenceNavigable navigable;
     private final SequenceParams _sequenceParams;
-    private PsiMethod _psiMethod;
+    private PsiElement psiElement;
     private String _titleName;
     private final JScrollPane _jScrollPane;
 
-    public SequencePanel(SequenceService plugin, PsiMethod psiMethod, SequenceParams sequenceParams) {
+    public SequencePanel(SequenceNavigable navigable, PsiElement psiMethod, SequenceParams sequenceParams) {
         super(new BorderLayout());
-        _plugin = plugin;
-        _psiMethod = psiMethod;
+
+        if (navigable == null) {
+            this.navigable = new EmptySequenceNavigable();
+        } else {
+            this.navigable = navigable;
+        }
+
+        psiElement = psiMethod;
         _sequenceParams = sequenceParams;
 
         _model = new Model();
@@ -50,7 +52,8 @@ public class SequencePanel extends JPanel {
         DefaultActionGroup actionGroup = new DefaultActionGroup("SequencerActionGroup", false);
         actionGroup.add(new ReGenerateAction());
         actionGroup.add(new ExportAction());
-        actionGroup.add(new ExportTextAction());
+        actionGroup.add(new SaveAsAction());
+        actionGroup.add(new LoadAction());
 
         ActionManager actionManager = ActionManager.getInstance();
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
@@ -80,29 +83,14 @@ public class SequencePanel extends JPanel {
     }
 
     public void generate() {
-        if (_psiMethod == null || !_psiMethod.isValid()) { // || !_psiMethod.isPhysical()
-            _psiMethod = null;
+        if (psiElement == null || !psiElement.isValid() || !(psiElement instanceof PsiMethod)) {
+            psiElement = null;
             return;
         }
         SequenceGenerator generator = new SequenceGenerator(_sequenceParams);
-        final CallStack callStack = generator.generate(_psiMethod);
+        final CallStack callStack = generator.generate((PsiMethod) psiElement);
         _titleName = callStack.getMethod().getTitleName();
         generate(callStack.generateSequence());
-    }
-
-    public void generateTextFile(File selectedFile) throws IOException {
-        if (_psiMethod == null || !_psiMethod.isValid()) { // || !_psiMethod.isPhysical()
-            _psiMethod = null;
-            return;
-        }
-        SequenceGenerator generator = new SequenceGenerator(_sequenceParams);
-        final CallStack callStack = generator.generate(_psiMethod);
-
-        Files.write(selectedFile.toPath(),
-                callStack.generateText().getBytes(),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-
     }
 
     private void showBirdView() {
@@ -129,14 +117,14 @@ public class SequencePanel extends JPanel {
     }
 
     private void gotoClass(ObjectInfo objectInfo) {
-        _plugin.openClassInEditor(objectInfo.getFullName());
+        navigable.openClassInEditor(objectInfo.getFullName());
     }
 
     private void gotoMethod(MethodInfo methodInfo) {
         String className = methodInfo.getObjectInfo().getFullName();
         String methodName = methodInfo.getRealName();
         List<String> argTypes = methodInfo.getArgTypes();
-        _plugin.openMethodInEditor(className, methodName, argTypes);
+        navigable.openMethodInEditor(className, methodName, argTypes);
     }
 
     private void gotoCall(MethodInfo fromMethodInfo, MethodInfo toMethodInfo) {
@@ -151,7 +139,7 @@ public class SequencePanel extends JPanel {
         }
 
         if (isLambdaCall(toMethodInfo)) {
-            _plugin.openLambdaExprInEditor(
+            navigable.openLambdaExprInEditor(
                     fromMethodInfo.getObjectInfo().getFullName(),
                     fromMethodInfo.getRealName(),
                     fromMethodInfo.getArgTypes(),
@@ -160,7 +148,7 @@ public class SequencePanel extends JPanel {
             );
         } else if (isLambdaCall(fromMethodInfo)) {
             LambdaExprInfo lambdaExprInfo = (LambdaExprInfo) fromMethodInfo;
-            _plugin.openMethodCallInsideLambdaExprInEditor(
+            navigable.openMethodCallInsideLambdaExprInEditor(
                     _sequenceParams.getMethodFilter(),
                     lambdaExprInfo.getObjectInfo().getFullName(),
                     lambdaExprInfo.getEnclosedMethodName(),
@@ -175,7 +163,7 @@ public class SequencePanel extends JPanel {
         } else if (fromMethodInfo.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && fromMethodInfo.hasAttribute(Info.ABSTRACT_ATTRIBUTE)) {
             gotoMethod(toMethodInfo);
         } else {
-            _plugin.openMethodCallInEditor(
+            navigable.openMethodCallInEditor(
                     _sequenceParams.getMethodFilter(),
                     fromMethodInfo.getObjectInfo().getFullName(),
                     fromMethodInfo.getRealName(),
@@ -192,6 +180,48 @@ public class SequencePanel extends JPanel {
         return Objects.equals(methodInfo.getRealName(), Constants.Lambda_Invoke);
     }
 
+    private static class EmptySequenceNavigable implements SequenceNavigable {
+        @Override
+        public void openClassInEditor(String className) {
+
+        }
+
+        @Override
+        public void openMethodInEditor(String className, String methodName, List<String> argTypes) {
+
+        }
+
+        @Override
+        public boolean isInsideAMethod() {
+            return false;
+        }
+
+        @Override
+        public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes, String toClass, String toMethod, List<String> toArgType, int callNo) {
+
+        }
+
+        @Override
+        public List<String> findImplementations(String className) {
+            return null;
+        }
+
+        @Override
+        public List<String> findImplementations(String className, String methodName, List<String> argTypes) {
+            return null;
+        }
+
+        @Override
+        public void openLambdaExprInEditor(String fromClass, String fromMethod, List<String> fromArgTypes, List<String> argTypes, String returnType) {
+
+        }
+
+        @Override
+        public void openMethodCallInsideLambdaExprInEditor(CompositeMethodFilter methodFilter, String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes, List<String> argTypes, String returnType, String toClass, String toMethod, List<String> toArgTypes, int callNo) {
+
+        }
+    }
+
 
     private class ReGenerateAction extends AnAction {
         public ReGenerateAction() {
@@ -201,6 +231,12 @@ public class SequencePanel extends JPanel {
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             generate();
 
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            Presentation presentation = e.getPresentation();
+            presentation.setEnabled(psiElement != null);
         }
     }
 
@@ -233,12 +269,64 @@ public class SequencePanel extends JPanel {
                 JOptionPane.showMessageDialog(SequencePanel.this, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
             }
         }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            e.getPresentation().setEnabled(_display.getDiagram().nonEmpty());
+        }
     }
 
-    private class ExportTextAction extends AnAction {
+    private class LoadAction extends AnAction {
+        public LoadAction() {
+            super("Open Diagram", "Open SequenceDiagram text (.sdt) file", SequencePluginIcons.EXPORT_TEXT_ICON);
+        }
 
-        public ExportTextAction() {
-            super("ExportTextFile", "Export call stack as text file", SequencePluginIcons.EXPORT_TEXT_ICON);
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            final JFileChooser chooser = new JFileChooser();
+            chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+            chooser.setDialogTitle("Open Diagram");
+            chooser.setFileFilter(new FileFilter() {
+                public boolean accept(File f) {
+                    return f.isDirectory() || f.getName().endsWith("sdt");
+                }
+
+                public String getDescription() {
+                    return "SequenceDiagram (.sdt) File";
+                }
+            });
+            int returnVal = chooser.showOpenDialog(SequencePanel.this);
+            if(returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = chooser.getSelectedFile();
+                _titleName = file.getName();
+                _model.readFromFile(file);
+
+
+//                Project project = e.getProject();
+//                if (project == null) return;
+//
+//                ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(SequenceService.PLUGIN_NAME);
+//                if (toolWindow == null) return;
+//
+//                Content selectedContent = toolWindow.getContentManager().getSelectedContent();
+//
+//                if (selectedContent == null) return;
+//
+//                selectedContent.setDisplayName(_titleName);
+            }
+
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            e.getPresentation().setEnabled(psiElement == null);
+        }
+    }
+
+    private class SaveAsAction extends AnAction {
+
+        public SaveAsAction() {
+            super("Save As ...", "Export Diagram to file", SequencePluginIcons.EXPORT_TEXT_ICON);
         }
 
         @Override
@@ -247,25 +335,31 @@ public class SequencePanel extends JPanel {
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().endsWith("txt");
+                    return f.isDirectory() || f.getName().endsWith("sdt");
                 }
 
                 public String getDescription() {
-                    return "Text File";
+                    return "SequenceDiagram (.sdt) File";
                 }
             });
             try {
                 if (fileChooser.showSaveDialog(SequencePanel.this) == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    if (!selectedFile.getName().endsWith("txt"))
-                        selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".txt");
+                    if (!selectedFile.getName().endsWith("sdt"))
+                        selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".sdt");
 
-                    generateTextFile(selectedFile);
+                    _model.writeToFile(selectedFile);
+//                    generateTextFile(selectedFile);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(SequencePanel.this, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
             }
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            e.getPresentation().setEnabled(_display.getDiagram().nonEmpty());
         }
     }
 
@@ -348,7 +442,7 @@ public class SequencePanel extends JPanel {
                 DisplayObject displayObject = (DisplayObject) screenObject;
                 if (displayObject.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && !_sequenceParams.isSmartInterface()) {
                     String className = displayObject.getObjectInfo().getFullName();
-                    List<String> impls = _plugin.findImplementations(className);
+                    List<String> impls = navigable.findImplementations(className);
                     actionGroup.addSeparator();
                     for (String impl : impls) {
                         actionGroup.add(new ExpendInterfaceAction(className, impl));
@@ -363,7 +457,7 @@ public class SequencePanel extends JPanel {
                     String className = displayMethod.getObjectInfo().getFullName();
                     String methodName = displayMethod.getMethodInfo().getRealName();
                     List<String> argTypes = displayMethod.getMethodInfo().getArgTypes();
-                    List<String> impls = _plugin.findImplementations(className, methodName, argTypes);
+                    List<String> impls = navigable.findImplementations(className, methodName, argTypes);
 
                     actionGroup.addSeparator();
                     for (String impl : impls) {
@@ -408,7 +502,6 @@ public class SequencePanel extends JPanel {
         private void init() {
             setUI(new BasicButtonUI());
             setBackground(UIUtil.getLabelBackground());
-//            setContentAreaFilled(false);
             setBorder(BorderFactory.createEmptyBorder());
             setBorderPainted(false);
             setFocusable(false);

@@ -27,15 +27,15 @@ public class DisplayObject extends ScreenObject {
 
     private int _x = -1;
     private int _y = -1;
-    private TextBox _textBox;
+    private final TextBox _textBox;
     private int _width = -1;
     private int _fullHeight;
     private int _fullWidth;
-    private ObjectInfo _objectInfo;
+    private final ObjectInfo _objectInfo;
 
-    private List<DisplayLink> _calls = new ArrayList<>();
-    private List<DisplayLink> _returns = new ArrayList<DisplayLink>();
-    private List<DisplayMethod> _methods = new ArrayList<>();
+    private final List<DisplayLink> _calls = new ArrayList<>();
+    private final List<DisplayLink> _returns = new ArrayList<>();
+    private final List<DisplayMethod> _methods = new ArrayList<>();
 
     DisplayObject(ObjectInfo objectInfo) {
         _objectInfo = objectInfo;
@@ -259,7 +259,7 @@ public class DisplayObject extends ScreenObject {
         ColorSupport.lookupMappedColorFor(configuration, _objectInfo.getFullName())
         .ifPresent(paint->{
             // draw a colored overlay, as per user's color mapping config
-            int overlayBoxSize = _textBox.getHeight()/2;
+            int overlayBoxSize = _textBox.getHeight()/3;
             g2.setPaint(ColorSupport.withTransparency((Color)paint,0.8f));
             g2.fillRect(_x-2, _y-2, overlayBoxSize, overlayBoxSize);
         });

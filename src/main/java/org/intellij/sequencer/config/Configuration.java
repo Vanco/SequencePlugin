@@ -36,8 +36,8 @@ public class Configuration implements PersistentStateComponent<Configuration> {
     public int FONT_SIZE = 11;
 
     @Transient
-    private List<ConfigListener> _listeners = new ArrayList<>();
-    private java.util.List<ExcludeEntry> _excludeList = new Vector<ExcludeEntry>();
+    private final List<ConfigListener> _listeners = new ArrayList<>();
+    private java.util.List<ExcludeEntry> _excludeList = new Vector<>();
     private java.util.List<ColorMapEntry> _colorMappingList = new Vector<>();
 
     public Configuration() {}

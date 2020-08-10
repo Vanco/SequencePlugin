@@ -34,8 +34,8 @@ public class ConfigurationUI implements ActionListener {
     private JButton _interfaceColor;
     private JCheckBox _showSimplifyCallName;
 
-    private ExcludeTableModel _excludeTableModel;
-    private ColorMapTableModel _colorMapTableModel;
+    private final ExcludeTableModel _excludeTableModel;
+    private final ColorMapTableModel _colorMapTableModel;
 
     public ConfigurationUI() {
         GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -148,46 +148,55 @@ public class ConfigurationUI implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if(e.getActionCommand().equals("classColor"))
-            handleColor(_classColor);
-        else if(e.getActionCommand().equals("externalClassColor"))
-            handleColor(_externalClassColor);
-        else if(e.getActionCommand().equals("methodBarColor"))
-            handleColor(_methodBarColor);
-        else if(e.getActionCommand().equals("selectedMethodBarColor"))
-            handleColor(_selectedMethodBarColor);
-        else if(e.getActionCommand().equals("interfaceColor"))
-            handleColor(_interfaceColor);
-        else if(e.getActionCommand().equals("addExcludeEntry")) {
-            String excludeName = JOptionPane.showInputDialog(_mainPanel,
-                  "Enter package or class name.\nFor example, java.lang.* or java.io.PrintStream:", "Exclude Entry",
-                  JOptionPane.PLAIN_MESSAGE);
-            if(excludeName != null && excludeName.trim().length() != 0)
-                _excludeTableModel.addExcludeEntry(excludeName, true);
-        }
-        else if(e.getActionCommand().equals("removeExcludeEntry")) {
-            int index = _excludeTable.getSelectedRow();
-            if(index != -1) {
-                _excludeTableModel.removeExcludeEntry(index);
+        switch (e.getActionCommand()) {
+            case "classColor":
+                handleColor(_classColor);
+                break;
+            case "externalClassColor":
+                handleColor(_externalClassColor);
+                break;
+            case "methodBarColor":
+                handleColor(_methodBarColor);
+                break;
+            case "selectedMethodBarColor":
+                handleColor(_selectedMethodBarColor);
+                break;
+            case "interfaceColor":
+                handleColor(_interfaceColor);
+                break;
+            case "addExcludeEntry":
+                String excludeName = JOptionPane.showInputDialog(_mainPanel,
+                        "Enter package or class name.\nFor example, java.lang.* or java.io.PrintStream:", "Exclude Entry",
+                        JOptionPane.PLAIN_MESSAGE);
+                if (excludeName != null && excludeName.trim().length() != 0)
+                    _excludeTableModel.addExcludeEntry(excludeName, true);
+                break;
+            case "removeExcludeEntry": {
+                int index = _excludeTable.getSelectedRow();
+                if (index != -1) {
+                    _excludeTableModel.removeExcludeEntry(index);
+                }
+                break;
             }
-        }
-        else if(e.getActionCommand().equals("addColorMapEntry")) {
-            String regex = JOptionPane.showInputDialog(_mainPanel,
-                    "Enter matcher for package or class name.\nFor example, java.lang.*", "Color Map Entry",
-                    JOptionPane.PLAIN_MESSAGE);
-            if(regex != null && regex.trim().length() != 0)
-                _colorMapTableModel.addColorMapEntry(regex, Color.ORANGE);
-        }
-        else if(e.getActionCommand().equals("removeColorMapEntry")) {
-            int index = _excludeTable.getSelectedRow();
-            if(index != -1) {
-                _colorMapTableModel.removeColorMapEntry(index);
+            case "addColorMapEntry":
+                String regex = JOptionPane.showInputDialog(_mainPanel,
+                        "Enter matcher for package or class name.\nFor example, java.lang.*", "Color Map Entry",
+                        JOptionPane.PLAIN_MESSAGE);
+                if (regex != null && regex.trim().length() != 0)
+                    _colorMapTableModel.addColorMapEntry(regex, Color.ORANGE);
+                break;
+            case "removeColorMapEntry": {
+                int index = _excludeTable.getSelectedRow();
+                if (index != -1) {
+                    _colorMapTableModel.removeColorMapEntry(index);
+                }
+                break;
             }
         }
     }
 
     private class ExcludeTableModel extends AbstractTableModel {
-        private java.util.List<ExcludeEntry> _excludeList = new ArrayList<ExcludeEntry>();
+        private java.util.List<ExcludeEntry> _excludeList = new ArrayList<>();
         private boolean _isChanged;
 
         public int getRowCount() {
@@ -207,9 +216,8 @@ public class ConfigurationUI implements ActionListener {
         }
 
         private boolean isAlreadyThere(String excludeName) {
-            for (Iterator<ExcludeEntry> iterator = _excludeList.iterator(); iterator.hasNext();) {
-                ExcludeEntry excludeEntry = iterator.next();
-                if(excludeEntry.getExcludeName().equals(excludeName))
+            for (ExcludeEntry excludeEntry : _excludeList) {
+                if (excludeEntry.getExcludeName().equals(excludeName))
                     return true;
             }
             return false;
@@ -263,7 +271,7 @@ public class ConfigurationUI implements ActionListener {
                     excludeEntry.setExcludeName(excludeName);
                     break;
                 case 1:
-                    excludeEntry.setEnabled(((Boolean)aValue).booleanValue());
+                    excludeEntry.setEnabled((Boolean) aValue);
                     break;
             }
             _isChanged = true;
@@ -289,7 +297,7 @@ public class ConfigurationUI implements ActionListener {
     }
 
     private class ColorMapTableModel extends AbstractTableModel {
-        private java.util.List<ColorMapEntry> colorMapEntries = new ArrayList<ColorMapEntry>();
+        private java.util.List<ColorMapEntry> colorMapEntries = new ArrayList<>();
         private boolean _isChanged;
 
         public int getRowCount() {
@@ -309,9 +317,8 @@ public class ConfigurationUI implements ActionListener {
         }
 
         private boolean isAlreadyThere(String regex) {
-            for (Iterator<ColorMapEntry> iterator = colorMapEntries.iterator(); iterator.hasNext();) {
-                ColorMapEntry entry = iterator.next();
-                if(entry.getRegex().equals(regex))
+            for (ColorMapEntry entry : colorMapEntries) {
+                if (entry.getRegex().equals(regex))
                     return true;
             }
             return false;

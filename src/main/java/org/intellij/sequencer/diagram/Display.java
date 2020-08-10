@@ -38,7 +38,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
         DisplayMouseAdapter displayMouseAdapter = new DisplayMouseAdapter();
         addMouseListener(displayMouseAdapter);
-        model.addModelTextListener(this);
+        _model.addModelTextListener(this);
 
         _displayHeader = new DisplayHeader();
         _displayHeader.addMouseListener(displayMouseAdapter);

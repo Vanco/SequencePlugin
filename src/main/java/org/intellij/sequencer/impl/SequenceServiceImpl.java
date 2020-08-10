@@ -1,13 +1,11 @@
 package org.intellij.sequencer.impl;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.RegisterToolWindowTask;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.*;
@@ -15,11 +13,9 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.content.ContentManagerEvent;
-import com.intellij.ui.content.ContentManagerListener;
+import com.intellij.ui.content.ContentManager;
 import com.intellij.util.Query;
-import icons.SequencePluginIcons;
+import org.intellij.sequencer.SequenceNavigable;
 import org.intellij.sequencer.SequencePanel;
 import org.intellij.sequencer.SequenceService;
 import org.intellij.sequencer.generator.SequenceParams;
@@ -28,7 +24,6 @@ import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.intellij.sequencer.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +31,8 @@ import java.util.List;
  * &copy; fanhuagang@gmail.com
  * Created by van on 2020/2/23.
  */
-public class SequenceServiceImpl implements SequenceService {
-    private static final String PLUGIN_NAME = "Sequence Diagram";
-    private static final Icon S_ICON = SequencePluginIcons.SEQUENCE_ICON_13;
+public class SequenceServiceImpl implements SequenceService, SequenceNavigable {
+//    private static final Icon S_ICON = SequencePluginIcons.SEQUENCE_ICON_13;
 
     private final Project _project;
     private final ToolWindow _toolWindow;
@@ -46,29 +40,14 @@ public class SequenceServiceImpl implements SequenceService {
     public SequenceServiceImpl(Project project) {
 
         _project = project;
-        _toolWindow = ToolWindowManager.getInstance(_project)
-                .registerToolWindow(RegisterToolWindowTask.closable(PLUGIN_NAME, S_ICON));
-        _toolWindow.setAvailable(false, null);
-        _toolWindow.getContentManager().addContentManagerListener(new ContentManagerListener() {
+        _toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(PLUGIN_NAME);
 
-            @Override
-            public void contentRemoved(@NotNull ContentManagerEvent event) {
-                if (_toolWindow.getContentManager().getContentCount() == 0) {
-                    _toolWindow.setAvailable(false, null);
-                }
-            }
-
-        });
     }
 
     @Override
-    public void showSequence(SequenceParams params) {
-        PsiMethod enclosingPsiMethod = getCurrentPsiMethod();
-        if (enclosingPsiMethod == null)
-            return;
-        _toolWindow.setAvailable(true, null);
+    public void showSequence(@NotNull SequenceParams params, @NotNull PsiElement psiElement) {
 
-        final SequencePanel sequencePanel = new SequencePanel(this, enclosingPsiMethod, params);
+        final SequencePanel sequencePanel = new SequencePanel(this, psiElement, params);
         Runnable postAction = () -> {
             sequencePanel.generate();
             addSequencePanel(sequencePanel);
@@ -239,9 +218,10 @@ public class SequenceServiceImpl implements SequenceService {
     }
 
     private void addSequencePanel(final SequencePanel sequencePanel) {
-        final Content content = ServiceManager.getService(ContentFactory.class).createContent(sequencePanel, sequencePanel.getTitleName(), false);
-        _toolWindow.getContentManager().addContent(content);
-        _toolWindow.getContentManager().setSelectedContent(content);
+        ContentManager contentManager = _toolWindow.getContentManager();
+        final Content content =  contentManager.getFactory().createContent(sequencePanel, sequencePanel.getTitleName(), false);
+        contentManager.addContent(content);
+        contentManager.setSelectedContent(content);
     }
 
     private PsiManager getPsiManager() {

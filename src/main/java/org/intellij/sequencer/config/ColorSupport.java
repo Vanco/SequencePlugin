@@ -1,5 +1,7 @@
 package org.intellij.sequencer.config;
 
+import com.intellij.ui.JBColor;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
@@ -25,8 +27,8 @@ public class ColorSupport {
     }
 
     public static Color withTransparency(Color c, float alpha) {
-        int transparancy = Math.round(alpha * 255.f);
-        return new Color(c.getRed(), c.getGreen(), c.getBlue(), transparancy);
+        int transparency = Math.round(alpha * 255.f);
+        return new JBColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), transparency), new Color(c.getRed(), c.getGreen(), c.getBlue(), transparency));
     }
 
     public static class ColorEditor extends AbstractCellEditor
@@ -34,8 +36,6 @@ public class ColorSupport {
             ActionListener {
         Color currentColor;
         JButton button;
-        JColorChooser colorChooser;
-        JDialog dialog;
         protected static final String EDIT = "edit";
 
         public ColorEditor() {
@@ -48,14 +48,6 @@ public class ColorSupport {
             button.addActionListener(this);
             button.setBorderPainted(false);
 
-            //Set up the dialog that the button brings up.
-            colorChooser = new JColorChooser();
-            dialog = JColorChooser.createDialog(button,
-                    "Pick a Color",
-                    true,  //modal
-                    colorChooser,
-                    this,  //OK button handler
-                    null); //no CANCEL button handler
         }
 
         /**
@@ -67,14 +59,15 @@ public class ColorSupport {
                 //The user has clicked the cell, so
                 //bring up the dialog.
                 button.setBackground(currentColor);
-                colorChooser.setColor(currentColor);
-                dialog.setVisible(true);
+
+                Color newColor = JColorChooser.showDialog(button, "Pick a Color",
+                        currentColor);
+                if(newColor != null)
+                    currentColor = newColor;
 
                 //Make the renderer reappear.
                 fireEditingStopped();
 
-            } else { //User pressed dialog's "OK" button.
-                currentColor = colorChooser.getColor();
             }
         }
 
@@ -98,7 +91,7 @@ public class ColorSupport {
             implements TableCellRenderer {
         Border unselectedBorder = null;
         Border selectedBorder = null;
-        boolean isBordered = true;
+        boolean isBordered;
 
         public ColorRenderer(boolean isBordered) {
             this.isBordered = isBordered;

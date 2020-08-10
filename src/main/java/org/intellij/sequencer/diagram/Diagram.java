@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Diagram {
@@ -131,11 +130,11 @@ public class Diagram {
             y += link.getTextHeight() + link.getLinkHeight();
         }
         y += 10;
-        culculateFullSize(y);
+        calculateFullSize(y);
         return new Dimension(maxX, y);
     }
 
-    private void culculateFullSize(int height) {
+    private void calculateFullSize(int height) {
         for(int i = 0; i < _objectLifeLines.size(); i++) {
             DisplayObject displayObject = _objectLifeLines.get(i);
             displayObject.setFullHeight(height);
@@ -197,6 +196,14 @@ public class Diagram {
     }
 
     public boolean isSingleObject() {
-        return _objectLifeLines.size() == 1;
+        return _objectLifeLines.size() <= 1;
+    }
+
+    public boolean isEmpty() {
+        return _objectLifeLines.isEmpty();
+    }
+
+    public boolean nonEmpty() {
+        return ! isEmpty();
     }
 }
