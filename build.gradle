@@ -7,19 +7,15 @@ plugins {
 intellij {
     version '2020.1'
     pluginName 'SequenceDiagram'
-    plugins = ['java','Kotlin']
+    plugins = ['java']
     updateSinceUntilBuild true
     sandboxDirectory = "${project.rootDir}/.sandbox"
-    jreRepo 'http://jetbrains.bintray.com/intellij-jbr'
+    jreRepo 'https://jetbrains.bintray.com/intellij-jbr'
 }
 
 patchPluginXml {
     sinceBuild 201.5656
     untilBuild '202.*'
-    changeNotes """Add save to file feature, you can save diagram to `*.sdt` file. 
-Load `.sdt` file to view the graph.
-Merged pull request #58 and now you can add object color overlay.
-"""
 }
 
 publishPlugin {
@@ -27,7 +23,7 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '2.0.2'
+version '2.0.3'
 
 sourceCompatibility = 1.8
 

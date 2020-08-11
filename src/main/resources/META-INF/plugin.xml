@@ -27,10 +27,14 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <depends>com.intellij.modules.java</depends>
 
-    <depends>org.jetbrains.kotlin</depends>
-
     <change-notes><![CDATA[
         <dl>
+        <dt>2.0.3</dt>
+        <dd>Fix NPE issue when click the diagram load from .sdt file.</dd>
+        <dt>2.0.2</dt>
+        <dd>Add save to file feature, you can save diagram to `*.sdt` file.
+Load `.sdt` file to view the graph.
+Merged pull request #58 and now you can add object color overlay.</dd>
         <dt>2.0.1</dt>
         <dd>#47 Filled arrows for synchronous messages. Refine Method Info Tips.</dd>
         <dt>2.0</dt>

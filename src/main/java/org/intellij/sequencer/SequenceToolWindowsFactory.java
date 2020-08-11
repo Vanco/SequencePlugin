@@ -9,6 +9,7 @@ import com.intellij.ui.content.ContentManagerEvent;
 import com.intellij.ui.content.ContentManagerListener;
 import org.intellij.sequencer.diagram.ModelTextEvent;
 import org.intellij.sequencer.diagram.ModelTextListener;
+import org.intellij.sequencer.generator.SequenceParams;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -42,7 +43,7 @@ public class SequenceToolWindowsFactory implements ToolWindowFactory {
     }
 
     private void addEmptyContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        SequencePanel sequencePanel = new SequencePanel(null,null, null);
+        SequencePanel sequencePanel = new SequencePanel(null,null, new SequenceParams());
         ContentManager contentManager = toolWindow.getContentManager();
         Content emptyDiagram = contentManager.getFactory().createContent(sequencePanel, "Open...", false);
         contentManager.addContent(emptyDiagram);

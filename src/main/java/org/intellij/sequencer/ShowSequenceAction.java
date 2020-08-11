@@ -1,7 +1,5 @@
 package org.intellij.sequencer;
 
-import com.intellij.lang.Language;
-import com.intellij.lang.LanguageUtil;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -12,18 +10,18 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.util.ui.JBUI;
-import kotlin.reflect.jvm.internal.impl.load.kotlin.KotlinClassFinder;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.NoConstructorsFilter;
 import org.intellij.sequencer.generator.filters.NoGetterSetterFilter;
 import org.intellij.sequencer.generator.filters.NoPrivateMethodsFilter;
 import org.intellij.sequencer.generator.filters.ProjectOnlyFilter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.idea.KotlinLanguage;
-import org.jetbrains.kotlin.psi.KtFunction;
 
 import javax.swing.*;
 import java.awt.*;
+
+//import org.jetbrains.kotlin.idea.KotlinLanguage;
+//import org.jetbrains.kotlin.psi.KtFunction;
 
 public class ShowSequenceAction extends AnAction {
     private int _callDepth = 5;
@@ -50,8 +48,8 @@ public class ShowSequenceAction extends AnAction {
         return psiElement != null
                 && (psiElement.getLanguage().is(JavaLanguage.INSTANCE)
                 && psiElement instanceof PsiMethod
-                || psiElement.getLanguage().is(KotlinLanguage.INSTANCE)
-                && psiElement instanceof KtFunction);
+                /*|| psiElement.getLanguage().is(KotlinLanguage.INSTANCE)
+                && psiElement instanceof KtFunction*/);
     }
 
     public void actionPerformed(@NotNull AnActionEvent event) {
