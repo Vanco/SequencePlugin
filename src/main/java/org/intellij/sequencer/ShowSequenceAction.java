@@ -29,7 +29,7 @@ public class ShowSequenceAction extends AnAction {
     private boolean _noGetterSetters = true;
     private boolean _noPrivateMethods;
     private boolean _noConstructors;
-    private boolean _smartInterface = true;
+    private boolean _smartInterface = false;
 
     public ShowSequenceAction() {
     }

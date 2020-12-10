@@ -29,6 +29,8 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>2.0.4</dt>
+        <dd>Rebuild for 203.*</dd>
         <dt>2.0.3</dt>
         <dd>Fix NPE issue when click the diagram load from .sdt file.</dd>
         <dt>2.0.2</dt>
