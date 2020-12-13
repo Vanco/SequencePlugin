@@ -1,11 +1,11 @@
 
 plugins {
     id 'java'
-    id "org.jetbrains.intellij" version "0.4.21"
+    id "org.jetbrains.intellij" version "0.5.1"
 }
 
 intellij {
-    version '2020.1'
+    version '2020.2'
     pluginName 'SequenceDiagram'
     plugins = ['java']
     updateSinceUntilBuild true
@@ -14,8 +14,8 @@ intellij {
 }
 
 patchPluginXml {
-    sinceBuild 201.5656
-    untilBuild '202.*'
+    sinceBuild '202'
+    untilBuild '203.*'
 }
 
 publishPlugin {
@@ -23,7 +23,7 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '2.0.3'
+version '2.0.4'
 
 sourceCompatibility = 1.8
 

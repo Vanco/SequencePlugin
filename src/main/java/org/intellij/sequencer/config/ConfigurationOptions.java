@@ -12,11 +12,6 @@ public class ConfigurationOptions implements SearchableConfigurable {
     private ConfigurationUI _configurationUI;
     private Configuration configuration;
 
-
-    public ConfigurationOptions(@NotNull Configuration configuration) {
-        this.configuration = configuration;
-    }
-
     public String getDisplayName() {
         return "Sequence Diagram";
     }
@@ -26,6 +21,7 @@ public class ConfigurationOptions implements SearchableConfigurable {
     }
 
     public JComponent createComponent() {
+        configuration = new Configuration();
         return getForm().getMainPanel();
     }
 
