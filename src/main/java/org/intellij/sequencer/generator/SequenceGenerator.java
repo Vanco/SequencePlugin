@@ -49,7 +49,7 @@ public class SequenceGenerator extends JavaElementVisitor {
                     if (psiElement instanceof PsiMethod) {
                         if (alreadyInStack((PsiMethod) psiElement)) continue;
 
-                        if (!params.isSmartInterface() && params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
+                        if (/*!params.isSmartInterface() && */params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
                             methodAccept(psiElement);
                     }
                 }

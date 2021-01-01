@@ -73,4 +73,34 @@ public class CallStack {
         }
     }
 
+    // Generate platUML file
+    public String generatePuml() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("@startuml").append('\n');
+        buffer.append("participant Actor").append('\n');
+        String classA = _method.getClassDescription().getClassShortName();
+        String method = _method.getMethodName();
+        buffer.append("Actor").append(" -> ").append(classA).append(" : ").append(method).append('\n');
+        buffer.append("activate ").append(classA).append('\n');
+        generatePumlStr(buffer);
+        buffer.append("return").append('\n');
+        buffer.append("@enduml");
+        return buffer.toString();
+    }
+
+    private void generatePumlStr(StringBuffer buffer) {
+        String classA = _method.getClassDescription().getClassShortName();
+
+        for (CallStack callStack : _calls) {
+            String classB = callStack.getMethod().getClassDescription().getClassShortName();
+            String method = callStack.getMethod().getMethodName();
+            buffer.append(classA).append(" -> ").append(classB).append(" : ").append(method).append('\n');
+            buffer.append("activate ").append(classB).append('\n');
+            callStack.generatePumlStr(buffer);
+            buffer.append(classB).append(" --> ").append(classA).append('\n');
+            buffer.append("deactivate ").append(classB).append('\n');
+        }
+
+    }
+
 }

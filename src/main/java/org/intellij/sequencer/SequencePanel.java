@@ -1,6 +1,7 @@
 package org.intellij.sequencer;
 
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBScrollBar;
@@ -54,6 +55,7 @@ public class SequencePanel extends JPanel {
         actionGroup.add(new ExportAction());
         actionGroup.add(new SaveAsAction());
         actionGroup.add(new LoadAction());
+        actionGroup.add(new ExportPumlAction());
 
         ActionManager actionManager = ActionManager.getInstance();
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
@@ -91,6 +93,17 @@ public class SequencePanel extends JPanel {
         final CallStack callStack = generator.generate((PsiMethod) psiElement);
         _titleName = callStack.getMethod().getTitleName();
         generate(callStack.generateSequence());
+    }
+
+    public String generatePuml() {
+        if (psiElement == null || !psiElement.isValid() || !(psiElement instanceof PsiMethod)) {
+            psiElement = null;
+            return "";
+        }
+        SequenceGenerator generator = new SequenceGenerator(_sequenceParams);
+        final CallStack callStack = generator.generate((PsiMethod) psiElement);
+
+        return callStack.generatePuml();
     }
 
     private void showBirdView() {
@@ -230,7 +243,6 @@ public class SequencePanel extends JPanel {
 
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             generate();
-
         }
 
         @Override
@@ -242,7 +254,7 @@ public class SequencePanel extends JPanel {
 
     private class ExportAction extends AnAction {
         public ExportAction() {
-            super("Export", "Export image to file", SequencePluginIcons.EXPORT_ICON);
+            super("Export Image", "Export image to file", SequencePluginIcons.EXPORT_ICON);
         }
 
         public void actionPerformed(@NotNull AnActionEvent event) {
@@ -278,7 +290,7 @@ public class SequencePanel extends JPanel {
 
     private class LoadAction extends AnAction {
         public LoadAction() {
-            super("Open Diagram", "Open SequenceDiagram text (.sdt) file", SequencePluginIcons.EXPORT_TEXT_ICON);
+            super("Open Diagram", "Open SequenceDiagram text (.sdt) file", SequencePluginIcons.OPEN_ICON);
         }
 
         @Override
@@ -300,19 +312,6 @@ public class SequencePanel extends JPanel {
                 File file = chooser.getSelectedFile();
                 _titleName = file.getName();
                 _model.readFromFile(file);
-
-
-//                Project project = e.getProject();
-//                if (project == null) return;
-//
-//                ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(SequenceService.PLUGIN_NAME);
-//                if (toolWindow == null) return;
-//
-//                Content selectedContent = toolWindow.getContentManager().getSelectedContent();
-//
-//                if (selectedContent == null) return;
-//
-//                selectedContent.setDisplayName(_titleName);
             }
 
         }
@@ -326,7 +325,7 @@ public class SequencePanel extends JPanel {
     private class SaveAsAction extends AnAction {
 
         public SaveAsAction() {
-            super("Save As ...", "Export Diagram to file", SequencePluginIcons.EXPORT_TEXT_ICON);
+            super("Save As ...", "Export Diagram to file", SequencePluginIcons.SAVE_ICON);
         }
 
         @Override
@@ -349,7 +348,6 @@ public class SequencePanel extends JPanel {
                         selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".sdt");
 
                     _model.writeToFile(selectedFile);
-//                    generateTextFile(selectedFile);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -362,6 +360,49 @@ public class SequencePanel extends JPanel {
             e.getPresentation().setEnabled(_display.getDiagram().nonEmpty());
         }
     }
+
+    private class ExportPumlAction extends AnAction {
+
+        public ExportPumlAction() {
+            super("Export PlantUML ...", "Export Diagram to PlantUML file", SequencePluginIcons.PUML_ICON);
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent event) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+            fileChooser.setFileFilter(new FileFilter() {
+                public boolean accept(File f) {
+                    return f.isDirectory() || f.getName().endsWith("puml");
+                }
+
+                public String getDescription() {
+                    return "PlantUML (.puml) File";
+                }
+            });
+            try {
+                if (fileChooser.showSaveDialog(SequencePanel.this) == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    if (!selectedFile.getName().endsWith("puml"))
+                        selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".puml");
+
+                    String uml =  generatePuml();
+
+                    FileUtil.writeToFile(selectedFile, uml);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(SequencePanel.this, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            e.getPresentation().setEnabled(_display.getDiagram().nonEmpty());
+        }
+    }
+
+
 
     private class GotoSourceAction extends AnAction {
         private final ScreenObject _screenObject;
