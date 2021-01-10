@@ -23,6 +23,9 @@ import java.awt.*;
 //import org.jetbrains.kotlin.idea.KotlinLanguage;
 //import org.jetbrains.kotlin.psi.KtFunction;
 
+/**
+ * Show Sequence generate options dialog.
+ */
 public class ShowSequenceAction extends AnAction {
     private int _callDepth = 5;
     private boolean _projectClassesOnly = true;
@@ -34,6 +37,10 @@ public class ShowSequenceAction extends AnAction {
     public ShowSequenceAction() {
     }
 
+    /**
+     * Enable or disable the menu base on file type. Current only java file will enable the menu.
+     * @param event event
+     */
     public void update(@NotNull AnActionEvent event) {
         super.update(event);
 
@@ -45,6 +52,7 @@ public class ShowSequenceAction extends AnAction {
     }
 
     private boolean isEnabled(PsiElement psiElement) {
+        // only JAVA method will enable the generator.
         return psiElement != null
                 && (psiElement.getLanguage().is(JavaLanguage.INSTANCE)
                 && psiElement instanceof PsiMethod

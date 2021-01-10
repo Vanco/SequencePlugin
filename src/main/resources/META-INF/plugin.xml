@@ -10,7 +10,8 @@
 + Navigate the code by click the diagram shape.<br>
 + Delete Class from diagram.<br>
 + Export the diagram as image.<br>
-+ Exclude classes from diagram by Settings > Other Settings > Sequence<br>
++ Export the diagram as PlantUML file.<br>
++ Exclude classes from diagram by Settings > Tools > Sequence Diagram<br>
 + Smart Interface(experimental)<br>
 + Lambda Expression(experimental)</p>
 
