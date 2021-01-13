@@ -21,7 +21,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
 ]]></description>
     <version>1.2.4</version>
-    <vendor>fanhuagang@gmail.com</vendor>
+    <vendor email="fanhuagang@gmail.com">VanStudio</vendor>
     <idea-version since-build="201.5656"/>
 
     <depends>com.intellij.modules.platform</depends>
@@ -30,6 +30,8 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <change-notes><![CDATA[
         <dl>
+        <dt>2.0.6</dt>
+        <dd>Fix #70</dd>
         <dt>2.0.5</dt>
         <dd>Export PlantUML file. #56</dd>
         <dt>2.0.4</dt>
@@ -97,9 +99,10 @@ Merged pull request #58 and now you can add object color overlay.</dd>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <applicationConfigurable groupId="tools"
+        <applicationConfigurable parentId="tools"
                                  id="Settings.Sequence.Configuration"
-                                 instance="org.intellij.sequencer.config.ConfigurationOptions"/>
+                                 instance="org.intellij.sequencer.config.ConfigurationOptions"
+                                 displayName="Sequence Diagram"/>
         <applicationService serviceImplementation="org.intellij.sequencer.config.Configuration"/>
         <toolWindow id="Sequence Diagram" icon="SequencePluginIcons.SEQUENCE_ICON_13" anchor="bottom"
                     factoryClass="org.intellij.sequencer.SequenceToolWindowsFactory" canCloseContents="true"/>

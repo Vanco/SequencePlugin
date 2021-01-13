@@ -1,7 +1,7 @@
 
 plugins {
     id 'java'
-    id "org.jetbrains.intellij" version "0.5.1"
+    id "org.jetbrains.intellij" version "0.6.5"
 }
 
 intellij {
@@ -14,7 +14,7 @@ intellij {
 }
 
 patchPluginXml {
-    sinceBuild '202'
+    sinceBuild '201'
     untilBuild '203.*'
 }
 
@@ -23,7 +23,7 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '2.0.5'
+version '2.0.6'
 
 sourceCompatibility = 1.8
 

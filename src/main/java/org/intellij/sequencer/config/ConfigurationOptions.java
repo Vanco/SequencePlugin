@@ -1,6 +1,5 @@
 package org.intellij.sequencer.config;
 
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +20,7 @@ public class ConfigurationOptions implements SearchableConfigurable {
     }
 
     public JComponent createComponent() {
-        configuration = new Configuration();
+        configuration = Configuration.getInstance();
         return getForm().getMainPanel();
     }
 
@@ -29,7 +28,7 @@ public class ConfigurationOptions implements SearchableConfigurable {
         return getForm().isModified(configuration);
     }
 
-    public void apply() throws ConfigurationException {
+    public void apply() {
         getForm().apply(configuration);
         fireConfigChanged();
     }

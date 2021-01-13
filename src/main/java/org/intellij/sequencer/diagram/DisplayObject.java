@@ -2,14 +2,12 @@ package org.intellij.sequencer.diagram;
 
 import com.intellij.ui.JBColor;
 import org.apache.log4j.Logger;
-import org.intellij.sequencer.config.ColorMapEntry;
 import org.intellij.sequencer.config.ColorSupport;
 import org.intellij.sequencer.config.Configuration;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class DisplayObject extends ScreenObject {
     private static final Logger LOGGER = Logger.getLogger(DisplayObject.class);

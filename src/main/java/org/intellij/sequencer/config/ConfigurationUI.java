@@ -165,7 +165,7 @@ public class ConfigurationUI implements ActionListener {
                 break;
             case "addExcludeEntry":
                 String excludeName = JOptionPane.showInputDialog(_mainPanel,
-                        "Enter package or class name.\nFor example, java.lang.* or java.io.PrintStream:", "Exclude Entry",
+                        "Enter package or class name.\nFor example, \njava.lang.* \njava.util.** \njava.io.PrintStream:", "Exclude Entry",
                         JOptionPane.PLAIN_MESSAGE);
                 if (excludeName != null && excludeName.trim().length() != 0)
                     _excludeTableModel.addExcludeEntry(excludeName, true);
