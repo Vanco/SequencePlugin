@@ -7,8 +7,6 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.content.ContentManagerEvent;
 import com.intellij.ui.content.ContentManagerListener;
-import org.intellij.sequencer.diagram.ModelTextEvent;
-import org.intellij.sequencer.diagram.ModelTextListener;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,11 +17,6 @@ import java.util.Objects;
  * Created by van on 2020/4/11.
  */
 public class SequenceToolWindowsFactory implements ToolWindowFactory {
-    @Override
-    public boolean isApplicable(@NotNull Project project) {
-
-        return true;
-    }
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {

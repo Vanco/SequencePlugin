@@ -89,38 +89,12 @@ Place the cursor inside the method, trigger it from `Tools` menu or `context` me
 **Current Verison 2.0**
 
 versions:
-<dl>
-        <dt>2.0</dt>
-        <dd>Support new IDEA 2020.x Dynamic Plugins. fix issue #47, #50</dd>
-        <dt>1.3</dt>
-        <dd>Lambda Expression. #38</dd>
-        <dt>1.2</dt>
-        <dd>new feature: Smart Interface, List implementation of interface in project, user can choose one to show in sequence diagram. If only one implementation found, it will show automatically. </dd>
-        <dt>1.1</dt>
-        <dd>fix issue #3 support parameter is anther method call, fix issue #4 support pipeline call.</dd>
-        <dt>1.0.9</dt>
-        <dd>fix issue #1 recognise more generic method definition, fix issue #2 show popup menu on mac and linux.</dd>
-        <dt>1.0.8</dt>
-        <dd>Refine not to call "Deprecated" methods. Add Exclude Settings. Change the name to SequenceDiagram. </dd>
-        <dt>1.0.7</dt>
-        <dd>Remove "com.intellij.diagram" dependency. </dd>
-        <dt>1.0.6</dt>
-        <dd>HotFix: add missing res file in version 1.0.5.</dd>
-        <dt>1.0.5</dt>
-        <dd>Narrow the plugin support product list to java.[ABANDONED]</dd>
-        <dt>1.0.4</dt>
-        <dd>fixbug: go to source</dd>
-        <dt>1.0.3</dt>
-        <dd>fixbug: NPE when call psiMethod.getContainingClass() on enum class.</dd>
-        <dt>1.0.2</dt>
-        <dd>Add Sequence Diagram... menu under the Tools menu and Editor popup menu group with Diagram.</dd>
-        <dd>fixbug: method name with generic type.</dd>
-</dl>
+[Changelog](CHANGELOG.md)
 
 ## Download Chart
-**63,000+** unique Downloads since 1.x version released April 2016.
+**141,000+** unique Downloads since 1.x version released April 2016.
 
-![SequenceDiagram downloads](imges/sd1x.svg)
+![SequenceDiagram downloads](imges/sd2x.svg)
 
 ## Acknowledgement
 

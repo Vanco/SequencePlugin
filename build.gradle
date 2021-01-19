@@ -2,12 +2,13 @@
 plugins {
     id 'java'
     id "org.jetbrains.intellij" version "0.6.5"
+    id "org.jetbrains.changelog" version "1.0.0"
 }
 
 intellij {
-    version '2020.2'
+    version '2020.1'
     pluginName 'SequenceDiagram'
-    plugins = ['java']
+    plugins = ['com.intellij.java']
     updateSinceUntilBuild true
     sandboxDirectory = "${project.rootDir}/.sandbox"
     jreRepo 'https://jetbrains.bintray.com/intellij-jbr'
@@ -16,14 +17,15 @@ intellij {
 patchPluginXml {
     sinceBuild '201'
     untilBuild '203.*'
+    changeNotes({ changelog.getLatest().toHTML() })
 }
 
 publishPlugin {
-    token intellijPublishToken
+    token System.getenv("PUGLISH_TOKEN")
 }
 
 group 'vanstudio'
-version '2.0.6'
+version '2.0.7'
 
 sourceCompatibility = 1.8
 

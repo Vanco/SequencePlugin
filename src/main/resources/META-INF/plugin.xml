@@ -22,71 +22,13 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 ]]></description>
     <version>1.2.4</version>
     <vendor email="fanhuagang@gmail.com">VanStudio</vendor>
-    <idea-version since-build="201.5656"/>
+    <idea-version since-build="201.6668.113"/>
 
     <depends>com.intellij.modules.platform</depends>
 
     <depends>com.intellij.modules.java</depends>
 
-    <change-notes><![CDATA[
-        <dl>
-        <dt>2.0.6</dt>
-        <dd>Fix #70</dd>
-        <dt>2.0.5</dt>
-        <dd>Export PlantUML file. #56</dd>
-        <dt>2.0.4</dt>
-        <dd>Rebuild for 203.*</dd>
-        <dt>2.0.3</dt>
-        <dd>Fix NPE issue when click the diagram load from .sdt file.</dd>
-        <dt>2.0.2</dt>
-        <dd>Add save to file feature, you can save diagram to `*.sdt` file.
-Load `.sdt` file to view the graph.
-Merged pull request #58 and now you can add object color overlay.</dd>
-        <dt>2.0.1</dt>
-        <dd>#47 Filled arrows for synchronous messages. Refine Method Info Tips.</dd>
-        <dt>2.0</dt>
-        <dd>New Plugin version support 2020.x</dd>
-        <dt>1.3</dt>
-        <dd>fix #38: Lambda Expression.</dd>
-        <dt>1.2.8</dt>
-        <dd>fix#34: Can we export the whole call stack to a text file.</dd>
-        <dt>1.2.7</dt>
-        <dd>fix#26: Dead loop when generate Wrapper Patten class. fix issue when disable smartInterface option.</dd>
-        <dt>1.2.6</dt>
-        <dd>fix#22: PNG export.</dd>
-        <dt>1.2.5</dt>
-        <dd>fix#20: Export PNG cropped method names.</dd>
-        <dt>1.2.4</dt>
-        <dd>Add configuration for method call name, It's now showing in simple/full format.</dd>
-        <dt>1.2.3</dt>
-        <dd>Add abstract class support.</dd>
-        <dt>1.2.2</dt>
-        <dd>hotfix: #10 NPE when visitNewException.</dd>
-        <dt>1.2.1</dt>
-        <dd>hotfix: NPE when process local variable's initializer. Show bird view icon in lower right corner.</dd>
-        <dt>1.2</dt>
-        <dd>new feature: Smart Interface, List implementation of interface in project, user can choose one to show in sequence diagram. If only one implementation found, it will show automatically. </dd>
-        <dt>1.1</dt>
-        <dd>fix issue #3 support parameter is anther method call, fix issue #4 support pipeline call.</dd>
-        <dt>1.0.9</dt>
-        <dd>fix issue #1 recognise more generic method definition, fix issue #2 show popup menu on mac and linux.</dd>
-        <dt>1.0.8</dt>
-        <dd>Refine not to call "@Deprecated" methods. Add Exclude Settings. Change the name to SequenceDiagram. </dd>
-        <dt>1.0.7</dt>
-        <dd>Remove "com.intellij.diagram" dependency. </dd>
-        <dt>1.0.6</dt>
-        <dd>HotFix: add missing res file in version 1.0.5.</dd>
-        <dt>1.0.5</dt>
-        <dd>Narrow the plugin support product list to java.[ABANDONED]</dd>
-        <dt>1.0.4</dt>
-        <dd>fixbug: go to source</dd>
-        <dt>1.0.3</dt>
-        <dd>fixbug: NPE when call psiMethod.getContainingClass() on enum class.</dd>
-        <dt>1.0.2</dt>
-        <dd>Add Sequence Diagram... menu under the Tools menu and Editor popup menu group with Diagram.</dd>
-        <dd>fixbug: method name with generic type.</dd>
-        </dl>
-    ]]></change-notes>
+    <change-notes></change-notes>
 
     <actions>
         <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction"
