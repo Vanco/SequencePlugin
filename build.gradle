@@ -17,6 +17,13 @@ intellij {
 patchPluginXml {
     sinceBuild '201'
     untilBuild '203.*'
+    pluginDescription({
+        def start = "<!-- Plugin description -->"
+        def end = "<!-- Plugin description end -->"
+        def lines = new File("./README.md").collect {it}
+        def str = lines.subList(lines.indexOf(start) + 1, lines.indexOf(end)).join("<br>")
+        str
+    })
     changeNotes({ changelog.getLatest().toHTML() })
 }
 

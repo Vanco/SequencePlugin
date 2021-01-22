@@ -1,4 +1,5 @@
 # SequenceDiagram
+<!-- Plugin description -->
 SequenceDiagram for IntelliJ IDEA
 http://vanco.github.io/SequencePlugin.
 
@@ -7,10 +8,11 @@ with this plugin, you can
 + Navigate the code by click the diagram shape.
 + Delete Class from diagram.
 + Export the diagram as image.
-+ Exclude classes from diagram by Settings > Other Settings > Sequence
++ Export the diagram as PlantUML file.
++ Exclude classes from diagram by Settings > Tools > Sequence Diagram
 + Smart Interface(experimental)
 + Lambda Expression(experimental)
-
+<!-- Plugin description end -->
 ## Experimental features
 **The experimental features are created by myself, which is not part of UML standard. Use this feature in your own risk.**
 

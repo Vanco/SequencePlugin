@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Use `org.jetbrains.changelog` gradle plugin `1.0.0` to manage changelog file.
+
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md`  
 
@@ -14,6 +15,7 @@
 ## [2.0.5]
 ### Added
 - Export PlantUML file.
+
 ### Fixed
 - [Feature Request] export puml file #56
 
@@ -29,6 +31,7 @@
 ### Added
 - Add save to file feature, you can save diagram to `*.sdt` file.
 - Load `.sdt` file to view the graph.
+
 ### Changed
 - Merged pull request #58 and now you can add object color overlay.
 
@@ -117,5 +120,6 @@
 ## [1.0.2]
 ### Added
 - Add Sequence Diagram... menu under the Tools menu and Editor popup menu group with Diagram.
+
 ### Fixed
 - fix bug: method name with generic type.
