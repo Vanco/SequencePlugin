@@ -13,6 +13,7 @@ with this plugin, you can
 + Smart Interface(experimental)
 + Lambda Expression(experimental)
 <!-- Plugin description end -->
+
 ## Experimental features
 **The experimental features are created by myself, which is not part of UML standard. Use this feature in your own risk.**
 
@@ -103,7 +104,8 @@ versions:
 #### Name history
 + **SequencePlugin** Maintained by Kentaur(Kesh Sibilev, ksibilve@yahoo.com) until 2011
 + **SequencePluginReload** Maintained by Vanhg(Evan Fan, fanhuagang@gmail.com) 2011 - 2015
-+ **SequenceDiagram** Maintained by Vanco(Evan Fan, fanhuagang@gmail.com) since 2016
++ **SequenceDiagram** Maintained by Vanco(Evan Fan, fanhuagang@gmail.com) since 2016 
+  ![new](imges/new.svg | width=32)
 
 #### Why change name?
 Since 2011, I found a solution of NPE of original **SequencePlugin**, so I write email to Kentaur with my solution,
