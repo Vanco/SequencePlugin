@@ -9,12 +9,12 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.diagram.*;
-import org.intellij.sequencer.generator.CallStack;
-import org.intellij.sequencer.generator.SequenceGenerator;
-import org.intellij.sequencer.generator.SequenceParams;
+import org.intellij.sequencer.generator.*;
 import org.intellij.sequencer.generator.filters.*;
+import org.intellij.sequencer.impl.EmptySequenceNavigable;
 import org.intellij.sequencer.ui.MyButtonlessScrollBarUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.psi.KtFunction;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -85,23 +85,26 @@ public class SequencePanel extends JPanel {
     }
 
     public void generate() {
-        if (psiElement == null || !psiElement.isValid() || !(psiElement instanceof PsiMethod)) {
+        if (psiElement == null || !psiElement.isValid() || !(psiElement instanceof PsiMethod || psiElement instanceof KtFunction)) {
             psiElement = null;
             return;
         }
-        SequenceGenerator generator = new SequenceGenerator(_sequenceParams);
-        final CallStack callStack = generator.generate((PsiMethod) psiElement);
+        IGenerator generator = GeneratorFactory.createGenerator(psiElement.getLanguage(), _sequenceParams);
+
+        final CallStack callStack = generator.generate(psiElement);
         _titleName = callStack.getMethod().getTitleName();
         generate(callStack.generateSequence());
     }
 
     public String generatePuml() {
-        if (psiElement == null || !psiElement.isValid() || !(psiElement instanceof PsiMethod)) {
+        if (psiElement == null || !psiElement.isValid() || !(psiElement instanceof PsiMethod || psiElement instanceof KtFunction)) {
             psiElement = null;
             return "";
         }
-        SequenceGenerator generator = new SequenceGenerator(_sequenceParams);
-        final CallStack callStack = generator.generate((PsiMethod) psiElement);
+
+        IGenerator generator = GeneratorFactory.createGenerator(psiElement.getLanguage(), _sequenceParams);
+
+        final CallStack callStack = generator.generate(psiElement);
 
         return callStack.generatePuml();
     }
@@ -192,49 +195,6 @@ public class SequencePanel extends JPanel {
     private boolean isLambdaCall(MethodInfo methodInfo) {
         return Objects.equals(methodInfo.getRealName(), Constants.Lambda_Invoke);
     }
-
-    private static class EmptySequenceNavigable implements SequenceNavigable {
-        @Override
-        public void openClassInEditor(String className) {
-
-        }
-
-        @Override
-        public void openMethodInEditor(String className, String methodName, List<String> argTypes) {
-
-        }
-
-        @Override
-        public boolean isInsideAMethod() {
-            return false;
-        }
-
-        @Override
-        public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes, String toClass, String toMethod, List<String> toArgType, int callNo) {
-
-        }
-
-        @Override
-        public List<String> findImplementations(String className) {
-            return null;
-        }
-
-        @Override
-        public List<String> findImplementations(String className, String methodName, List<String> argTypes) {
-            return null;
-        }
-
-        @Override
-        public void openLambdaExprInEditor(String fromClass, String fromMethod, List<String> fromArgTypes, List<String> argTypes, String returnType) {
-
-        }
-
-        @Override
-        public void openMethodCallInsideLambdaExprInEditor(CompositeMethodFilter methodFilter, String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes, List<String> argTypes, String returnType, String toClass, String toMethod, List<String> toArgTypes, int callNo) {
-
-        }
-    }
-
 
     private class ReGenerateAction extends AnAction {
         public ReGenerateAction() {

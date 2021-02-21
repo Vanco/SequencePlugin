@@ -8,7 +8,7 @@ plugins {
 intellij {
     version '2020.1'
     pluginName 'SequenceDiagram'
-    plugins = ['com.intellij.java']
+    plugins = ['com.intellij.java','org.jetbrains.kotlin']
     updateSinceUntilBuild true
     sandboxDirectory = "${project.rootDir}/.sandbox"
     jreRepo 'https://jetbrains.bintray.com/intellij-jbr'
@@ -16,7 +16,7 @@ intellij {
 
 patchPluginXml {
     sinceBuild '201'
-    untilBuild '203.*'
+    untilBuild '211.*'
     pluginDescription({
         def start = "<!-- Plugin description -->"
         def end = "<!-- Plugin description end -->"
@@ -32,7 +32,7 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '2.0.7'
+version '2.1.a1'
 
 sourceCompatibility = 1.8
 

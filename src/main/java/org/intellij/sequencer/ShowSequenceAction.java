@@ -20,8 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 
-//import org.jetbrains.kotlin.idea.KotlinLanguage;
-//import org.jetbrains.kotlin.psi.KtFunction;
+import org.jetbrains.kotlin.idea.KotlinLanguage;
+import org.jetbrains.kotlin.psi.KtFunction;
 
 /**
  * Show Sequence generate options dialog.
@@ -52,12 +52,12 @@ public class ShowSequenceAction extends AnAction {
     }
 
     private boolean isEnabled(PsiElement psiElement) {
-        // only JAVA method will enable the generator.
+        // only JAVA method or Kotlin Function will enable the generator.
         return psiElement != null
                 && (psiElement.getLanguage().is(JavaLanguage.INSTANCE)
                 && psiElement instanceof PsiMethod
-                /*|| psiElement.getLanguage().is(KotlinLanguage.INSTANCE)
-                && psiElement instanceof KtFunction*/);
+                || psiElement.getLanguage().is(KotlinLanguage.INSTANCE)
+                && psiElement instanceof KtFunction);
     }
 
     public void actionPerformed(@NotNull AnActionEvent event) {

@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - Use `org.jetbrains.changelog` gradle plugin `1.0.0` to manage changelog file.
+- Kotlin support(experimental)
 
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md`  

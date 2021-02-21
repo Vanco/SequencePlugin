@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class SequenceGenerator extends JavaElementVisitor {
+public class SequenceGenerator extends JavaElementVisitor implements IGenerator {
     private final Stack<PsiCallExpression> _exprStack = new Stack<>();
     private final Stack<CallStack> _callStack = new Stack<>();
     private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class.getName());
@@ -26,6 +26,11 @@ public class SequenceGenerator extends JavaElementVisitor {
 
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
+    }
+
+    @Override
+    public CallStack generate(PsiElement psiElement) {
+        return generate((PsiMethod) psiElement);
     }
 
     public CallStack generate(PsiMethod psiMethod) {
