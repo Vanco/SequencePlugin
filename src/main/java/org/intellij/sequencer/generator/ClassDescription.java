@@ -51,4 +51,8 @@ public class ClassDescription {
     public static ClassDescription ANONYMOUS_CLASS = new ClassDescription(Constants.ANONYMOUS_CLASS_NAME,new ArrayList<>());
 
     public static ClassDescription TOP_LEVEL_FUN = new ClassDescription(Constants.TOP_LEVEL_FUN, new ArrayList<>());
+
+    public static ClassDescription getFileNameAsClass(String filename) {
+        return new ClassDescription(filename, new ArrayList<>());
+    }
 }

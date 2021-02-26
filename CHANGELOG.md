@@ -4,6 +4,11 @@
 ### Added
 - Use `org.jetbrains.changelog` gradle plugin `1.0.0` to manage changelog file.
 - Kotlin support(experimental)
+  - Support generate topLevel function
+  - Support generate PrimaryConstructor and SecondaryConstructor
+  - Support generate No Constructor Class
+  - Support generate JavaCall
+  - Code navigation is Not Implement Yet
 
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md`  
