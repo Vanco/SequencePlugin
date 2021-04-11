@@ -1,26 +1,26 @@
 
 plugins {
     id 'java'
-    id "org.jetbrains.intellij" version "0.6.5"
-    id "org.jetbrains.changelog" version "1.0.0"
+    id "org.jetbrains.intellij" version "0.7.2"
+    id "org.jetbrains.changelog" version "1.1.1"
 }
 
 intellij {
-    version '2020.1'
+    version '2020.2'
     pluginName 'SequenceDiagram'
-    plugins = ['com.intellij.java','org.jetbrains.kotlin']
+    plugins = ['com.intellij.java','org.jetbrains.kotlin','org.intellij.plugins.markdown']
     updateSinceUntilBuild true
     sandboxDirectory = "${project.rootDir}/.sandbox"
     jreRepo 'https://jetbrains.bintray.com/intellij-jbr'
 }
 
 patchPluginXml {
-    sinceBuild '201'
+    sinceBuild '202'
     untilBuild '211.*'
     pluginDescription({
         def start = "<!-- Plugin description -->"
         def end = "<!-- Plugin description end -->"
-        def lines = new File("./README.md").collect {it}
+        def lines = new File("${project.projectDir}/README.md").collect {it}
         def str = lines.subList(lines.indexOf(start) + 1, lines.indexOf(end)).join("<br>")
         str
     })

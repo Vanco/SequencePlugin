@@ -119,8 +119,9 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
     @Nullable
     private PsiElement resolveFunction(@NotNull KtExpression expression) {
         ResolvedCall<? extends CallableDescriptor> resolvedCall = ResolutionUtils.resolveToCall(expression, BodyResolveMode.PARTIAL);
-        PsiElement psiElement = DescriptorToSourceUtils.descriptorToDeclaration(resolvedCall.getCandidateDescriptor());
-        return psiElement;
+        if (resolvedCall == null) return  null;
+        CallableDescriptor candidateDescriptor = resolvedCall.getCandidateDescriptor();
+        return DescriptorToSourceUtils.descriptorToDeclaration(candidateDescriptor);
     }
 
     private void methodCall(PsiElement psiElement) {

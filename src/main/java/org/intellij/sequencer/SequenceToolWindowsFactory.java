@@ -8,6 +8,7 @@ import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.content.ContentManagerEvent;
 import com.intellij.ui.content.ContentManagerListener;
 import org.intellij.sequencer.generator.SequenceParams;
+import org.intellij.sequencer.ui.Welcome;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -36,12 +37,10 @@ public class SequenceToolWindowsFactory implements ToolWindowFactory {
     }
 
     private void addEmptyContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        SequencePanel sequencePanel = new SequencePanel(null,null, new SequenceParams());
+        Welcome welcome = new Welcome();
         ContentManager contentManager = toolWindow.getContentManager();
-        Content emptyDiagram = contentManager.getFactory().createContent(sequencePanel, "Open...", false);
+        Content emptyDiagram = contentManager.getFactory().createContent(welcome.getMainPanel(), "Welcome", false);
         contentManager.addContent(emptyDiagram);
-
-        sequencePanel.getModel().addModelTextListener(mte -> emptyDiagram.setDisplayName(sequencePanel.getTitleName()));
 
     }
 

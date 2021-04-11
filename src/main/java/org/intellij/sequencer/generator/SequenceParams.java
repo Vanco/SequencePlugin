@@ -14,7 +14,7 @@ public class SequenceParams {
     private static final String RECURSIVE_PACKAGE_INDICATOR = ".**";
 
     private int _maxDepth = 3;
-    private boolean _allowRecursion = true;
+    private boolean _allowRecursion = false;
     private boolean smartInterface = true;
     private CompositeMethodFilter _methodFilter = new CompositeMethodFilter();
     private InterfaceImplFilter _implFilter = new InterfaceImplFilter();

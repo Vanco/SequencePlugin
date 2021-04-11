@@ -30,6 +30,8 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <depends>org.jetbrains.kotlin</depends>
 
+    <depends>org.intellij.plugins.markdown</depends>
+
     <change-notes></change-notes>
 
     <actions>

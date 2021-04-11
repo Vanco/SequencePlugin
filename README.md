@@ -94,11 +94,6 @@ Place the caret inside the method name, trigger it from `Tools` menu or `context
 versions:
 [Changelog](CHANGELOG.md)
 
-## Download Chart
-**141,000+** unique Downloads since 1.x version released April 2016.
-
-![SequenceDiagram downloads](imges/sd2x.svg)
-
 ## Acknowledgement
 
 #### Name history
