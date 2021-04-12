@@ -1,4 +1,3 @@
-
 plugins {
     id 'java'
     id "org.jetbrains.intellij" version "0.7.2"
@@ -6,16 +5,16 @@ plugins {
 }
 
 intellij {
-    version '2020.2'
+    version '2020.1'
     pluginName 'SequenceDiagram'
-    plugins = ['com.intellij.java','org.jetbrains.kotlin','org.intellij.plugins.markdown']
+    plugins = ['com.intellij.java','org.jetbrains.kotlin']
     updateSinceUntilBuild true
     sandboxDirectory = "${project.rootDir}/.sandbox"
     jreRepo 'https://jetbrains.bintray.com/intellij-jbr'
 }
 
 patchPluginXml {
-    sinceBuild '202'
+    sinceBuild '201'
     untilBuild '211.*'
     pluginDescription({
         def start = "<!-- Plugin description -->"
@@ -27,12 +26,16 @@ patchPluginXml {
     changeNotes({ changelog.getLatest().toHTML() })
 }
 
+runPluginVerifier {
+    ideVersions = ["2020.2.4", "2020.3.3", "2021.1"]
+}
+
 publishPlugin {
     token System.getenv("PUGLISH_TOKEN")
 }
 
 group 'vanstudio'
-version '2.1.a1'
+version '2.1.a2'
 
 sourceCompatibility = 1.8
 
