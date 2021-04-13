@@ -32,9 +32,10 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '2.1.a1'
+version '2.1.a2'
 
-sourceCompatibility = 1.8
+//some jdk11 functions in codes
+sourceCompatibility = 11
 
 tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
 

@@ -11,32 +11,39 @@ public class ConfigurationOptions implements SearchableConfigurable {
     private ConfigurationUI _configurationUI;
     private Configuration configuration;
 
+    @Override
     public String getDisplayName() {
         return "Sequence Diagram";
     }
 
+    @Override
     public String getHelpTopic() {
         return null;
     }
 
+    @Override
     public JComponent createComponent() {
         configuration = Configuration.getInstance();
         return getForm().getMainPanel();
     }
 
+    @Override
     public boolean isModified() {
         return getForm().isModified(configuration);
     }
 
+    @Override
     public void apply() {
         getForm().apply(configuration);
         fireConfigChanged();
     }
 
+    @Override
     public void reset() {
         getForm().reset(configuration);
     }
 
+    @Override
     public void disposeUIResources() {
 
     }
