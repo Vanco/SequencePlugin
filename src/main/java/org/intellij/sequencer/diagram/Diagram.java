@@ -182,14 +182,12 @@ public class Diagram {
     }
 
     public void paint(Graphics2D g2) {
-        int max = _objectLifeLines.size();
         for (DisplayObject displayObject : _objectLifeLines) {
             displayObject.paint(g2);
         }
     }
 
     public void paintHeader(Graphics2D g2) {
-        int max = _objectLifeLines.size();
         for (DisplayObject displayObject : _objectLifeLines) {
             displayObject.paintHeader(g2);
         }

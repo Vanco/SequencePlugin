@@ -74,33 +74,22 @@ public class MethodDescription {
         return _returnType;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MethodDescription)) return false;
-
-        final MethodDescription method = (MethodDescription) o;
-
-        if (!_classDescription.equals(method._classDescription)) return false;
-        if (!_methodName.equals(method._methodName)) return false;
-        for (ListIterator<String> iterator = _argTypes.listIterator(); iterator.hasNext(); ) {
-            String argType = iterator.next();
-            if (!argType.equals(method._argTypes.get(iterator.previousIndex())))
-                return false;
-        }
-
-        return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MethodDescription that = (MethodDescription) o;
+        return _hashCode == that._hashCode
+                && Objects.equals(_classDescription, that._classDescription)
+                && Objects.equals(_methodName, that._methodName)
+                && Objects.equals(_argTypes, that._argTypes);
     }
 
+    @Override
     public int hashCode() {
-        if (_hashCode == -1) {
-            _hashCode = _classDescription.hashCode();
-            _hashCode = 29 * _hashCode + _methodName.hashCode();
-            for (String argType : _argTypes) {
-                _hashCode = 29 * _hashCode + argType.hashCode();
-            }
-        }
-        return _hashCode;
+        return Objects.hash(_classDescription, _methodName, _argTypes, _hashCode);
     }
+
 
     static MethodDescription createMethodDescription(ClassDescription classDescription,
                                                      List<String> attributes, String methodName,
