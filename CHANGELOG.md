@@ -11,7 +11,9 @@
   - Code navigation is Not Implement Yet
 
 ### Changed
-- Move changelog from `README.md` to `CHANGELOG.md`  
+- Move changelog from `README.md` to `CHANGELOG.md` 
+- Add some missing `@Override` annotations in `ConfigurationOptions.java`(And it seems that SequenceDiagram support the 
+  2021.1 IDEA platform now ?)
 
 ### Fixed 
 - Issue#81 IndexOutOfBoundsException
