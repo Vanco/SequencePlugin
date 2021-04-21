@@ -72,6 +72,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
     @Override
     public void openLambdaExprInEditor(String fromClass, String methodName, List<String> methodArgTypes, List<String> argTypes, String returnType) {
         PsiClass containingClass = PsiUtil.findPsiClass(getPsiManager(), fromClass);
+        if (containingClass == null) return;
 
         PsiMethod psiMethod = PsiUtil.findPsiMethod(containingClass, methodName, methodArgTypes);
         if (psiMethod == null) return;
@@ -88,6 +89,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                                                        List<String> argTypes, String returnType,
                                                        String toClass, String toMethod, List<String> toArgTypes, int callNo) {
         PsiClass containingClass = PsiUtil.findPsiClass(getPsiManager(), fromClass);
+        if (containingClass == null) return;
 
         PsiMethod psiMethod = PsiUtil.findPsiMethod(containingClass, enclosedMethodName, enclosedMethodArgTypes);
         if (psiMethod == null) return;

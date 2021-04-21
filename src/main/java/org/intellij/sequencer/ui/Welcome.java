@@ -1,14 +1,11 @@
 package org.intellij.sequencer.ui;
 
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.util.io.StreamUtil;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import icons.SequencePluginIcons;
-import org.intellij.plugins.markdown.ui.preview.MarkdownHtmlPanel;
-import org.intellij.plugins.markdown.ui.preview.jcef.MarkdownJCEFHtmlPanel;
 import org.intellij.sequencer.SequencePanel;
 import org.intellij.sequencer.SequenceService;
 import org.intellij.sequencer.generator.SequenceParams;
@@ -19,8 +16,12 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 public class Welcome {
     private final JPanel myHtmlPanelWrapper;
@@ -34,23 +35,27 @@ public class Welcome {
 
         myHtmlPanelWrapper = new JPanel(new BorderLayout());
         myHtmlPanelWrapper.add(actionToolbar.getComponent(), BorderLayout.WEST);
-        MarkdownHtmlPanel myPanel = new MarkdownJCEFHtmlPanel();
-        myHtmlPanelWrapper.add(myPanel.getComponent(), BorderLayout.CENTER);
+        JEditorPane myPanel = new JEditorPane();
+        myHtmlPanelWrapper.add(myPanel, BorderLayout.CENTER);
         myHtmlPanelWrapper.repaint();
 
         String currentHtml = loadWelcome();
-        myPanel.setHtml(currentHtml);
+        myPanel.setContentType("text/html");
+        myPanel.setText(currentHtml);
+        myPanel.setEditable(false);
+        myPanel.setEnabled(true);
     }
 
     @NotNull
     private String loadWelcome() {
         String text = "Welcome to use SequenceDiagram Plugin";
-        try (
-                InputStream inputStream = Welcome.class.getResourceAsStream("/welcome.md")
-        ) {
-            if (inputStream != null)
-                text = new String(StreamUtil.loadFromStream(inputStream));
 
+        try (InputStream inputStream = Welcome.class.getResourceAsStream("/welcome.md")) {
+            if (inputStream != null)
+                try (InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                     BufferedReader reader = new BufferedReader(isr)) {
+                    text = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+                }
         } catch (Exception e) {
             e.printStackTrace();
         }

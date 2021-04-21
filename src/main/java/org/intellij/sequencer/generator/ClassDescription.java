@@ -2,10 +2,7 @@ package org.intellij.sequencer.generator;
 
 import org.intellij.sequencer.Constants;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ClassDescription {
     private String _className;
@@ -35,17 +32,17 @@ public class ClassDescription {
         return buffer.toString();
     }
 
+    @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(!(o instanceof ClassDescription)) return false;
-
-        final ClassDescription classDescription = (ClassDescription)o;
-
-        return _className.equals(classDescription._className);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClassDescription that = (ClassDescription) o;
+        return Objects.equals(_className, that._className);
     }
 
+    @Override
     public int hashCode() {
-        return _className.hashCode();
+        return Objects.hash(_className);
     }
 
     public static ClassDescription ANONYMOUS_CLASS = new ClassDescription(Constants.ANONYMOUS_CLASS_NAME,new ArrayList<>());

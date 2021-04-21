@@ -1,6 +1,6 @@
-# Welcome to use SequenceDiagram
+# Welcome to SequenceDiagram
 
-version 2.1.a1
+version 2.1.a4
 
 - Kotlin support(experimental)
     - Support generate topLevel function
@@ -9,7 +9,7 @@ version 2.1.a1
     - Support generate JavaCall
     - Code navigation is Not Implement Yet
     
-**Attention:** The Kotlin support is on very early stage. Do not use in production.
+**Attention:** The Kotlin support is on very early stage. Do not use in production.  
 
 ## Online Manual
 [http://vanco.github.io/SequencePlugin](http://vanco.github.io/SequencePlugin)
