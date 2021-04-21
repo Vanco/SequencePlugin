@@ -1,6 +1,6 @@
 # Welcome to SequenceDiagram
 
-version 2.1.a1
+version 2.1.a4
 
 - Kotlin support(experimental)
     - Support generate topLevel function

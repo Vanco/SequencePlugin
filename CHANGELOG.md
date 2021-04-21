@@ -13,6 +13,10 @@
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md`  
 
+### Fixed 
+- Issue#81 IndexOutOfBoundsException
+- Issue#82 Null pointer exception after double-click in the diagram
+
 ## [2.0.6]
 ### Fixed
 - bug：cannot save configuration #70

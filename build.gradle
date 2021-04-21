@@ -5,12 +5,12 @@ plugins {
 }
 
 intellij {
-    version '2020.1'
+    version '2021.1'
     pluginName 'SequenceDiagram'
     plugins = ['com.intellij.java','org.jetbrains.kotlin']
     updateSinceUntilBuild true
     sandboxDirectory = "${project.rootDir}/.sandbox"
-    jreRepo 'https://jetbrains.bintray.com/intellij-jbr'
+//    jreRepo 'https://jetbrains.bintray.com/intellij-jbr'
 }
 
 patchPluginXml {
@@ -35,7 +35,7 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '2.1.a2'
+version '2.1.a4'
 
 sourceCompatibility = 1.8
 
