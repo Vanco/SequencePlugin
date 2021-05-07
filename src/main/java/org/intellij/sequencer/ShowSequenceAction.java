@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.util.ui.JBUI;
@@ -55,7 +56,7 @@ public class ShowSequenceAction extends AnAction {
         // only JAVA method or Kotlin Function will enable the generator.
         return psiElement != null
                 && (psiElement.getLanguage().is(JavaLanguage.INSTANCE)
-                && psiElement instanceof PsiMethod
+                && (psiElement instanceof PsiMethod || psiElement instanceof PsiClass)
                 || psiElement.getLanguage().is(KotlinLanguage.INSTANCE)
                 && psiElement instanceof KtFunction);
     }
@@ -65,6 +66,7 @@ public class ShowSequenceAction extends AnAction {
         if (project == null) return;
 
         SequenceService plugin = project.getService(SequenceService.class);
+
 
         OptionsDialogWrapper dialogWrapper = new OptionsDialogWrapper(project);
         dialogWrapper.show();
@@ -83,9 +85,19 @@ public class ShowSequenceAction extends AnAction {
             params.getMethodFilter().addFilter(new NoGetterSetterFilter(_noGetterSetters));
             params.getMethodFilter().addFilter(new NoPrivateMethodsFilter(_noPrivateMethods));
             params.getMethodFilter().addFilter(new NoConstructorsFilter(_noConstructors));
+
             if (plugin != null) {
                 PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
-                plugin.showSequence(params, psiElement);
+                if(psiElement instanceof PsiClass){
+                    PsiMethod[] methods = ((PsiClass)psiElement).getAllMethods();
+                    for (PsiMethod m:methods) {
+                        System.out.println(m.getName());
+                        plugin.showSequence(params,m);
+                    }
+                }else if (psiElement instanceof PsiMethod){
+                    PsiMethod method = (PsiMethod)  psiElement;
+                    plugin.showSequence(params, method);
+                }
             }
         }
     }
