@@ -47,6 +47,7 @@ public class SequencePanel extends JPanel {
         psiElement = psiMethod;
         _sequenceParams = sequenceParams;
 
+
         _model = new Model();
         _display = new Display(_model, new SequenceListenerImpl());
 
@@ -220,7 +221,7 @@ public class SequencePanel extends JPanel {
 
         public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setSelectedFile(new File(((PsiMethod)psiElement).getName()+".png"));
+            fileChooser.setSelectedFile(new File(((PsiMethod) psiElement).getContainingClass().getName() + "_" + ((PsiMethod) psiElement).getName() + ".png"));
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {

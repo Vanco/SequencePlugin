@@ -30,7 +30,7 @@ import org.jetbrains.kotlin.psi.KtFunction;
 public class ShowSequenceAction extends AnAction {
     private int _callDepth = 5;
     private boolean _projectClassesOnly = true;
-    private boolean _noGetterSetters = true;
+    private boolean _noGetterSetters = false;
     private boolean _noPrivateMethods;
     private boolean _noConstructors;
     private boolean _smartInterface = false;
