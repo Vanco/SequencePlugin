@@ -89,9 +89,8 @@ public class ShowSequenceAction extends AnAction {
             if (plugin != null) {
                 PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
                 if(psiElement instanceof PsiClass){
-                    PsiMethod[] methods = ((PsiClass)psiElement).getAllMethods();
+                    PsiMethod[] methods = ((PsiClass)psiElement).getMethods();
                     for (PsiMethod m:methods) {
-                        System.out.println(m.getName());
                         plugin.showSequence(params,m);
                     }
                 }else if (psiElement instanceof PsiMethod){
