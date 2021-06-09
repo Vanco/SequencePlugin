@@ -3,11 +3,10 @@ package org.intellij.sequencer.generator.filters;
 import com.intellij.psi.PsiMethod;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class CompositeMethodFilter implements MethodFilter {
-    private List _filters = new ArrayList();
+    private List<MethodFilter> _filters = new ArrayList<>();
 
     public void addFilter(MethodFilter filter) {
         _filters.add(filter);
@@ -17,11 +16,12 @@ public class CompositeMethodFilter implements MethodFilter {
         _filters.remove(filter);
     }
 
+    @Override
     public boolean allow(PsiMethod psiMethod) {
-        for(Iterator iterator = _filters.iterator(); iterator.hasNext();) {
-            MethodFilter methodFilter = (MethodFilter)iterator.next();
-            if(!methodFilter.allow(psiMethod))
+        for (MethodFilter methodFilter : _filters) {
+            if (!methodFilter.allow(psiMethod)) {
                 return false;
+            }
         }
         return true;
     }

@@ -12,7 +12,7 @@ public class ObjectInfo extends Info {
     private String _name;
     private String _fullName;
     private int _seq;
-    private List<MethodInfo> _methods = new ArrayList<MethodInfo>();
+    private List<MethodInfo> _methods = new ArrayList<>();
 
     public ObjectInfo(String name, List<String> attributes, int seq) {
         super(attributes);

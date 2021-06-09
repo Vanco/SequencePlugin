@@ -109,7 +109,7 @@ public class PlasticTabbedPaneUI  extends MetalTabbedPaneUI {
     private boolean hasNoContentBorder() {
         return noContentBorder == null
                 ? clearLookSuggestsNoContentBorder()
-                : noContentBorder.booleanValue();
+                : noContentBorder;
     }
 
     /**
@@ -118,7 +118,7 @@ public class PlasticTabbedPaneUI  extends MetalTabbedPaneUI {
     private boolean hasEmbeddedTabs() {
         return embeddedTabs == null
                 ? false
-                : embeddedTabs.booleanValue();
+                : embeddedTabs;
     }
 
     /**

@@ -9,7 +9,7 @@ import java.util.HashMap;
  * Created by van on 17/10/2016.
  */
 public class InterfaceImplFilter implements MethodFilter {
-    private HashMap<String, MethodFilter> filters = new HashMap<String, MethodFilter>();
+    private HashMap<String, MethodFilter> filters = new HashMap<>();
 
     public void clear() {
         filters.clear();
