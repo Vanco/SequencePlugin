@@ -61,7 +61,7 @@ public class SequencePanel extends JPanel {
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
         add(actionToolbar.getComponent(), BorderLayout.WEST);
 
-        MyButton birdViewButton = new MyButton(SequencePluginIcons.PREVIEW_ICON_13);
+        MyButton birdViewButton = new MyButton(SequencePluginIcons.PREVIEW_ICON);
         birdViewButton.setToolTipText("Bird view");
         birdViewButton.addActionListener(e -> showBirdView());
 

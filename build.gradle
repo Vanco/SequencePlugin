@@ -35,7 +35,7 @@ publishPlugin {
 }
 
 group 'vanstudio'
-version '2.1.a4'
+version '2.2.0'
 
 //some jdk11 functions in codes
 sourceCompatibility = 11
