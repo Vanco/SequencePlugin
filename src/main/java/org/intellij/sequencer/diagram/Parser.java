@@ -49,7 +49,7 @@ public class Parser {
     }
 
     private void resolveBackCalls() {
-        HashMap<Numbering, MethodInfo> callsMap = new HashMap<Numbering, MethodInfo>();
+        HashMap<Numbering, MethodInfo> callsMap = new HashMap<>();
         for (Link link : _linkList) {
             if (!(link instanceof Call))
                 continue;
@@ -180,7 +180,7 @@ public class Parser {
 
     private String readNonWhitespace(PushbackReader r) throws IOException {
         int c = -1;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int deep = 0;
         boolean isGeneric = false;
         while ((c = r.read()) != -1) {
@@ -198,14 +198,14 @@ public class Parser {
                     if (tmp.toString().equals("\\u003c")) {
                         deep++;
                         isGeneric = true;
-                        sb.append(tmp.toString());
+                        sb.append(tmp);
                     } else if (tmp.toString().equals("\\u003e")) {
                         deep--;
                         if (deep == 0)
                             isGeneric = false;
-                        sb.append(tmp.toString());
+                        sb.append(tmp);
                     } else {
-                        sb.append(tmp.toString());
+                        sb.append(tmp);
                     }
                 }
             } else if (c == '<') {

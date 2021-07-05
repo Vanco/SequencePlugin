@@ -30,7 +30,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <depends>org.jetbrains.kotlin</depends>
 
-    <change-notes></change-notes>
+    <change-notes/>
 
     <actions>
         <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction"
@@ -48,7 +48,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
                                  instance="org.intellij.sequencer.config.ConfigurationOptions"
                                  displayName="Sequence Diagram"/>
         <applicationService serviceImplementation="org.intellij.sequencer.config.Configuration"/>
-        <toolWindow id="Sequence Diagram" icon="SequencePluginIcons.SEQUENCE_ICON_13" anchor="bottom"
+        <toolWindow id="Sequence Diagram" icon="SequencePluginIcons.SEQUENCE_ICON" anchor="bottom"
                     factoryClass="org.intellij.sequencer.SequenceToolWindowsFactory" canCloseContents="true"/>
 
         <projectService serviceInterface="org.intellij.sequencer.SequenceService"

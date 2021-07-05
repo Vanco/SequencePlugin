@@ -167,7 +167,7 @@ public class Sequence extends JFrame implements PropertyChangeListener {
         LOGGER.error("exception", e);
     }
 
-    public static void main(String s[]) {
+    public static void main(String[] s) {
         sequence = new Sequence();
     }
 }

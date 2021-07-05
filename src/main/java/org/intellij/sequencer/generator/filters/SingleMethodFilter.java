@@ -10,9 +10,9 @@ import java.util.List;
 public class SingleMethodFilter implements MethodFilter {
     private String _className;
     private String _methodName;
-    private List _argTypes;
+    private List<String> _argTypes;
 
-    public SingleMethodFilter(String className, String methodName, List argTypes) {
+    public SingleMethodFilter(String className, String methodName, List<String> argTypes) {
         _className = className;
         _methodName = methodName;
         _argTypes = argTypes;

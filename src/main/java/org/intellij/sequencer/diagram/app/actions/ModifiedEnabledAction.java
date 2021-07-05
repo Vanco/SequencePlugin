@@ -23,6 +23,6 @@ public abstract class ModifiedEnabledAction extends ModelAction implements Prope
         if(LOGGER.isDebugEnabled())
             LOGGER.debug("propertyChange(...) modified is " +
                   modified);
-        setEnabled(modified.booleanValue());
+        setEnabled(modified);
     }
 }

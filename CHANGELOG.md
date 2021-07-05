@@ -12,12 +12,15 @@
 
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md` 
-- Add some missing `@Override` annotations in `ConfigurationOptions.java`(And it seems that SequenceDiagram support the 
-  2021.1 IDEA platform now ?)
+- Add some missing `@Override` annotations in `ConfigurationOptions.java`
 
 ### Fixed 
 - Issue#81 IndexOutOfBoundsException
 - Issue#82 Null pointer exception after double-click in the diagram
+
+## [2.2.0]
+### Changed
+- SequenceDiagram now have new vector icons.
 
 ## [2.0.6]
 ### Fixed
