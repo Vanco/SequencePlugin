@@ -47,6 +47,7 @@ public class SequencePanel extends JPanel {
         psiElement = psiMethod;
         _sequenceParams = sequenceParams;
 
+
         _model = new Model();
         _display = new Display(_model, new SequenceListenerImpl());
 
@@ -72,6 +73,7 @@ public class SequencePanel extends JPanel {
         _jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         _jScrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, birdViewButton);
         add(_jScrollPane, BorderLayout.CENTER);
+
     }
 
     public Model getModel() {
@@ -219,6 +221,7 @@ public class SequencePanel extends JPanel {
 
         public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setSelectedFile(new File(((PsiMethod) psiElement).getContainingClass().getName() + "_" + ((PsiMethod) psiElement).getName() + ".png"));
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
