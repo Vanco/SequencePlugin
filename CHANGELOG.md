@@ -9,18 +9,19 @@
   - Support generate No Constructor Class
   - Support generate JavaCall
   - Code navigation is Not Implement Yet
+- SequenceDiagram now have new vector icons.
 
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md` 
-- Add some missing `@Override` annotations in `ConfigurationOptions.java`
+- Add some missing `@Override` annotations in `ConfigurationOptions.java`(And it seems that SequenceDiagram support the 
+  2021.1 IDEA platform now ?)
+- Build for 2021.2 
+- Change to gradle kotlin script.
 
 ### Fixed 
-- Issue#81 IndexOutOfBoundsException
-- Issue#82 Null pointer exception after double-click in the diagram
-
-## [2.2.0]
-### Changed
-- SequenceDiagram now have new vector icons.
+- Issue #81 IndexOutOfBoundsException
+- Issue #82 Null pointer exception after double-click in the diagram
+- Issue #88 Exported PlantUML is zero-length for reopened SDT files
 
 ## [2.0.6]
 ### Fixed

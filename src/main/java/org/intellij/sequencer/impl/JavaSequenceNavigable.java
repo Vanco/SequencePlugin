@@ -97,7 +97,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
         PsiLambdaExpression lambdaPsiElement = (PsiLambdaExpression) PsiUtil.findLambdaExpression(psiMethod, argTypes, returnType);
 
         PsiMethod toPsiMethod = PsiUtil.findPsiMethod(getPsiManager(), toClass, toMethod, toArgTypes);
-        if (toPsiMethod == null) {
+        if (toPsiMethod == null || lambdaPsiElement == null) {
             return;
         }
 

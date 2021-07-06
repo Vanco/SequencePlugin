@@ -115,12 +115,19 @@ public class PsiUtil {
         return null;
     }
 
+    /**
+     * Check PsiCallExpression is like:
+     * <code> a().b().c() </code>
+     * Calls after one by one.
+     * @param callExpression
+     * @return
+     */
     public static boolean isPipeline(PsiCallExpression callExpression) {
         PsiElement[] children = callExpression.getChildren();
         for (PsiElement child : children) {
             if (child instanceof PsiReferenceExpression) {
                 for (PsiElement psiElement : child.getChildren()) {
-                    if (psiElement instanceof PsiMethodCallExpression) {
+                    if (psiElement instanceof PsiMethodCallExpression || psiElement instanceof PsiNewExpression) {
                         return true;
                     }
                 }
@@ -130,6 +137,14 @@ public class PsiUtil {
         return false;
     }
 
+    /**
+     * Check PsiCallExpression is like:
+     * <code> a(b(),c) </code>
+     * The parameter is another call.
+     *
+     * @param callExpression
+     * @return
+     */
     public static boolean isComplexCall(PsiCallExpression callExpression) {
         PsiExpressionList argumentList = callExpression.getArgumentList();
         if (argumentList != null) {

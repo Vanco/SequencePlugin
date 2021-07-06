@@ -55,7 +55,7 @@ public class MethodDescription {
 
     public String getTitleName() {
         return getClassDescription().getClassShortName() + '.' +
-                getMethodName() + "()";
+                getMethodName() ;
     }
 
     public List<String> getAttributes() {

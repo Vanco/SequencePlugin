@@ -1,5 +1,6 @@
 package org.intellij.sequencer;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.PsiElement;
@@ -62,7 +63,7 @@ public class SequencePanel extends JPanel {
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
         add(actionToolbar.getComponent(), BorderLayout.WEST);
 
-        MyButton birdViewButton = new MyButton(SequencePluginIcons.PREVIEW_ICON);
+        MyButton birdViewButton = new MyButton(AllIcons.General.InspectionsEye);
         birdViewButton.setToolTipText("Bird view");
         birdViewButton.addActionListener(e -> showBirdView());
 
@@ -117,6 +118,9 @@ public class SequencePanel extends JPanel {
     }
 
     public String getTitleName() {
+        if (_titleName == null) {
+            return "Unknown";
+        }
         return _titleName;
     }
 
@@ -200,7 +204,7 @@ public class SequencePanel extends JPanel {
 
     private class ReGenerateAction extends AnAction {
         public ReGenerateAction() {
-            super("ReGenerate", "Regenerate diagram", SequencePluginIcons.REFRESH_ICON);
+            super("ReGenerate", "Regenerate diagram", SequencePluginIcons.PLAY_ICON);
         }
 
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -221,7 +225,7 @@ public class SequencePanel extends JPanel {
 
         public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setSelectedFile(new File(((PsiMethod) psiElement).getContainingClass().getName() + "_" + ((PsiMethod) psiElement).getName() + ".png"));
+            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_") + ".png"));
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
@@ -294,6 +298,7 @@ public class SequencePanel extends JPanel {
         @Override
         public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_") + ".sdt"));
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
@@ -333,6 +338,7 @@ public class SequencePanel extends JPanel {
         @Override
         public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_") + ".puml"));
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
@@ -361,7 +367,7 @@ public class SequencePanel extends JPanel {
 
         @Override
         public void update(@NotNull AnActionEvent e) {
-            e.getPresentation().setEnabled(_display.getDiagram().nonEmpty());
+            e.getPresentation().setEnabled(psiElement != null);
         }
     }
 
