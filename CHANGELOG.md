@@ -10,6 +10,7 @@
   - Support generate JavaCall
   - Code navigation is Not Implement Yet
 - SequenceDiagram now have new vector icons.
+- Add Generate sequence diagram to quick fix intention.
 
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md` 

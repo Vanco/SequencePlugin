@@ -54,6 +54,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
         <projectService serviceInterface="org.intellij.sequencer.SequenceService"
                         serviceImplementation="org.intellij.sequencer.impl.SequenceServiceImpl"/>
 
+        <annotator language="JAVA" implementationClass="org.intellij.sequencer.SequenceAnnotator"/>
 
     </extensions>
 </idea-plugin>

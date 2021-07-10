@@ -16,8 +16,8 @@ public class SequenceParams {
     private int _maxDepth = 3;
     private boolean _allowRecursion = false;
     private boolean smartInterface = true;
-    private CompositeMethodFilter _methodFilter = new CompositeMethodFilter();
-    private InterfaceImplFilter _implFilter = new InterfaceImplFilter();
+    private final CompositeMethodFilter _methodFilter = new CompositeMethodFilter();
+    private final InterfaceImplFilter _implFilter = new InterfaceImplFilter();
 
     public SequenceParams() {
         List<ExcludeEntry> excludeList = Configuration.getInstance().getExcludeList();
