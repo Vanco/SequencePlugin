@@ -194,8 +194,23 @@ public class JavaSequenceNavigable implements SequenceNavigable {
         VirtualFile virtualFile = PsiUtil.findVirtualFile(psiClass);
         if (virtualFile == null)
             return;
+        final int offset = findBestOffset(psiElement);
+
         getFileEditorManager().openTextEditor(new OpenFileDescriptor(_project,
-                virtualFile, psiElement.getTextOffset()), true);
+                virtualFile, offset), true);
+    }
+
+    private int findBestOffset(PsiElement psiElement) {
+        if (psiElement instanceof PsiMethod) {
+            return psiElement.getNavigationElement().getTextOffset();
+        } else if (psiElement instanceof PsiMethodCallExpression) {
+            return psiElement.getFirstChild().getNavigationElement().getTextOffset();
+        } else if (psiElement instanceof PsiLambdaExpression) {
+            return psiElement.getNavigationElement().getTextOffset();
+        } else if (psiElement instanceof PsiNewExpression) {
+            return psiElement.getNavigationElement().getTextOffset();
+        }
+        return psiElement.getNavigationElement().getTextOffset();
     }
 
 }
