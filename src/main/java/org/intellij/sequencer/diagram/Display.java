@@ -3,7 +3,7 @@ package org.intellij.sequencer.diagram;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.ImageUtil;
 import org.intellij.sequencer.config.ConfigListener;
-import org.intellij.sequencer.config.Configuration;
+import org.intellij.sequencer.config.SequenceSettingsState;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -80,9 +80,9 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
     }
 
     private void setupGraphics(Graphics2D g2) {
-        Configuration configuration = Configuration.getInstance();
-        g2.setFont(new Font(configuration.FONT_NAME, Font.PLAIN, configuration.FONT_SIZE));
-        if (configuration.USE_ANTIALIASING) {
+        SequenceSettingsState sequenceSettingsState = SequenceSettingsState.getInstance();
+        g2.setFont(new Font(sequenceSettingsState.FONT_NAME, Font.PLAIN, sequenceSettingsState.FONT_SIZE));
+        if (sequenceSettingsState.USE_ANTIALIASING) {
             HashMap<Object, Object> hintsMap = new HashMap<>();
             hintsMap.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.addRenderingHints(hintsMap);
@@ -137,12 +137,12 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
     public void addNotify() {
         super.addNotify();
-        Configuration.getInstance().addConfigListener(this);
+        SequenceSettingsState.getInstance().addConfigListener(this);
         setScrollPaneHeaderView(getHeader());
     }
 
     public void removeNotify() {
-        Configuration.getInstance().removeConfigListener(this);
+        SequenceSettingsState.getInstance().removeConfigListener(this);
         setScrollPaneHeaderView(null);
         super.removeNotify();
     }

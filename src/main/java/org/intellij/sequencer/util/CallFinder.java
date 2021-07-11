@@ -33,14 +33,14 @@ public class CallFinder extends JavaElementVisitor {
     }
 
     public void visitCallExpression(PsiCallExpression callExpression) {
-        if (!(PsiUtil.isComplexCall(callExpression) || PsiUtil.isPipeline(callExpression))) {
+        if (!(MyPsiUtil.isComplexCall(callExpression) || MyPsiUtil.isPipeline(callExpression))) {
             PsiMethod psiMethod = callExpression.resolveMethod();
             if (checkCurrentPsiElement(psiMethod, callExpression)) return;
         } else {
             _exprStack.push(callExpression);
         }
         super.visitCallExpression(callExpression);
-        if (!found && !_exprStack.isEmpty() && (PsiUtil.isPipeline(callExpression) || PsiUtil.isComplexCall(callExpression))) {
+        if (!found && !_exprStack.isEmpty() && (MyPsiUtil.isPipeline(callExpression) || MyPsiUtil.isComplexCall(callExpression))) {
             PsiCallExpression pop = _exprStack.pop();
             checkCurrentPsiElement(pop.resolveMethod(), pop);
         }

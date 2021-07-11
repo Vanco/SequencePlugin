@@ -6,7 +6,7 @@ import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
-import org.intellij.sequencer.util.PsiUtil;
+import org.intellij.sequencer.util.MyPsiUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +44,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
         }
 
         // follow implementation
-        if (PsiUtil.isAbstract(containingClass)) {
+        if (MyPsiUtil.isAbstract(containingClass)) {
             psiMethod.accept(this);
             PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
             if (psiElements.length == 1) {
@@ -61,7 +61,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
             }
         } else {
             // resolve variable initializer
-            if (params.isSmartInterface() && !PsiUtil.isExternal(containingClass)){
+            if (params.isSmartInterface() && !MyPsiUtil.isExternal(containingClass)){
                 containingClass.accept(implementationFinder);
             }
 
@@ -80,7 +80,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
             PsiMethod method = (PsiMethod) psiElement;
             if (params.getMethodFilter().allow(method)) {
                 PsiClass containingClass = (method).getContainingClass();
-                if (params.isSmartInterface() && containingClass != null && !PsiUtil.isExternal(containingClass))
+                if (params.isSmartInterface() && containingClass != null && !MyPsiUtil.isExternal(containingClass))
                     containingClass.accept(implementationFinder);
                 method.accept(this);
             }
@@ -99,7 +99,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
 
     @Override
     public void visitCallExpression(PsiCallExpression callExpression) {
-        if (PsiUtil.isPipeline(callExpression)) {
+        if (MyPsiUtil.isPipeline(callExpression)) {
             _exprStack.push(callExpression);
             _callStack.push(currentStack);
 
@@ -114,7 +114,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
                 currentStack = old;
             }
             super.visitCallExpression(callExpression);
-        } else if (PsiUtil.isComplexCall(callExpression)) {
+        } else if (MyPsiUtil.isComplexCall(callExpression)) {
             _exprStack.push(callExpression);
             _callStack.push(currentStack);
             super.visitCallExpression(callExpression);
@@ -143,7 +143,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
     private void findAbstractImplFilter(PsiCallExpression callExpression, PsiMethod psiMethod) {
         try {
             PsiClass containingClass = psiMethod.getContainingClass();
-            if (PsiUtil.isAbstract(containingClass)) {
+            if (MyPsiUtil.isAbstract(containingClass)) {
                 String type = containingClass.getQualifiedName();
                 if (type == null) return;
 
@@ -193,7 +193,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
 
         Objects.requireNonNull(containingClass);
 
-        List<String> attributes = createAttributes(psiMethod.getModifierList(), PsiUtil.isExternal(containingClass));
+        List<String> attributes = createAttributes(psiMethod.getModifierList(), MyPsiUtil.isExternal(containingClass));
         if (psiMethod.isConstructor())
             return MethodDescription.createConstructorDescription(
                     createClassDescription(containingClass),
@@ -222,7 +222,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
 
     private ClassDescription createClassDescription(PsiClass psiClass) {
         return new ClassDescription(psiClass.getQualifiedName(),
-                createAttributes(psiClass.getModifierList(), PsiUtil.isExternal(psiClass)));
+                createAttributes(psiClass.getModifierList(), MyPsiUtil.isExternal(psiClass)));
     }
 
     private List<String> createAttributes(PsiModifierList psiModifierList, boolean external) {
@@ -237,7 +237,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
         }
         if (external)
             attributes.add(Info.EXTERNAL_ATTRIBUTE);
-        if (PsiUtil.isInterface(psiModifierList))
+        if (MyPsiUtil.isInterface(psiModifierList))
             attributes.add(Info.INTERFACE_ATTRIBUTE);
         return attributes;
     }
@@ -255,7 +255,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
         if (referenceElement != null) {
             PsiClass psiClass = (PsiClass) referenceElement.resolve();
 
-            if (PsiUtil.isAbstract(psiClass)) {
+            if (MyPsiUtil.isAbstract(psiClass)) {
                 String type = psiType.getCanonicalText();
                 if (initializer instanceof PsiNewExpression) {
                     PsiType initializerType = initializer.getType();
@@ -316,7 +316,7 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
             returnType = functionalInterfaceType.getCanonicalText();
         }
 
-        PsiMethod psiMethod = PsiUtil.findEnclosedPsiMethod(expression);
+        PsiMethod psiMethod = MyPsiUtil.findEnclosedPsiMethod(expression);
 
         MethodDescription enclosedMethod = createMethod(psiMethod);
 
@@ -333,11 +333,11 @@ public class SequenceGenerator extends JavaElementVisitor implements IGenerator 
         @Override
         public void visitClass(PsiClass aClass) {
             for (PsiClass psiClass : aClass.getSupers()) {
-                if (!PsiUtil.isExternal(psiClass))
+                if (!MyPsiUtil.isExternal(psiClass))
                     psiClass.accept(this);
             }
 
-            if (!PsiUtil.isAbstract(aClass) && !PsiUtil.isExternal(aClass)) {
+            if (!MyPsiUtil.isAbstract(aClass) && !MyPsiUtil.isExternal(aClass)) {
                 super.visitClass(aClass);
             }
         }

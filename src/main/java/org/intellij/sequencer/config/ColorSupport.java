@@ -14,10 +14,10 @@ import java.util.Optional;
 
 public class ColorSupport {
 
-    public static Optional<Paint> lookupMappedColorFor(Configuration configuration, String fullName) {
-        final List<ColorMapEntry> colorMappings = configuration.getColorMappingList();
+    public static Optional<Paint> lookupMappedColorFor(SequenceSettingsState sequenceSettingsState, String fullName) {
+        final List<ColorMapEntry> colorMappings = sequenceSettingsState.getColorMappingList();
         if(colorMappings!=null) {
-            return configuration.getColorMappingList()
+            return sequenceSettingsState.getColorMappingList()
                     .stream()
                     .filter(entry->entry.matches(fullName))
                     .findFirst()

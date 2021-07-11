@@ -1,7 +1,7 @@
 package org.intellij.sequencer.generator.filters;
 
 import com.intellij.psi.PsiMethod;
-import org.intellij.sequencer.util.PsiUtil;
+import org.intellij.sequencer.util.MyPsiUtil;
 
 public class PackageFilter implements MethodFilter {
     private String _packageName;
@@ -17,7 +17,7 @@ public class PackageFilter implements MethodFilter {
     }
 
     public boolean allow(PsiMethod psiMethod) {
-        String packageName = PsiUtil.getPackageName(psiMethod);
+        String packageName = MyPsiUtil.getPackageName(psiMethod);
         if(packageName == null)
             return true;
         if (_recursive) {

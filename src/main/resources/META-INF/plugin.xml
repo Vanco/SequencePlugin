@@ -38,6 +38,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
                 text="Sequence Diagram..." description="Generate sequence diagram of the current method">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
         </action>
     </actions>
 
@@ -45,9 +46,10 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
         <!-- Add your extensions here -->
         <applicationConfigurable parentId="tools"
                                  id="Settings.Sequence.Configuration"
-                                 instance="org.intellij.sequencer.config.ConfigurationOptions"
+                                 instance="org.intellij.sequencer.config.SequenceSettingsConfigurable"
                                  displayName="Sequence Diagram"/>
-        <applicationService serviceImplementation="org.intellij.sequencer.config.Configuration"/>
+        <applicationService serviceImplementation="org.intellij.sequencer.config.SequenceSettingsState"/>
+        <applicationService serviceImplementation="org.intellij.sequencer.config.SequenceParamsState"/>
         <toolWindow id="Sequence Diagram" icon="SequencePluginIcons.SEQUENCE_ICON" anchor="bottom"
                     factoryClass="org.intellij.sequencer.SequenceToolWindowsFactory" canCloseContents="true"/>
 

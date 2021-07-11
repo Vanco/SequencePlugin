@@ -3,7 +3,7 @@ package org.intellij.sequencer.diagram;
 import com.intellij.ui.JBColor;
 import org.apache.log4j.Logger;
 import org.intellij.sequencer.config.ColorSupport;
-import org.intellij.sequencer.config.Configuration;
+import org.intellij.sequencer.config.SequenceSettingsState;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -220,7 +220,7 @@ public class DisplayObject extends ScreenObject {
             // todo make it configurable
             if (displayLink instanceof DisplaySelfCallReturn /*|| displayLink.getLink().isBootstrap()*/)
                 continue;
-            if (!Configuration.getInstance().SHOW_RETURN_ARROWS && displayLink instanceof DisplayCallReturn)
+            if (!SequenceSettingsState.getInstance().SHOW_RETURN_ARROWS && displayLink instanceof DisplayCallReturn)
                 continue;
             if (displayLink.getTo().getObjectInfo().getName().equals(ObjectInfo.ACTOR_NAME))
                 continue;
@@ -238,12 +238,12 @@ public class DisplayObject extends ScreenObject {
     public void paintHeader(Graphics2D g2) {
         if(!isInClipArea(g2, getPreferredHeaderHeight()))
             return;
-        Configuration configuration = Configuration.getInstance();
-        if(configuration.USE_3D_VIEW) {
+        SequenceSettingsState sequenceSettingsState = SequenceSettingsState.getInstance();
+        if(sequenceSettingsState.USE_3D_VIEW) {
             g2.setPaint(SHADOW_COLOR);
             g2.fillRect(_x + 2, _y + 2, _textBox.getWidth(), _textBox.getHeight());
         }
-        g2.setPaint(determineBackgroundPaintForObject(configuration));
+        g2.setPaint(determineBackgroundPaintForObject(sequenceSettingsState));
         g2.fillRect(_x, _y, _textBox.getWidth(), _textBox.getHeight());
 
         g2.setPaint(BORDER_COLOR);
@@ -254,7 +254,7 @@ public class DisplayObject extends ScreenObject {
         g2.drawRect(_x, _y, _textBox.getWidth() - 1, _textBox.getHeight() - 1);
         g2.setStroke(oldStroke);
 
-        ColorSupport.lookupMappedColorFor(configuration, _objectInfo.getFullName())
+        ColorSupport.lookupMappedColorFor(sequenceSettingsState, _objectInfo.getFullName())
         .ifPresent(paint->{
             // draw a colored overlay, as per user's color mapping config
             int overlayBoxSize = _textBox.getHeight()/3;
@@ -271,7 +271,7 @@ public class DisplayObject extends ScreenObject {
     }
 
     public int getPreferredHeaderHeight() {
-        int yDelta = Configuration.getInstance().USE_3D_VIEW? 2: 0;
+        int yDelta = SequenceSettingsState.getInstance().USE_3D_VIEW? 2: 0;
         return _y + _textBox.getHeight() + yDelta;
     }
 
@@ -283,12 +283,12 @@ public class DisplayObject extends ScreenObject {
         return "DisplayObject " + _objectInfo.getName() + " seq " + _objectInfo.getSeq();
     }
 
-    private Paint determineBackgroundPaintForObject(Configuration configuration) {
+    private Paint determineBackgroundPaintForObject(SequenceSettingsState sequenceSettingsState) {
         return _objectInfo.hasAttribute(Info.EXTERNAL_ATTRIBUTE)
-                ? configuration.EXTERNAL_CLASS_COLOR
+                ? sequenceSettingsState.EXTERNAL_CLASS_COLOR
                 : _objectInfo.hasAttribute(Info.INTERFACE_ATTRIBUTE)
-                    ? configuration.INTERFACE_COLOR
-                    : configuration.CLASS_COLOR;
+                    ? sequenceSettingsState.INTERFACE_COLOR
+                    : sequenceSettingsState.CLASS_COLOR;
     }
 
 

@@ -2,7 +2,7 @@ package org.intellij.sequencer.diagram;
 
 import com.intellij.ui.JBColor;
 import org.apache.log4j.Logger;
-import org.intellij.sequencer.config.Configuration;
+import org.intellij.sequencer.config.SequenceSettingsState;
 
 import java.awt.*;
 
@@ -54,12 +54,12 @@ public class DisplayMethod extends ScreenObject {
     }
 
     public void paint(Graphics2D g2) {
-        Configuration configuration = Configuration.getInstance();
-        if(configuration.USE_3D_VIEW) {
+        SequenceSettingsState sequenceSettingsState = SequenceSettingsState.getInstance();
+        if(sequenceSettingsState.USE_3D_VIEW) {
             g2.setPaint(SHADOW_COLOR);
             g2.fillRect(getX() + 2, getY() + 2, getWidth(), getHeight());
         }
-        g2.setPaint(isSelected() ? configuration.SELECTED_METHOD_BAR_COLOR : configuration.METHOD_BAR_COLOR);
+        g2.setPaint(isSelected() ? sequenceSettingsState.SELECTED_METHOD_BAR_COLOR : sequenceSettingsState.METHOD_BAR_COLOR);
         g2.fillRect(getX(), getY(), getWidth(), getHeight());
         g2.setPaint(LINE_COLOR);
         g2.drawRect(getX(), getY(), getWidth() - 1, getHeight() - 1);

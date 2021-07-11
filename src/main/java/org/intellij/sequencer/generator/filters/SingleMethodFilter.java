@@ -3,7 +3,7 @@ package org.intellij.sequencer.generator.filters;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import org.intellij.sequencer.Constants;
-import org.intellij.sequencer.util.PsiUtil;
+import org.intellij.sequencer.util.MyPsiUtil;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class SingleMethodFilter implements MethodFilter {
 
     public boolean allow(PsiMethod psiMethod) {
         PsiClass containingClass = psiMethod.getContainingClass();
-        if(isSameClass(containingClass) && PsiUtil.isMethod(psiMethod, _methodName, _argTypes))
+        if(isSameClass(containingClass) && MyPsiUtil.isMethod(psiMethod, _methodName, _argTypes))
             return false;
         return true;
     }

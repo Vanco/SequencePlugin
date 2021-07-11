@@ -32,7 +32,7 @@ public class LambdaFinder extends JavaElementVisitor {
     public void visitLambdaExpression(PsiLambdaExpression expression) {
         super.visitLambdaExpression(expression);
 
-        if (PsiUtil.isLambdaExpression(expression, _argTypes, _returnType)) {
+        if (MyPsiUtil.isLambdaExpression(expression, _argTypes, _returnType)) {
             _psiElement = expression;
         }
     }

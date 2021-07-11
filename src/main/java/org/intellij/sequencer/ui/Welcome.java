@@ -7,6 +7,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.SequencePanel;
+import org.intellij.sequencer.SequenceParamsEditor;
 import org.intellij.sequencer.SequenceService;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.impl.EmptySequenceNavigable;
@@ -29,6 +30,7 @@ public class Welcome {
     public Welcome() {
         DefaultActionGroup actionGroup = new DefaultActionGroup("SequencerActionGroup", false);
         actionGroup.add(new LoadAction());
+        actionGroup.add(new SequenceParamsEditor());
 
         ActionManager actionManager = ActionManager.getInstance();
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);

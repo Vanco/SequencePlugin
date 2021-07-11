@@ -6,10 +6,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class ConfigurationOptions implements SearchableConfigurable {
+public class SequenceSettingsConfigurable implements SearchableConfigurable {
 
-    private ConfigurationUI _configurationUI;
-    private Configuration configuration;
+    private SequenceSettingsComponent _sequenceSettingsComponent;
+    private SequenceSettingsState sequenceSettingsState;
 
     @Override
     public String getDisplayName() {
@@ -23,41 +23,41 @@ public class ConfigurationOptions implements SearchableConfigurable {
 
     @Override
     public JComponent createComponent() {
-        configuration = Configuration.getInstance();
+        sequenceSettingsState = SequenceSettingsState.getInstance();
         return getForm().getMainPanel();
     }
 
     @Override
     public boolean isModified() {
-        return getForm().isModified(configuration);
+        return getForm().isModified(sequenceSettingsState);
     }
 
     @Override
     public void apply() {
-        getForm().apply(configuration);
+        getForm().apply(sequenceSettingsState);
         fireConfigChanged();
     }
 
     @Override
     public void reset() {
-        getForm().reset(configuration);
+        getForm().reset(sequenceSettingsState);
     }
 
     @Override
     public void disposeUIResources() {
-
+        _sequenceSettingsComponent = null;
     }
 
     private void fireConfigChanged() {
-        configuration.fireConfigChanged();
+        sequenceSettingsState.fireConfigChanged();
     }
 
     @NotNull
-    private ConfigurationUI getForm() {
-        if (_configurationUI == null) {
-            _configurationUI = new ConfigurationUI();
+    private SequenceSettingsComponent getForm() {
+        if (_sequenceSettingsComponent == null) {
+            _sequenceSettingsComponent = new SequenceSettingsComponent();
         }
-        return _configurationUI;
+        return _sequenceSettingsComponent;
     }
 
     @NotNull

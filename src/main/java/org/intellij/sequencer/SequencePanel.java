@@ -54,9 +54,12 @@ public class SequencePanel extends JPanel {
 
         DefaultActionGroup actionGroup = new DefaultActionGroup("SequencerActionGroup", false);
         actionGroup.add(new ReGenerateAction());
-        actionGroup.add(new ExportAction());
+        actionGroup.add(new SequenceParamsEditor());
+        actionGroup.addSeparator();
         actionGroup.add(new SaveAsAction());
         actionGroup.add(new LoadAction());
+        actionGroup.addSeparator();
+        actionGroup.add(new ExportAction());
         actionGroup.add(new ExportPumlAction());
 
         ActionManager actionManager = ActionManager.getInstance();

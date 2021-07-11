@@ -1,6 +1,6 @@
 package org.intellij.sequencer.generator;
 
-import org.intellij.sequencer.config.Configuration;
+import org.intellij.sequencer.config.SequenceSettingsState;
 import org.intellij.sequencer.config.ExcludeEntry;
 import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
 import org.intellij.sequencer.generator.filters.InterfaceImplFilter;
@@ -20,7 +20,7 @@ public class SequenceParams {
     private final InterfaceImplFilter _implFilter = new InterfaceImplFilter();
 
     public SequenceParams() {
-        List<ExcludeEntry> excludeList = Configuration.getInstance().getExcludeList();
+        List<ExcludeEntry> excludeList = SequenceSettingsState.getInstance().getExcludeList();
         for (ExcludeEntry excludeEntry : excludeList) {
             if (!excludeEntry.isEnabled())
                 continue;

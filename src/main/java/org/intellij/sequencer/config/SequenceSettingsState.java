@@ -4,6 +4,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.ui.JBColor;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.util.xmlb.annotations.Transient;
@@ -16,17 +17,17 @@ import java.util.List;
 import java.util.Vector;
 
 @State(name = "sequencePlugin", storages = {@Storage("sequencePlugin.xml")})
-public class Configuration implements PersistentStateComponent<Configuration> {
+public class SequenceSettingsState implements PersistentStateComponent<SequenceSettingsState> {
     @OptionTag(converter = ColorConverter.class)
-    public Color CLASS_COLOR = new Color(0xFFFFC0);
+    public Color CLASS_COLOR = new JBColor(new Color(0xFFFFC0), new Color(0xFFFFC0));
     @OptionTag(converter = ColorConverter.class)
-    public Color EXTERNAL_CLASS_COLOR = new Color(0xFFD1CE);
+    public Color EXTERNAL_CLASS_COLOR = new JBColor(new Color(0xFFD1CE), new Color(0xFFD1CE));
     @OptionTag(converter = ColorConverter.class)
-    public Color METHOD_BAR_COLOR = new Color(0xFFE0A7);
+    public Color METHOD_BAR_COLOR = new JBColor(new Color(0xFFE0A7), new Color(0xFFE0A7));
     @OptionTag(converter = ColorConverter.class)
-    public Color SELECTED_METHOD_BAR_COLOR = new Color(0x85C1FF);
+    public Color SELECTED_METHOD_BAR_COLOR = new JBColor(new Color(0x85C1FF), new Color(0x85C1FF));
     @OptionTag(converter = ColorConverter.class)
-    public Color INTERFACE_COLOR = new Color(0xCCFACF);
+    public Color INTERFACE_COLOR = new JBColor(new Color(0xCCFACF), new Color(0xCCFACF));
     public boolean USE_3D_VIEW = false;
     public boolean USE_ANTIALIASING = true;
     public boolean SHOW_RETURN_ARROWS = true;
@@ -40,10 +41,10 @@ public class Configuration implements PersistentStateComponent<Configuration> {
     private java.util.List<ExcludeEntry> _excludeList = new Vector<>();
     private java.util.List<ColorMapEntry> _colorMappingList = new Vector<>();
 
-    public Configuration() {}
+    public SequenceSettingsState() {}
 
-    public static Configuration getInstance() {
-        return ServiceManager.getService(Configuration.class);
+    public static SequenceSettingsState getInstance() {
+        return ServiceManager.getService(SequenceSettingsState.class);
     }
 
     public void addConfigListener(ConfigListener listener) {
@@ -78,13 +79,13 @@ public class Configuration implements PersistentStateComponent<Configuration> {
 
     @Nullable
     @Override
-    public Configuration getState() {
+    public SequenceSettingsState getState() {
         return this;
     }
 
     @Override
-    public void loadState(@NotNull Configuration configuration) {
-        XmlSerializerUtil.copyBean(configuration, this);
+    public void loadState(@NotNull SequenceSettingsState sequenceSettingsState) {
+        XmlSerializerUtil.copyBean(sequenceSettingsState, this);
     }
 
 

@@ -14,7 +14,7 @@ import com.intellij.util.Query;
 import org.intellij.sequencer.SequenceNavigable;
 import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
 import org.intellij.sequencer.generator.filters.MethodFilter;
-import org.intellij.sequencer.util.PsiUtil;
+import org.intellij.sequencer.util.MyPsiUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
 
     @Override
     public void openMethodInEditor(String className, String methodName, List<String> argTypes) {
-        PsiMethod psiMethod = PsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
+        PsiMethod psiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
         if (psiMethod == null)
             return;
         openInEditor(psiMethod.getContainingClass(), psiMethod);
@@ -51,16 +51,16 @@ public class JavaSequenceNavigable implements SequenceNavigable {
     public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes,
                                        String toClass, String toMethod, List<String> toArgType, int callNo) {
 
-        PsiMethod fromPsiMethod = PsiUtil.findPsiMethod(getPsiManager(), fromClass, fromMethod, fromArgTypes);
+        PsiMethod fromPsiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), fromClass, fromMethod, fromArgTypes);
         if (fromPsiMethod == null) {
             return;
         }
-        PsiMethod toPsiMethod = PsiUtil.findPsiMethod(getPsiManager(), toClass, toMethod, toArgType);
+        PsiMethod toPsiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), toClass, toMethod, toArgType);
         if (toPsiMethod == null) {
             return;
         }
 
-        PsiElement psiElement = PsiUtil.findPsiCallExpression(filter, fromPsiMethod, toPsiMethod, callNo);
+        PsiElement psiElement = MyPsiUtil.findPsiCallExpression(filter, fromPsiMethod, toPsiMethod, callNo);
         if (psiElement == null) {
             return;
         }
@@ -71,13 +71,13 @@ public class JavaSequenceNavigable implements SequenceNavigable {
 
     @Override
     public void openLambdaExprInEditor(String fromClass, String methodName, List<String> methodArgTypes, List<String> argTypes, String returnType) {
-        PsiClass containingClass = PsiUtil.findPsiClass(getPsiManager(), fromClass);
+        PsiClass containingClass = MyPsiUtil.findPsiClass(getPsiManager(), fromClass);
         if (containingClass == null) return;
 
-        PsiMethod psiMethod = PsiUtil.findPsiMethod(containingClass, methodName, methodArgTypes);
+        PsiMethod psiMethod = MyPsiUtil.findPsiMethod(containingClass, methodName, methodArgTypes);
         if (psiMethod == null) return;
 
-        PsiElement psiElement = PsiUtil.findLambdaExpression(psiMethod, argTypes, returnType);
+        PsiElement psiElement = MyPsiUtil.findLambdaExpression(psiMethod, argTypes, returnType);
 
         openInEditor(containingClass, psiElement);
 
@@ -88,20 +88,20 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                                                        String enclosedMethodName, List<String> enclosedMethodArgTypes,
                                                        List<String> argTypes, String returnType,
                                                        String toClass, String toMethod, List<String> toArgTypes, int callNo) {
-        PsiClass containingClass = PsiUtil.findPsiClass(getPsiManager(), fromClass);
+        PsiClass containingClass = MyPsiUtil.findPsiClass(getPsiManager(), fromClass);
         if (containingClass == null) return;
 
-        PsiMethod psiMethod = PsiUtil.findPsiMethod(containingClass, enclosedMethodName, enclosedMethodArgTypes);
+        PsiMethod psiMethod = MyPsiUtil.findPsiMethod(containingClass, enclosedMethodName, enclosedMethodArgTypes);
         if (psiMethod == null) return;
 
-        PsiLambdaExpression lambdaPsiElement = (PsiLambdaExpression) PsiUtil.findLambdaExpression(psiMethod, argTypes, returnType);
+        PsiLambdaExpression lambdaPsiElement = (PsiLambdaExpression) MyPsiUtil.findLambdaExpression(psiMethod, argTypes, returnType);
 
-        PsiMethod toPsiMethod = PsiUtil.findPsiMethod(getPsiManager(), toClass, toMethod, toArgTypes);
+        PsiMethod toPsiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), toClass, toMethod, toArgTypes);
         if (toPsiMethod == null || lambdaPsiElement == null) {
             return;
         }
 
-        PsiElement psiElement = PsiUtil.findPsiCallExpression(methodFilter, lambdaPsiElement, toPsiMethod, callNo);
+        PsiElement psiElement = MyPsiUtil.findPsiCallExpression(methodFilter, lambdaPsiElement, toPsiMethod, callNo);
         if (psiElement == null) {
             return;
         }
@@ -111,9 +111,9 @@ public class JavaSequenceNavigable implements SequenceNavigable {
 
     @Override
     public List<String> findImplementations(String className) {
-        PsiClass psiClass = PsiUtil.findPsiClass(getPsiManager(), className);
+        PsiClass psiClass = MyPsiUtil.findPsiClass(getPsiManager(), className);
 
-        if (PsiUtil.isAbstract(psiClass)) {
+        if (MyPsiUtil.isAbstract(psiClass)) {
             PsiElement[] psiElements = DefinitionsScopedSearch.search(psiClass).toArray(PsiElement.EMPTY_ARRAY);
             ArrayList<String> result = new ArrayList<>();
 
@@ -134,14 +134,14 @@ public class JavaSequenceNavigable implements SequenceNavigable {
     public List<String> findImplementations(String className, String methodName, List<String> argTypes) {
         ArrayList<String> result = new ArrayList<>();
 
-        PsiMethod psiMethod = PsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
+        PsiMethod psiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
         if (psiMethod == null) return result;
 
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();
         }
-        if (PsiUtil.isAbstract(containingClass)) {
+        if (MyPsiUtil.isAbstract(containingClass)) {
             PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
 
             for (PsiElement element : psiElements) {
@@ -171,7 +171,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
         if (virtualFile == null)
             return null;
         PsiFile psiFile = getPsiFile(virtualFile);
-        return PsiUtil.getEnclosingMethod(psiFile, editor.getCaretModel().getOffset());
+        return MyPsiUtil.getEnclosingMethod(psiFile, editor.getCaretModel().getOffset());
     }
 
     private Editor getSelectedEditor() {
@@ -191,7 +191,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
     }
 
     private void openInEditor(PsiClass psiClass, PsiElement psiElement) {
-        VirtualFile virtualFile = PsiUtil.findVirtualFile(psiClass);
+        VirtualFile virtualFile = MyPsiUtil.findVirtualFile(psiClass);
         if (virtualFile == null)
             return;
         final int offset = findBestOffset(psiElement);

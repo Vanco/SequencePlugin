@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class ConfigurationUI implements ActionListener {
+public class SequenceSettingsComponent implements ActionListener {
     public static final String[] FONT_SIZES =
           {"8", "9", "10", "11", "12", "13", "14",
            "16", "18", "20", "24", "28", "32", "48", "64"};
@@ -36,7 +36,7 @@ public class ConfigurationUI implements ActionListener {
     private final ExcludeTableModel _excludeTableModel;
     private final ColorMapTableModel _colorMapTableModel;
 
-    public ConfigurationUI() {
+    public SequenceSettingsComponent() {
         GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
         String[] fonts = environment.getAvailableFontFamilyNames();
         for (String font : fonts) {
@@ -80,30 +80,30 @@ public class ConfigurationUI implements ActionListener {
         return _mainPanel;
     }
 
-    public boolean isModified(Configuration configuration) {
-        if(!_classColor.getBackground().equals(configuration.CLASS_COLOR))
+    public boolean isModified(SequenceSettingsState sequenceSettingsState) {
+        if(!_classColor.getBackground().equals(sequenceSettingsState.CLASS_COLOR))
             return true;
-        if(!_externalClassColor.getBackground().equals(configuration.EXTERNAL_CLASS_COLOR))
+        if(!_externalClassColor.getBackground().equals(sequenceSettingsState.EXTERNAL_CLASS_COLOR))
             return true;
-        if(!_methodBarColor.getBackground().equals(configuration.METHOD_BAR_COLOR))
+        if(!_methodBarColor.getBackground().equals(sequenceSettingsState.METHOD_BAR_COLOR))
             return true;
-        if(!_selectedMethodBarColor.getBackground().equals(configuration.SELECTED_METHOD_BAR_COLOR))
+        if(!_selectedMethodBarColor.getBackground().equals(sequenceSettingsState.SELECTED_METHOD_BAR_COLOR))
             return true;
-        if(!_interfaceColor.getBackground().equals(configuration.INTERFACE_COLOR))
+        if(!_interfaceColor.getBackground().equals(sequenceSettingsState.INTERFACE_COLOR))
             return true;
-        if(configuration.USE_ANTIALIASING != _antialiasing.isSelected())
+        if(sequenceSettingsState.USE_ANTIALIASING != _antialiasing.isSelected())
             return true;
-        if(configuration.SHOW_RETURN_ARROWS != _showReturnArrows.isSelected())
+        if(sequenceSettingsState.SHOW_RETURN_ARROWS != _showReturnArrows.isSelected())
             return true;
-        if(configuration.SHOW_CALL_NUMBERS != _showCallNumbers.isSelected())
+        if(sequenceSettingsState.SHOW_CALL_NUMBERS != _showCallNumbers.isSelected())
             return true;
-        if(configuration.SHOW_SIMPLIFY_CALL_NAME != _showSimplifyCallName.isSelected())
+        if(sequenceSettingsState.SHOW_SIMPLIFY_CALL_NAME != _showSimplifyCallName.isSelected())
             return true;
-        if(configuration.USE_3D_VIEW != _use3dView.isSelected())
+        if(sequenceSettingsState.USE_3D_VIEW != _use3dView.isSelected())
             return true;
-        if(!Objects.equals(_fontName.getSelectedItem(), configuration.FONT_NAME))
+        if(!Objects.equals(_fontName.getSelectedItem(), sequenceSettingsState.FONT_NAME))
             return true;
-        if(configuration.FONT_SIZE != Integer.parseInt((String) Objects.requireNonNull(_fondSize.getSelectedItem())))
+        if(sequenceSettingsState.FONT_SIZE != Integer.parseInt((String) Objects.requireNonNull(_fondSize.getSelectedItem())))
             return true;
         if(_excludeTableModel.isChanged())
             return true;
@@ -112,38 +112,38 @@ public class ConfigurationUI implements ActionListener {
         return false;
     }
 
-    public void apply(Configuration configuration) {
-        configuration.CLASS_COLOR = _classColor.getBackground();
-        configuration.EXTERNAL_CLASS_COLOR = _externalClassColor.getBackground();
-        configuration.METHOD_BAR_COLOR = _methodBarColor.getBackground();
-        configuration.SELECTED_METHOD_BAR_COLOR = _selectedMethodBarColor.getBackground();
-        configuration.INTERFACE_COLOR = _interfaceColor.getBackground();
-        configuration.USE_ANTIALIASING = _antialiasing.isSelected();
-        configuration.SHOW_RETURN_ARROWS = _showReturnArrows.isSelected();
-        configuration.SHOW_CALL_NUMBERS = _showCallNumbers.isSelected();
-        configuration.SHOW_SIMPLIFY_CALL_NAME = _showSimplifyCallName.isSelected();
-        configuration.USE_3D_VIEW = _use3dView.isSelected();
-        configuration.FONT_NAME = (String)_fontName.getSelectedItem();
-        configuration.FONT_SIZE = Integer.parseInt(((String) Objects.requireNonNull(_fondSize.getSelectedItem())));
-        configuration.setExcludeList(_excludeTableModel.getExcludeList());
-        configuration.setColorMappingList(_colorMapTableModel.getColorMapEntryList());
+    public void apply(SequenceSettingsState sequenceSettingsState) {
+        sequenceSettingsState.CLASS_COLOR = _classColor.getBackground();
+        sequenceSettingsState.EXTERNAL_CLASS_COLOR = _externalClassColor.getBackground();
+        sequenceSettingsState.METHOD_BAR_COLOR = _methodBarColor.getBackground();
+        sequenceSettingsState.SELECTED_METHOD_BAR_COLOR = _selectedMethodBarColor.getBackground();
+        sequenceSettingsState.INTERFACE_COLOR = _interfaceColor.getBackground();
+        sequenceSettingsState.USE_ANTIALIASING = _antialiasing.isSelected();
+        sequenceSettingsState.SHOW_RETURN_ARROWS = _showReturnArrows.isSelected();
+        sequenceSettingsState.SHOW_CALL_NUMBERS = _showCallNumbers.isSelected();
+        sequenceSettingsState.SHOW_SIMPLIFY_CALL_NAME = _showSimplifyCallName.isSelected();
+        sequenceSettingsState.USE_3D_VIEW = _use3dView.isSelected();
+        sequenceSettingsState.FONT_NAME = (String)_fontName.getSelectedItem();
+        sequenceSettingsState.FONT_SIZE = Integer.parseInt(((String) Objects.requireNonNull(_fondSize.getSelectedItem())));
+        sequenceSettingsState.setExcludeList(_excludeTableModel.getExcludeList());
+        sequenceSettingsState.setColorMappingList(_colorMapTableModel.getColorMapEntryList());
     }
 
-    public void reset(Configuration configuration) {
-        _classColor.setBackground(configuration.CLASS_COLOR);
-        _externalClassColor.setBackground(configuration.EXTERNAL_CLASS_COLOR);
-        _methodBarColor.setBackground(configuration.METHOD_BAR_COLOR);
-        _selectedMethodBarColor.setBackground(configuration.SELECTED_METHOD_BAR_COLOR);
-        _interfaceColor.setBackground(configuration.INTERFACE_COLOR);
-        _antialiasing.setSelected(configuration.USE_ANTIALIASING);
-        _showReturnArrows.setSelected(configuration.SHOW_RETURN_ARROWS);
-        _showCallNumbers.setSelected(configuration.SHOW_CALL_NUMBERS);
-        _showSimplifyCallName.setSelected(configuration.SHOW_SIMPLIFY_CALL_NAME);
-        _use3dView.setSelected(configuration.USE_3D_VIEW);
-        _fontName.setSelectedItem(configuration.FONT_NAME);
-        _fondSize.setSelectedItem(String.valueOf(configuration.FONT_SIZE));
-        _excludeTableModel.setExcludeList(new ArrayList<>(configuration.getExcludeList()));
-        _colorMapTableModel.setColorMapEntryList(new ArrayList<>(configuration.getColorMappingList()));
+    public void reset(SequenceSettingsState sequenceSettingsState) {
+        _classColor.setBackground(sequenceSettingsState.CLASS_COLOR);
+        _externalClassColor.setBackground(sequenceSettingsState.EXTERNAL_CLASS_COLOR);
+        _methodBarColor.setBackground(sequenceSettingsState.METHOD_BAR_COLOR);
+        _selectedMethodBarColor.setBackground(sequenceSettingsState.SELECTED_METHOD_BAR_COLOR);
+        _interfaceColor.setBackground(sequenceSettingsState.INTERFACE_COLOR);
+        _antialiasing.setSelected(sequenceSettingsState.USE_ANTIALIASING);
+        _showReturnArrows.setSelected(sequenceSettingsState.SHOW_RETURN_ARROWS);
+        _showCallNumbers.setSelected(sequenceSettingsState.SHOW_CALL_NUMBERS);
+        _showSimplifyCallName.setSelected(sequenceSettingsState.SHOW_SIMPLIFY_CALL_NAME);
+        _use3dView.setSelected(sequenceSettingsState.USE_3D_VIEW);
+        _fontName.setSelectedItem(sequenceSettingsState.FONT_NAME);
+        _fondSize.setSelectedItem(String.valueOf(sequenceSettingsState.FONT_SIZE));
+        _excludeTableModel.setExcludeList(new ArrayList<>(sequenceSettingsState.getExcludeList()));
+        _colorMapTableModel.setColorMapEntryList(new ArrayList<>(sequenceSettingsState.getColorMappingList()));
     }
 
     public void actionPerformed(ActionEvent e) {

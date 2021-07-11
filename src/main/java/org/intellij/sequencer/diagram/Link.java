@@ -1,6 +1,6 @@
 package org.intellij.sequencer.diagram;
 
-import org.intellij.sequencer.config.Configuration;
+import org.intellij.sequencer.config.SequenceSettingsState;
 
 public class Link {
 
@@ -18,7 +18,7 @@ public class Link {
     public String getName() {
         if (_methodInfo == null)
             return "";
-        if (Configuration.getInstance().SHOW_SIMPLIFY_CALL_NAME)
+        if (SequenceSettingsState.getInstance().SHOW_SIMPLIFY_CALL_NAME)
             return _methodInfo.getName();
         else
             return _methodInfo.getFullName();

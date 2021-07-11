@@ -9,8 +9,11 @@
   - Support generate No Constructor Class
   - Support generate JavaCall
   - Code navigation is Not Implement Yet
-- SequenceDiagram now have new vector icons.
-- Add Generate sequence diagram to quick fix intention.
+- UI improvements
+  - Use vector icons.
+  - Add Generate sequence diagram intention.
+  - Add Icon to Toolbar.
+  - Add Settings Icon.
 
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md` 
@@ -18,6 +21,8 @@
   2021.1 IDEA platform now ?)
 - Build for 2021.2 
 - Change to gradle kotlin script.
+- Place inside method will generate sequence diagram for enclosed method.
+- Place at class name or anywhere other than method will popup method list to choose.
 
 ### Fixed 
 - Issue #81 IndexOutOfBoundsException
@@ -26,7 +31,7 @@
 
 ## [2.0.6]
 ### Fixed
-- bug：cannot save configuration #70
+- bug：cannot save sequenceSettingsState #70
 - Cannot add SequenceDiagram to Android Studio 4.1.1 #69
 
 ## [2.0.5]
@@ -83,7 +88,7 @@
 
 ## [1.2.4]
 ### Added
-- Add configuration for method call name, It's now showing in simple/full format.
+- Add sequenceSettingsState for method call name, It's now showing in simple/full format.
 
 ## [1.2.3]
 ### Added

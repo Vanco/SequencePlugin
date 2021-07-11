@@ -10,9 +10,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-public class PsiUtil {
+public class MyPsiUtil {
 
-    private PsiUtil() {
+    private MyPsiUtil() {
     }
 
     public static PsiMethod getEnclosingMethod(PsiFile psiFile, int position) {
@@ -49,7 +49,7 @@ public class PsiUtil {
 
     public static PsiMethod findPsiMethod(PsiMethod[] psiMethods, String methodName, List<String> argTypes) {
         for (PsiMethod psiMethod : psiMethods) {
-            if (PsiUtil.isMethod(psiMethod, methodName, argTypes))
+            if (MyPsiUtil.isMethod(psiMethod, methodName, argTypes))
                 return psiMethod;
         }
         return null;
@@ -91,7 +91,7 @@ public class PsiUtil {
         PsiMethod[] psiMethods = psiClass.findMethodsByName(methodName, false);
         if (psiMethods.length == 0)
             return null;
-        return PsiUtil.findPsiMethod(psiMethods, methodName, argTypes);
+        return MyPsiUtil.findPsiMethod(psiMethods, methodName, argTypes);
     }
 
     public static PsiElement findPsiCallExpression(final MethodFilter methodFilter,

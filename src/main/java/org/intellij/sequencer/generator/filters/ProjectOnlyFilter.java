@@ -1,7 +1,7 @@
 package org.intellij.sequencer.generator.filters;
 
 import com.intellij.psi.PsiMethod;
-import org.intellij.sequencer.util.PsiUtil;
+import org.intellij.sequencer.util.MyPsiUtil;
 
 public class ProjectOnlyFilter implements MethodFilter {
     private boolean _projectClasssesOnly = true;
@@ -25,7 +25,7 @@ public class ProjectOnlyFilter implements MethodFilter {
     }
 
     private boolean isInProject(PsiMethod psiMethod) {
-        return PsiUtil.isInJarFileSystem(psiMethod) || PsiUtil.isInClassFile(psiMethod);
+        return MyPsiUtil.isInJarFileSystem(psiMethod) || MyPsiUtil.isInClassFile(psiMethod);
     }
 
 }
