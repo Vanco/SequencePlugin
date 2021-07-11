@@ -2,12 +2,12 @@ import org.jetbrains.changelog.markdownToHTML
 
 plugins {
     java
-    id("org.jetbrains.intellij") version "1.0"
+    id("org.jetbrains.intellij") version "1.1.2"
     id("org.jetbrains.changelog") version "1.1.1"
 }
 
 group = "vanstudio"
-version = "2.1.a6"
+version = "2.1.0"
 
 repositories {
     jcenter()
