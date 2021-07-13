@@ -17,10 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
@@ -38,7 +35,7 @@ public class Welcome {
         myHtmlPanelWrapper = new JPanel(new BorderLayout());
         myHtmlPanelWrapper.add(actionToolbar.getComponent(), BorderLayout.WEST);
         JEditorPane myPanel = new JEditorPane();
-        myHtmlPanelWrapper.add(myPanel, BorderLayout.CENTER);
+        myHtmlPanelWrapper.add(new JScrollPane(myPanel), BorderLayout.CENTER);
         myHtmlPanelWrapper.repaint();
 
         String currentHtml = loadWelcome();

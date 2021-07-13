@@ -50,7 +50,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
                                  displayName="Sequence Diagram"/>
         <applicationService serviceImplementation="org.intellij.sequencer.config.SequenceSettingsState"/>
         <applicationService serviceImplementation="org.intellij.sequencer.config.SequenceParamsState"/>
-        <toolWindow id="Sequence Diagram" icon="SequencePluginIcons.SEQUENCE_ICON" anchor="bottom"
+        <toolWindow id="Sequence Diagram" icon="SequencePluginIcons.SEQUENCE_ICON_13" anchor="bottom"
                     factoryClass="org.intellij.sequencer.SequenceToolWindowsFactory" canCloseContents="true"/>
 
         <projectService serviceInterface="org.intellij.sequencer.SequenceService"
