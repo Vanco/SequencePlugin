@@ -7,14 +7,14 @@ plugins {
 }
 
 group = "vanstudio"
-version = "2.1.0"
+version = "2.1.1"
 
 repositories {
     jcenter()
 }
 
 intellij {
-    version.set("2020.1")
+    version.set("2021.1")
     pluginName.set("SequenceDiagram")
     plugins.set(listOf("com.intellij.java", "org.jetbrains.kotlin"))
     updateSinceUntilBuild.set(true)

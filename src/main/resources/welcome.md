@@ -1,12 +1,12 @@
 # Welcome to SequenceDiagram
 
-version 2.1.0
+version 2.1.1
 
 - Kotlin support(experimental)
     - Support generate topLevel function
     - Support generate PrimaryConstructor and SecondaryConstructor
     - Support generate No Constructor Class
-    - Support generate JavaCall
+    - Support generate JavaCall deeply
     - Code navigation is Not Implement Yet
 - Ui improvements
   - Use vector icons.
@@ -14,7 +14,8 @@ version 2.1.0
   - Add Icon to Toolbar.
   - Share Settings.
   
-#### Attention:
+
+**Attention**:
 The Kotlin support is on very early stage. Do not use in production.  
 
 ## Online Manual

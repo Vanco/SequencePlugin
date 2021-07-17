@@ -6,6 +6,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.util.containers.Stack;
 import org.apache.log4j.Level;
 import org.intellij.sequencer.Constants;
+import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.descriptors.CallableDescriptor;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
-    private final Stack<KtExpression> exprStack = new Stack<>();
+    private final Stack<KtCallExpression> exprStack = new Stack<>();
     private final Stack<CallStack> callStack = new Stack<>();
     private static final Logger LOGGER = Logger.getInstance(KtSequenceGenerator.class.getName());
 
@@ -40,10 +41,10 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
         }
         if (psiElement instanceof KtFunction) {
             return generate((KtFunction) psiElement);
-        }
-
-        if (psiElement instanceof PsiMethod) {
+        } else if (psiElement instanceof PsiMethod) {
             return generate((PsiMethod) psiElement);
+        } else {
+            LOGGER.warn("unsupported" + psiElement.getText());
         }
 
         return topStack;
@@ -56,9 +57,8 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
 
     public CallStack generate(PsiMethod psiMethod) {
         CallStack javaCall = new SequenceGenerator(params).generate(psiMethod);
-        LOGGER.debug("[JAVACall]:"+javaCall.generateText());
-        currentStack.methodCall(javaCall.getMethod());
-//        makeMethodCallExceptCurrentStackIsRecursive(javaCall.getMethod());
+        LOGGER.debug("[JAVACall]:" + javaCall.generateText());
+        currentStack.merge(javaCall);
         return topStack;
     }
 
@@ -104,29 +104,45 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("[visitCallExpression]" + expression.getText());
         }
+        if (MyPsiUtil.isComplexCall(expression)) {
+            exprStack.push(expression);
+            callStack.push(currentStack);
+            super.visitCallExpression(expression);
+            if (!exprStack.isEmpty()) {
+                CallStack old = currentStack;
+                final KtCallExpression pop = exprStack.pop();
+                currentStack = callStack.pop();
+                resolveAndCall(pop);
+                currentStack = old;
+            }
+        } else {
+            resolveAndCall(expression);
+            super.visitCallExpression(expression);
+        }
+
+    }
+
+    private void resolveAndCall(@NotNull KtCallExpression expression) {
         PsiElement psiElement = resolveFunction(expression);
         if (psiElement instanceof KtClass) {
             currentStack.methodCall(createMethod((KtClass) psiElement));
         } else {
             methodCall(psiElement);
         }
-
-        super.visitCallExpression(expression);
     }
-
 
 
     @Nullable
     private PsiElement resolveFunction(@NotNull KtExpression expression) {
         ResolvedCall<? extends CallableDescriptor> resolvedCall = ResolutionUtils.resolveToCall(expression, BodyResolveMode.PARTIAL);
-        if (resolvedCall == null) return  null;
+        if (resolvedCall == null) return null;
         CallableDescriptor candidateDescriptor = resolvedCall.getCandidateDescriptor();
         return DescriptorToSourceUtils.descriptorToDeclaration(candidateDescriptor);
     }
 
     private void methodCall(PsiElement psiElement) {
         if (psiElement == null) return;
-       // if (!params.getMethodFilter().allow(psiMethod)) return;
+        // if (!params.getMethodFilter().allow(psiMethod)) return;
 
         if (depth < params.getMaxDepth() - 1) {
             CallStack oldStack = currentStack;
@@ -239,7 +255,11 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
      * @param typeReference KtTypeReference
      * @return String
      */
-    private String getType(KtTypeReference typeReference) {
+    private String getType(@Nullable KtTypeReference typeReference) {
+        if (typeReference == null) {
+            return "Unit";
+        }
+
         KtTypeElement typeElement = typeReference.getTypeElement();
 
         if (typeElement instanceof KtNullableType) {

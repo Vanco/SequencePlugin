@@ -40,6 +40,7 @@ public class SequenceToolWindowsFactory implements ToolWindowFactory {
         Welcome welcome = new Welcome();
         ContentManager contentManager = toolWindow.getContentManager();
         Content emptyDiagram = contentManager.getFactory().createContent(welcome.getMainPanel(), "Welcome", false);
+        emptyDiagram.setCloseable(false);
         contentManager.addContent(emptyDiagram);
 
     }

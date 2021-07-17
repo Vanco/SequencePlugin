@@ -6,6 +6,7 @@ import com.intellij.psi.util.ClassUtil;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.psi.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -119,8 +120,8 @@ public class MyPsiUtil {
      * Check PsiCallExpression is like:
      * <code> a().b().c() </code>
      * Calls after one by one.
-     * @param callExpression
-     * @return
+     * @param callExpression the expression
+     * @return true if the expression are calls one by one.
      */
     public static boolean isPipeline(PsiCallExpression callExpression) {
         PsiElement[] children = callExpression.getChildren();
@@ -140,10 +141,10 @@ public class MyPsiUtil {
     /**
      * Check PsiCallExpression is like:
      * <code> a(b(),c) </code>
-     * The parameter is another call.
+     * The argument is another call.
      *
-     * @param callExpression
-     * @return
+     * @param callExpression the expression
+     * @return true when argument is another call.
      */
     public static boolean isComplexCall(PsiCallExpression callExpression) {
         PsiExpressionList argumentList = callExpression.getArgumentList();
@@ -153,6 +154,26 @@ public class MyPsiUtil {
                 if (expression instanceof PsiCallExpression) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check KtCallExpression is like:
+     * <code> a(b(),c) </code>
+     * The argument is another call.
+     *
+     * @param ktCallExpression the expression
+     * @return true when the argument is another call
+     */
+    public static boolean isComplexCall(KtCallExpression ktCallExpression) {
+        final List<KtValueArgument> valueArguments = ktCallExpression.getValueArguments();
+        for (KtValueArgument valueArgument : valueArguments) {
+            final KtExpression argumentExpression = valueArgument.getArgumentExpression();
+            if (argumentExpression instanceof KtDotQualifiedExpression
+                    || argumentExpression instanceof KtCallExpression) {
+                return true;
             }
         }
         return false;

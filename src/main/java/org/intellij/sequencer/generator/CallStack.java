@@ -24,6 +24,16 @@ public class CallStack {
         return callStack;
     }
 
+    public CallStack merge(CallStack callStack) {
+        callStack.setParent(this);
+        _calls.add(callStack);
+        return this;
+    }
+
+    private void setParent(CallStack callStack) {
+        this._parent = callStack;
+    }
+
     public boolean isRecursive(MethodDescription method) {
         CallStack current = this;
         while(current != null) {

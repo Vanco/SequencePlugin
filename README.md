@@ -12,10 +12,11 @@ with this plugin, you can
 + Exclude classes from diagram by Settings > Tools > Sequence Diagram
 + Smart Interface(experimental)
 + Lambda Expression(experimental)
++ Kotlin Support(Experimental, No code navigation)
 <!-- Plugin description end -->
 
 ## Experimental features
-**The experimental features are created by myself, which is not part of UML standard. Use this feature in your own risk.**
+**The experimental features created by myself, which is not part of UML standard. Use this feature in your own risk.**
 
 ### Smart Interface
 Find the implementation of the interface smartly.  e.g.
@@ -47,7 +48,7 @@ I draw dummy `implementation call` in dash line.
 ![Smart Interface](imges/smart_interface.png)
 
 For the interface or abstract class, if there is only one implementation found, it will draw in diagram automatically. 
-More than one implementations, you need to choose one to draw. this is an option in settings.
+More than one implementation, you need to choose one to draw. this is an option in settings.
 
 ### Lambda Expression
 No standard for the lambda expression in the sequence diagram yet. So I create mine. e.g.
@@ -57,7 +58,7 @@ public interface Service<Int, String> {
     String invoke(Int a);
 }
 ```
-And I need draw the sequence diagram for `hello` method:
+ I need draw the sequence diagram for `hello` method:
 ```java
 public class Lambda {
 
@@ -74,22 +75,30 @@ I draw a dummy `λ→` self call in diagram.
 
 ![Lambda Expression](imges/lambda_expr.png)
 
+### Kotlin support
+The Kotlin language support are in very early stage. 
+  - Support generate topLevel function
+  - Support generate PrimaryConstructor and SecondaryConstructor
+  - Support generate No Constructor Class
+  - Support generate JavaCall deeply
+  - Code navigation is Not Implement Yet
 
 ## How to use
-SequenceDiagram **ONLY** generate sequence diagram for the **CURRENT** method of **JAVA** file in the editor.
+SequenceDiagram can generate sequence diagram from JAVA and Kotlin File. 
 ### When installed, where to find it?
-1. Open a **JAVA** file in editor.
-2. Navigate to one **Method**, which you want to generate sequence diagram. Place the caret inside Method name, (See the screenshot bellow)
-3. From the `Tools` > `Sequence Diagram...` menu.
+Since v2.1.0, the UI has improved a lot. now you can easily find it everywhere :)
+1. In navigation toolbar, A new ICON ![Sequence Diagram ...](imges/sequence.svg){:height="24px" width="24px"} added.
+2. In Tools menu. `Tools` > `Sequence Diagram ...`
+3. In Project view popup up menu.
+4. In Editor popup up menu.
+5. In IntentionAction tips.
 
-![Tools Menu](imges/tools_menu.png "Tools Menu")
+Please try to experience it and find what happen. 
 
-![Context Menu](imges/context_menu.png "Context Menu")
-
-Place the caret inside the method name, trigger it from `Tools` menu or `context` menu > `Sequence Diagram...`
+Have fun!
 
 ## Version History
-**Current Verison 2.0**
+**Current Version 2.1.0**
 
 versions:
 [Changelog](CHANGELOG.md)
@@ -104,13 +113,13 @@ versions:
 
 #### Why change name?
 Since 2011, I found a solution of NPE of original **SequencePlugin**, so I write email to Kentaur with my solution,
-He said he was not coding any more. Instead, he send me the code. I fix the NPE issue and publish to plugin
+He said he was not coding anymore. Instead, he sent me the code. I fix the NPE issue and publish to plugin
 repository with new name **SequencePluginReload**.
 
-But in 2015, the IntelliJ change the login system, and I lost my account, cannot continue publish new version to
+In 2015, the IntelliJ change the login system, and I lost my account, cannot continue to publish new version to
 the repository.
 
 In 2016, I change the Name again to **SequenceDiagram** and host the source code on [github](https://github.com/Vanco/SequencePlugin).
-Now it open source.
+Now it is open source.
 
 Thanks Kentaur for the great work on the original source.

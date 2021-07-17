@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 ### Added
+- Kotlin support(experimental)
+  - Support generate JavaCall deeply
+  
+## [2.1.0]
+### Added
 - Use `org.jetbrains.changelog` gradle plugin `1.0.0` to manage changelog file.
 - Kotlin support(experimental)
   - Support generate topLevel function
