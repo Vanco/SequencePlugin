@@ -19,4 +19,4 @@ version 2.1.1
 The Kotlin support is on very early stage. Do not use in production.  
 
 ## Online Manual
-[http://vanco.github.io/SequencePlugin](http://vanco.github.io/SequencePlugin)
+[https://vanco.github.io/SequencePlugin](https://vanco.github.io/SequencePlugin)

@@ -1,7 +1,7 @@
 # SequenceDiagram
 <!-- Plugin description -->
 SequenceDiagram for IntelliJ IDEA
-http://vanco.github.io/SequencePlugin.
+https://vanco.github.io/SequencePlugin.
 
 with this plugin, you can
 + generate Simple Sequence Diagram.
@@ -89,16 +89,16 @@ SequenceDiagram can generate sequence diagram from JAVA and Kotlin File.
 Since v2.1.0, the UI has improved a lot. now you can easily find it everywhere :)
 1. In navigation toolbar, A new ICON ![Sequence Diagram ...](imges/sequence.svg){:height="24px" width="24px"} added.
 2. In Tools menu. `Tools` > `Sequence Diagram ...`
-3. In Project view popup up menu.
-4. In Editor popup up menu.
-5. In IntentionAction tips.
+3. In Project view popup up menu. `Sequence Diagram ...`
+4. In Editor popup up menu. `Sequence Diagram ...`
+5. In IntentionAction tips.`Generate sequence diagram`
 
 Please try to experience it and find what happen. 
 
 Have fun!
 
 ## Version History
-**Current Version 2.1.0**
+**Current Version 2.1.1**
 
 versions:
 [Changelog](CHANGELOG.md)
