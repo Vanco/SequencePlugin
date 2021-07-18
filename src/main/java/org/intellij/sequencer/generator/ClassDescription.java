@@ -5,8 +5,8 @@ import org.intellij.sequencer.Constants;
 import java.util.*;
 
 public class ClassDescription {
-    private String _className;
-    private List<String> _attributes;
+    private final String _className;
+    private final List<String> _attributes;
 
     public ClassDescription(String className, List<String> attributes) {
         _className = className != null ? className : Constants.ANONYMOUS_CLASS_NAME;

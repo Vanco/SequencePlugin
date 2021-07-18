@@ -31,7 +31,7 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
 
     public KtSequenceGenerator(SequenceParams params) {
         this.params = params;
-        LOGGER.setLevel(Level.DEBUG);
+//        LOGGER.setLevel(Level.DEBUG);
     }
 
     @Override
@@ -58,7 +58,12 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
     public CallStack generate(PsiMethod psiMethod) {
         CallStack javaCall = new SequenceGenerator(params).generate(psiMethod);
         LOGGER.debug("[JAVACall]:" + javaCall.generateText());
-        currentStack.merge(javaCall);
+        if (topStack == null) {
+            topStack = javaCall;
+            currentStack = topStack;
+        } else {
+            currentStack.merge(javaCall);
+        }
         return topStack;
     }
 

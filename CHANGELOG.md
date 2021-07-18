@@ -4,7 +4,16 @@
 ### Added
 - Kotlin support(experimental)
   - Support generate JavaCall deeply
-  
+- UI improvements
+  - Add to Project view popup menu
+
+### Changed
+- Change `README.md` add some description in where to find section.
+
+### Fixed
+- http://vanco.github.io/SequencePlugin can not open #96
+- NPE when generate some kotlin in Java.
+
 ## [2.1.0]
 ### Added
 - Use `org.jetbrains.changelog` gradle plugin `1.0.0` to manage changelog file.

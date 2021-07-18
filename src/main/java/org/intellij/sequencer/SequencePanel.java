@@ -2,6 +2,7 @@ package org.intellij.sequencer;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class SequencePanel extends JPanel {
-    //private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
+    private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
 
     private final Display _display;
     private final Model _model;
@@ -85,7 +86,9 @@ public class SequencePanel extends JPanel {
     }
 
     private void generate(String query) {
-//        LOGGER.debug("sequence = " + query);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("sequence = " + query);
+        }
         _model.setText(query, this);
         _display.invalidate();
     }
@@ -278,7 +281,7 @@ public class SequencePanel extends JPanel {
                 }
             });
             int returnVal = chooser.showOpenDialog(SequencePanel.this);
-            if(returnVal == JFileChooser.APPROVE_OPTION) {
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
                 _titleName = file.getName();
                 _model.readFromFile(file);
@@ -358,7 +361,7 @@ public class SequencePanel extends JPanel {
                     if (!selectedFile.getName().endsWith("puml"))
                         selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".puml");
 
-                    String uml =  generatePuml();
+                    String uml = generatePuml();
 
                     FileUtil.writeToFile(selectedFile, uml);
                 }
@@ -373,7 +376,6 @@ public class SequencePanel extends JPanel {
             e.getPresentation().setEnabled(psiElement != null);
         }
     }
-
 
 
     private class GotoSourceAction extends AnAction {

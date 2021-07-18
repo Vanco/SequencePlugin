@@ -6,14 +6,13 @@ import org.intellij.sequencer.Constants;
 import java.util.*;
 
 public class MethodDescription {
-    private ClassDescription _classDescription;
+    private final ClassDescription _classDescription;
 
-    private String _methodName;
-    private List<String> _attributes;
-    private List<String> _argNames;
-    private List<String> _argTypes;
-    private String _returnType;
-    private int _hashCode = -1;
+    private final String _methodName;
+    private final List<String> _attributes;
+    private final List<String> _argNames;
+    private final List<String> _argTypes;
+    private final String _returnType;
 
     protected MethodDescription(ClassDescription classDescription, List<String> attributes,
                               String methodName, String returnType, List<String> argNames, List<String> argTypes) {
@@ -79,15 +78,14 @@ public class MethodDescription {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MethodDescription that = (MethodDescription) o;
-        return _hashCode == that._hashCode
-                && Objects.equals(_classDescription, that._classDescription)
+        return Objects.equals(_classDescription, that._classDescription)
                 && Objects.equals(_methodName, that._methodName)
                 && Objects.equals(_argTypes, that._argTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_classDescription, _methodName, _argTypes, _hashCode);
+        return Objects.hash(_classDescription, _methodName, _argTypes);
     }
 
 
