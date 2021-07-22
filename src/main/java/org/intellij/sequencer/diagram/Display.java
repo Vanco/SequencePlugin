@@ -2,6 +2,7 @@ package org.intellij.sequencer.diagram;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.ImageUtil;
+import com.intellij.util.ui.UIUtil;
 import org.intellij.sequencer.config.ConfigListener;
 import org.intellij.sequencer.config.SequenceSettingsState;
 
@@ -186,7 +187,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
     public void saveImageToFile(File file) throws IOException {
         Dimension size = getFullSize();
-        BufferedImage image = ImageUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = UIUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
         try {
             String systemLookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();

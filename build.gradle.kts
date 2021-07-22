@@ -7,14 +7,14 @@ plugins {
 }
 
 group = "vanstudio"
-version = "2.1.1"
+version = "1.5.1"
 
 repositories {
     jcenter()
 }
 
 intellij {
-    version.set("2021.1")
+    version.set("2019.2.4")
     pluginName.set("SequenceDiagram")
     plugins.set(listOf("com.intellij.java", "org.jetbrains.kotlin"))
     updateSinceUntilBuild.set(true)
@@ -29,8 +29,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("201")
-        untilBuild.set("212.*")
+        sinceBuild.set("192")
+        untilBuild.set("193.*")
         pluginDescription.set(
             File(projectDir, "README.md").readText().lines().run {
                 val start = "<!-- Plugin description -->"
@@ -46,7 +46,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("2020.1.4", "2020.2.4", "2020.3.4", "2021.1.1"))
+        ideVersions.set(listOf(/*"2018.1.7","2018.2.8","2018.3.6","2019.1.4",*/"2019.2.4","2019.3.5","2020.1.4", "2020.2.4", "2020.3.4", "2021.1.1"))
     }
 
 

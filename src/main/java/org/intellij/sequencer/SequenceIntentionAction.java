@@ -2,6 +2,7 @@ package org.intellij.sequencer;
 
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -37,7 +38,7 @@ public class SequenceIntentionAction extends PsiElementBaseIntentionAction {
     @Override
     public void invoke(@NotNull Project project, Editor editor, @NotNull PsiElement element) throws IncorrectOperationException {
         ApplicationManager.getApplication().invokeLater(() -> {
-            SequenceService plugin = project.getService(SequenceService.class);
+            SequenceService plugin = ServiceManager.getService(project, SequenceService.class);
 
             SequenceParamsState state = SequenceParamsState.getInstance();
 

@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -63,7 +64,7 @@ public class ShowSequenceAction extends AnAction {
         Project project = event.getProject();
         if (project == null) return;
 
-        SequenceService plugin = project.getService(SequenceService.class);
+        SequenceService plugin = ServiceManager.getService(project, SequenceService.class);
 
         SequenceParamsState state = SequenceParamsState.getInstance();
 
