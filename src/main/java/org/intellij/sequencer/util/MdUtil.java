@@ -16,8 +16,8 @@ public class MdUtil {
         final GFMFlavourDescriptor flavour = new GFMFlavourDescriptor();
         final ASTNode parsedTree = new MarkdownParser(flavour).buildMarkdownTreeFromString(text);
         final LinkMap linkMap = LinkMap.Builder.buildLinkMap(parsedTree, text);
-//        final Map<IElementType, GeneratingProvider> map = flavour.createHtmlGeneratingProviders(linkMap);
+        final Map<IElementType, GeneratingProvider> map = flavour.createHtmlGeneratingProviders(linkMap, null);
 
-        return new HtmlGenerator(text, parsedTree, flavour, linkMap, true).generateHtml();
+        return new HtmlGenerator(text, parsedTree, map, true).generateHtml();
     }
 }
