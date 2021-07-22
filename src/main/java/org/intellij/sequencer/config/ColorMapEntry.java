@@ -25,7 +25,7 @@ public class ColorMapEntry {
     }
 
     public void setRegex(String regex) {
-        matcher = null; // invalidate
+        pattern = null; // invalidate
         this.regex = regex;
     }
 
@@ -37,17 +37,18 @@ public class ColorMapEntry {
         this.color = color;
     }
 
-    private Predicate<String> matcher;
+//    private Predicate<String> matcher;
+    private Pattern pattern;
 
     public boolean matches(String fullName) {
-        if(matcher==null) {
+        if(pattern==null) {
             // simply pattern to actual regex
             String regex = getRegex().replace(".", "\\.").replace("*", ".*");
-            matcher = Pattern.compile(regex).asMatchPredicate();
+            pattern = Pattern.compile(regex);//.asMatchPredicate();
         }
         if(fullName==null) {
             return false;
         }
-        return matcher.test(fullName);
+        return pattern.matcher(fullName).matches();
     }
 }
