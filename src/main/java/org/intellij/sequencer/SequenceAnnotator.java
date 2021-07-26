@@ -18,7 +18,7 @@ public class SequenceAnnotator implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         if (element instanceof PsiIdentifier && element.getParent() instanceof PsiMethod) {
-            holder.newAnnotation(new HighlightSeverity("Sequence Diagram", 200), "Generate '"+element.getText()+"' sequence diagram")
+            holder.newSilentAnnotation(new HighlightSeverity("Sequence Diagram", 200))
                     .withFix(new SequenceIntentionAction())
                     .range(element)
                     .highlightType(ProblemHighlightType.INFORMATION)
