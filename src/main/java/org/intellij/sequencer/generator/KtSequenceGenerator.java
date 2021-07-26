@@ -4,7 +4,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.util.containers.Stack;
-import org.apache.log4j.Level;
 import org.intellij.sequencer.Constants;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +78,7 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("[visitNamedFunction]" + function.getText());
         }
-        MethodDescription method = createMethod(function);
+        MethodDescription method = createMethod(function, function.getTextOffset());
         if (makeMethodCallExceptCurrentStackIsRecursive(method)) return;
         super.visitNamedFunction(function);
     }
@@ -130,9 +129,9 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
     private void resolveAndCall(@NotNull KtCallExpression expression) {
         PsiElement psiElement = resolveFunction(expression);
         if (psiElement instanceof KtClass) {
-            currentStack.methodCall(createMethod((KtClass) psiElement));
+            currentStack.methodCall(createMethod((KtClass) psiElement, expression.getTextOffset()));
         } else {
-            methodCall(psiElement);
+            methodCall(psiElement, expression.getTextOffset());
         }
     }
 
@@ -145,7 +144,7 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
         return DescriptorToSourceUtils.descriptorToDeclaration(candidateDescriptor);
     }
 
-    private void methodCall(PsiElement psiElement) {
+    private void methodCall(PsiElement psiElement, int offset) {
         if (psiElement == null) return;
         // if (!params.getMethodFilter().allow(psiMethod)) return;
 
@@ -158,18 +157,18 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
             LOGGER.debug("- depth = " + depth + " method = " + psiElement.getText());
             currentStack = oldStack;
         } else {
-            currentStack.methodCall(createMethod(psiElement));
+            currentStack.methodCall(createMethod(psiElement, offset));
         }
     }
 
-    private MethodDescription createMethod(PsiElement psiElement) {
-        if (psiElement instanceof KtClass) return createMethod((KtClass) psiElement);
-        else if (psiElement instanceof KtNamedFunction) return createMethod((KtNamedFunction) psiElement);
+    private MethodDescription createMethod(PsiElement psiElement, int offset) {
+        if (psiElement instanceof KtClass) return createMethod((KtClass) psiElement, offset);
+        else if (psiElement instanceof KtNamedFunction) return createMethod((KtNamedFunction) psiElement, offset);
         // todo Something else
         return null;
     }
 
-    private MethodDescription createMethod(KtNamedFunction function) {
+    private MethodDescription createMethod(KtNamedFunction function, int offset) {
         ParamPair paramPair = extractParameters(function.getValueParameters());
         ClassDescription classDescription;
         if (function.isTopLevel()) {
@@ -195,7 +194,8 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
         return MethodDescription.createMethodDescription(
                 classDescription,
                 attributes, function.getName(), returnType,
-                paramPair.argNames, paramPair.argTypes
+                paramPair.argNames, paramPair.argTypes,
+                offset
         );
     }
 
@@ -209,7 +209,8 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
         return MethodDescription.createMethodDescription(
                 classDescription,
                 attributes, Constants.CONSTRUCTOR_METHOD_NAME, returnType,
-                paramPair.argNames, paramPair.argTypes
+                paramPair.argNames, paramPair.argTypes,
+                constructor.getTextOffset()
         );
     }
 
@@ -223,11 +224,12 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
         return MethodDescription.createMethodDescription(
                 classDescription,
                 attributes, Constants.CONSTRUCTOR_METHOD_NAME, returnType,
-                paramPair.argNames, paramPair.argTypes
+                paramPair.argNames, paramPair.argTypes,
+                constructor.getTextOffset()
         );
     }
 
-    private MethodDescription createMethod(KtClass ktClass) {
+    private MethodDescription createMethod(KtClass ktClass, int offset) {
         ClassDescription classDescription = new ClassDescription(ktClass.getFqName().asString(), new ArrayList<>());
         List<String> attributes = createAttributes(ktClass.getModifierList());
         String returnType = ktClass.getName();
@@ -235,7 +237,8 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
         return MethodDescription.createMethodDescription(
                 classDescription,
                 attributes, Constants.CONSTRUCTOR_METHOD_NAME, returnType,
-                new ArrayList<>(), new ArrayList<>()
+                new ArrayList<>(), new ArrayList<>(),
+                offset
         );
     }
 

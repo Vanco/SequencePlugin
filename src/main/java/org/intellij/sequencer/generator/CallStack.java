@@ -54,6 +54,10 @@ public class CallStack {
         return _method;
     }
 
+    public List<CallStack> getCalls() {
+        return _calls;
+    }
+
     private void generate(StringBuffer buffer) {
         buffer.append('(').append(_method.toJson()).append(' ');
         for(Iterator<CallStack> iterator = _calls.iterator(); iterator.hasNext();) {

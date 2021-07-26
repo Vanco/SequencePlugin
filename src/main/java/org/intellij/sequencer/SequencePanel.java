@@ -23,6 +23,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +37,7 @@ public class SequencePanel extends JPanel {
     private PsiElement psiElement;
     private String _titleName;
     private final JScrollPane _jScrollPane;
+    private final HashMap<String, Integer> navIndexMap = new HashMap<>();
 
     public SequencePanel(SequenceNavigable navigable, PsiElement psiMethod, SequenceParams sequenceParams) {
         super(new BorderLayout());
@@ -101,8 +103,17 @@ public class SequencePanel extends JPanel {
         IGenerator generator = GeneratorFactory.createGenerator(psiElement.getLanguage(), _sequenceParams);
 
         final CallStack callStack = generator.generate(psiElement);
+        buildNaviIndex(callStack, "1");
         _titleName = callStack.getMethod().getTitleName();
         generate(callStack.generateSequence());
+    }
+
+    private void buildNaviIndex(CallStack callStack, String level) {
+        navIndexMap.put(level, callStack.getMethod().getOffset());
+        int i = 1;
+        for (CallStack call : callStack.getCalls()) {
+            buildNaviIndex(call, level+"."+ i++);
+        }
     }
 
     public String generatePuml() {
@@ -172,7 +183,8 @@ public class SequencePanel extends JPanel {
                     fromMethodInfo.getRealName(),
                     fromMethodInfo.getArgTypes(),
                     toMethodInfo.getArgTypes(),
-                    toMethodInfo.getReturnType()
+                    toMethodInfo.getReturnType(),
+                    navIndexMap.get(toMethodInfo.getNumbering().getName())
             );
         } else if (isLambdaCall(fromMethodInfo)) {
             LambdaExprInfo lambdaExprInfo = (LambdaExprInfo) fromMethodInfo;
@@ -186,7 +198,7 @@ public class SequencePanel extends JPanel {
                     toMethodInfo.getObjectInfo().getFullName(),
                     toMethodInfo.getRealName(),
                     toMethodInfo.getArgTypes(),
-                    toMethodInfo.getNumbering().getTopLevel()
+                    navIndexMap.get(toMethodInfo.getNumbering().getName())
             );
         } else if (fromMethodInfo.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && fromMethodInfo.hasAttribute(Info.ABSTRACT_ATTRIBUTE)) {
             gotoMethod(toMethodInfo);
@@ -199,7 +211,7 @@ public class SequencePanel extends JPanel {
                     toMethodInfo.getObjectInfo().getFullName(),
                     toMethodInfo.getRealName(),
                     toMethodInfo.getArgTypes(),
-                    toMethodInfo.getNumbering().getTopLevel()
+                    navIndexMap.get(toMethodInfo.getNumbering().getName())
             );
         }
     }

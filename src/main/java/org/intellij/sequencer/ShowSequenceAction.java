@@ -93,7 +93,7 @@ public class ShowSequenceAction extends AnAction {
         if (psiElement instanceof PsiClass) {
             PsiMethod[] methods = ((PsiClass) psiElement).getMethods();
             // for PsiClass, show popup menu list method to choose
-            JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<PsiMethod>("Choose method ...", Arrays.asList(methods)) {
+            JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<PsiMethod>("Choose Method ...", Arrays.asList(methods)) {
                 @Override
                 public @NotNull
                 String getTextFor(PsiMethod value) {
@@ -102,7 +102,7 @@ public class ShowSequenceAction extends AnAction {
 
                 @Override
                 public @Nullable
-                PopupStep onChosen(PsiMethod selectedValue, boolean finalChoice) {
+                PopupStep<?> onChosen(PsiMethod selectedValue, boolean finalChoice) {
                     return doFinalStep(() -> {
                         plugin.showSequence(params, selectedValue);
                     });

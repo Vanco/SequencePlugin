@@ -95,15 +95,6 @@ public class MyPsiUtil {
         return MyPsiUtil.findPsiMethod(psiMethods, methodName, argTypes);
     }
 
-    public static PsiElement findPsiCallExpression(final MethodFilter methodFilter,
-                                                   @NotNull PsiElement psiCodeBlock,
-                                                   final PsiMethod toPsiMethod,
-                                                   final int callNo) {
-        CallFinder callFinder = new CallFinder(callNo, methodFilter, toPsiMethod);
-        psiCodeBlock.accept(callFinder);
-        return callFinder.getPsiElement();
-    }
-
     public static String getPackageName(PsiMethod psiMethod) {
         PsiElement psiElement = psiMethod.getParent();
         while (psiElement != null) {
@@ -219,9 +210,16 @@ public class MyPsiUtil {
         return true;
     }
 
-    public static PsiElement findLambdaExpression(PsiElement parent, List<String> argTypes, String returnType) {
-        LambdaFinder callFinder = new LambdaFinder(argTypes, returnType);
-        parent.accept(callFinder);
-        return callFinder.getPsiElement();
+    public static int findBestOffset(PsiElement psiElement) {
+        if (psiElement instanceof PsiMethod) {
+            return psiElement.getNavigationElement().getTextOffset();
+        } else if (psiElement instanceof PsiMethodCallExpression) {
+            return psiElement.getFirstChild().getNavigationElement().getTextOffset();
+        } else if (psiElement instanceof PsiLambdaExpression) {
+            return psiElement.getNavigationElement().getTextOffset();
+        } else if (psiElement instanceof PsiNewExpression) {
+            return psiElement.getNavigationElement().getTextOffset();
+        }
+        return psiElement.getNavigationElement().getTextOffset();
     }
 }

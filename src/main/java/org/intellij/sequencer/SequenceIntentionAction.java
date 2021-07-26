@@ -5,6 +5,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiIdentifier;
+import com.intellij.psi.PsiMethod;
 import com.intellij.util.IncorrectOperationException;
 import org.intellij.sequencer.config.SequenceParamsState;
 import org.intellij.sequencer.generator.SequenceParams;
@@ -26,12 +28,12 @@ public class SequenceIntentionAction extends PsiElementBaseIntentionAction {
 
     @Override
     public @NotNull String getFamilyName() {
-        return "Sequence Diagram";
+        return "Sequence diagram";
     }
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, @NotNull PsiElement element) {
-        return true;
+        return element instanceof PsiIdentifier && element.getParent() instanceof PsiMethod;
     }
 
     @Override

@@ -13,15 +13,17 @@ public class MethodDescription {
     private final List<String> _argNames;
     private final List<String> _argTypes;
     private final String _returnType;
+    private int offset;
 
     protected MethodDescription(ClassDescription classDescription, List<String> attributes,
-                              String methodName, String returnType, List<String> argNames, List<String> argTypes) {
+                                String methodName, String returnType, List<String> argNames, List<String> argTypes, int offset) {
         _attributes = attributes;
         _returnType = returnType;
         _argNames = argNames;
         _argTypes = argTypes;
         _classDescription = classDescription;
         _methodName = methodName;
+        this.offset = offset;
     }
 
     public String toString() {
@@ -80,7 +82,8 @@ public class MethodDescription {
         MethodDescription that = (MethodDescription) o;
         return Objects.equals(_classDescription, that._classDescription)
                 && Objects.equals(_methodName, that._methodName)
-                && Objects.equals(_argTypes, that._argTypes);
+                && Objects.equals(_argTypes, that._argTypes)
+                && offset == that.getOffset();
     }
 
     @Override
@@ -92,20 +95,24 @@ public class MethodDescription {
     static MethodDescription createMethodDescription(ClassDescription classDescription,
                                                      List<String> attributes, String methodName,
                                                      String returnType,
-                                                     List<String> argNames, List<String> argTypes) {
-        return new MethodDescription(classDescription, attributes, methodName, returnType, argNames, argTypes);
+                                                     List<String> argNames, List<String> argTypes, int offset) {
+        return new MethodDescription(classDescription, attributes, methodName, returnType, argNames, argTypes, offset);
     }
 
     static MethodDescription createConstructorDescription(ClassDescription classDescription,
                                                           List<String> attributes, List<String> argNames,
-                                                          List<String> argTypes) {
+                                                          List<String> argTypes, int offset) {
         return new MethodDescription(classDescription, attributes, Constants.CONSTRUCTOR_METHOD_NAME,
-                classDescription.getClassName(), argNames, argTypes);
+                classDescription.getClassName(), argNames, argTypes, offset);
     }
 
-    static MethodDescription createLambdaDescription(ClassDescription classDescription,
-                                                     List<String> argNames, List<String> argTypes, String returnType) {
-        return new MethodDescription(classDescription,
-                new ArrayList<>(), Constants.Lambda_Invoke, returnType, argNames, argTypes);
+    public int getOffset() {
+        return offset;
     }
+
+//    static MethodDescription createLambdaDescription(ClassDescription classDescription,
+//                                                     List<String> argNames, List<String> argTypes, String returnType) {
+//        return new MethodDescription(classDescription,
+//                new ArrayList<>(), Constants.Lambda_Invoke, returnType, argNames, argTypes);
+//    }
 }

@@ -16,7 +16,7 @@ public class OptionsUI {
         private final JCheckBox jCheckBoxNGS;
         private final JCheckBox jCheckBoxNPM;
         private final JCheckBox jCheckBoxNC;
-        private final JCheckBox jCheckBoxSI;
+//        private final JCheckBox jCheckBoxSI;
 
         public DialogPanel() {
             super(new GridBagLayout());
@@ -52,13 +52,13 @@ public class OptionsUI {
             jCheckBoxNGS = new JCheckBox("Skip getters/setters", state.noGetterSetters);
             add(jCheckBoxNGS, gc);
 
-            gc.gridx = 0;
-            gc.gridy = 3;
-            gc.anchor = GridBagConstraints.WEST;
-            gc.gridwidth = 2;
-            gc.insets = JBUI.emptyInsets();
-            jCheckBoxSI = new JCheckBox("Smart interface (experimental)", state.smartInterface);
-            add(jCheckBoxSI, gc);
+//            gc.gridx = 0;
+//            gc.gridy = 3;
+//            gc.anchor = GridBagConstraints.WEST;
+//            gc.gridwidth = 2;
+//            gc.insets = JBUI.emptyInsets();
+//            jCheckBoxSI = new JCheckBox("Smart interface (experimental)", state.smartInterface);
+//            add(jCheckBoxSI, gc);
 
             gc.gridx = 2;
             gc.gridy = 1;
@@ -116,9 +116,9 @@ public class OptionsUI {
             return dialogPanel.jCheckBoxNC.isSelected();
         }
 
-        public boolean isSmartInterface() {
-            return dialogPanel.jCheckBoxSI.isSelected();
-        }
+//        public boolean isSmartInterface() {
+//            return dialogPanel.jCheckBoxSI.isSelected();
+//        }
     }
 
 }
