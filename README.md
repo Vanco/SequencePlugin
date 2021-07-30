@@ -98,7 +98,7 @@ Please try to experience it and find what happen.
 Have fun!
 
 ## Version History
-**Current Version 2.1.1**
+**Current Version 2.1.2**
 
 versions:
 [Changelog](CHANGELOG.md)
