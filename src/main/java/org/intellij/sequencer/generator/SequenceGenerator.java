@@ -91,8 +91,8 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     private boolean alreadyInStack(PsiMethod psiMethod) {
         // Don't check external method, because the getTextOffset() will cause Java decompiler, it will wast of time.
         if (psiMethod.getContainingClass() == null || MyPsiUtil.isExternal(psiMethod.getContainingClass())) return true;
-
-        MethodDescription method = createMethod(psiMethod, psiMethod.getTextOffset());
+        final int offset = psiMethod.getTextOffset();
+        MethodDescription method = createMethod(psiMethod, offset);
         return currentStack.isRecursive(method);
     }
 
@@ -128,7 +128,8 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         final PsiElement resolve = expression.resolve();
         if (resolve instanceof PsiMethod) {
             final PsiMethod psiMethod = (PsiMethod) resolve;
-            methodCall(psiMethod, expression.getTextOffset());
+            final int offset = expression.getTextOffset();
+            methodCall(psiMethod, offset);
         }
         super.visitMethodReferenceExpression(expression);
     }
@@ -316,10 +317,10 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         }
 
         PsiMethod psiMethod = MyPsiUtil.findEnclosedPsiMethod(expression);
+        final int offset = expression.getTextOffset();
+        MethodDescription enclosedMethod = createMethod(psiMethod, offset);
 
-        MethodDescription enclosedMethod = createMethod(psiMethod, expression.getTextOffset());
-
-        return new LambdaExprDescription(enclosedMethod, returnType, paramPair.argNames, paramPair.argTypes, expression.getTextOffset());
+        return new LambdaExprDescription(enclosedMethod, returnType, paramPair.argNames, paramPair.argTypes, offset);
     }
 
     @Override

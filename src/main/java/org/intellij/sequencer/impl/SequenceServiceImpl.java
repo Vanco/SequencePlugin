@@ -1,12 +1,16 @@
 package org.intellij.sequencer.impl;
 
+import com.intellij.ide.util.DelegatingProgressIndicator;
 import com.intellij.lang.java.JavaLanguage;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
+import com.intellij.util.concurrency.NonUrgentExecutor;
 import org.intellij.sequencer.SequenceNavigable;
 import org.intellij.sequencer.SequencePanel;
 import org.intellij.sequencer.SequenceService;
@@ -19,7 +23,6 @@ import org.jetbrains.kotlin.idea.KotlinLanguage;
  * Created by van on 2020/2/23.
  */
 public class SequenceServiceImpl implements SequenceService {
-//    private static final Icon S_ICON = SequencePluginIcons.SEQUENCE_ICON_13;
 
     private final Project _project;
     private final ToolWindow _toolWindow;
@@ -42,22 +45,24 @@ public class SequenceServiceImpl implements SequenceService {
             navigable = new KotlinSequenceNavigable(_project);
         }
 
-        final SequencePanel sequencePanel = new SequencePanel(navigable, psiElement, params);
-        Runnable postAction = () -> {
-            sequencePanel.generate();
-            addSequencePanel(sequencePanel);
-        };
+        final SequencePanel sequencePanel = new SequencePanel(_project, navigable, psiElement, params);
+        final Content content = addSequencePanel(sequencePanel);
+        // register callback when generate finished, update the content title.
+        sequencePanel.withFinishedListener(content::setDisplayName);
+
+        Runnable postAction = sequencePanel::generate;
         if (_toolWindow.isActive())
             _toolWindow.show(postAction);
         else
             _toolWindow.activate(postAction);
     }
 
-    private void addSequencePanel(final SequencePanel sequencePanel) {
+    private Content addSequencePanel(final SequencePanel sequencePanel) {
         ContentManager contentManager = _toolWindow.getContentManager();
-        final Content content =  contentManager.getFactory().createContent(sequencePanel, sequencePanel.getTitleName(), false);
+        final Content content = contentManager.getFactory().createContent(sequencePanel, sequencePanel.getTitleName(), false);
         contentManager.addContent(content);
         contentManager.setSelectedContent(content);
+        return content;
     }
 
 }

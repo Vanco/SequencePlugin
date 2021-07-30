@@ -1,6 +1,16 @@
 # SequenceDiagram Changelog
 
-## [Unreleased]
+## [2.1.2]
+### Changed
+- Optimized performance issue
+- Optimized java navigation
+- Optimized Lambda generation
+
+### Fixed
+- SequencePlugin shows puzzling warnings in the Problems tab #99
+- Navigation not jump to source #76
+
+## [2.1.1]
 ### Added
 - Kotlin support(experimental)
   - Support generate JavaCall deeply

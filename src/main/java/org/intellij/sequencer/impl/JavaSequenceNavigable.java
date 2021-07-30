@@ -1,23 +1,28 @@
 package org.intellij.sequencer.impl;
 
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.searches.AllClassesSearch;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
-import com.intellij.util.Query;
+import com.intellij.psi.util.ClassUtil;
+import com.intellij.util.concurrency.NonUrgentExecutor;
 import org.intellij.sequencer.SequenceNavigable;
 import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.concurrency.CancellablePromise;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static org.intellij.sequencer.util.MyPsiUtil.findBestOffset;
 
@@ -29,19 +34,49 @@ public class JavaSequenceNavigable implements SequenceNavigable {
     }
 
     public void openClassInEditor(final String className) {
-        Query<PsiClass> search = AllClassesSearch.search(GlobalSearchScope.projectScope(_project), _project, className::endsWith);
-        PsiClass psiClass = search.findFirst();
-        if (psiClass == null)
-            return;
-        openInEditor(psiClass, findBestOffset(psiClass));
+        ReadAction
+                .nonBlocking(() -> {
+                    final PsiClass psiClass = ClassUtil.findPsiClass(getPsiManager(), className);
+                    if (psiClass == null) return null;
+
+                    VirtualFile virtualFile = MyPsiUtil.findVirtualFile(psiClass);
+                    final int offset = findBestOffset(psiClass);
+
+                    return new Pair<>(virtualFile, offset);
+                })
+                .finishOnUiThread(ModalityState.defaultModalityState(), p -> {
+                    if (p != null)
+                        openInEditor(p.first, p.second);
+                })
+                .inSmartMode(_project)
+                .submit(NonUrgentExecutor.getInstance());
+
     }
 
     @Override
     public void openMethodInEditor(String className, String methodName, List<String> argTypes) {
-        PsiMethod psiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
-        if (psiMethod == null)
-            return;
-        openInEditor(psiMethod.getContainingClass(), findBestOffset(psiMethod));
+
+        ReadAction
+                .nonBlocking(() -> {
+                    final PsiMethod psiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
+                    if (psiMethod == null) return null;
+
+                    final PsiClass containingClass = psiMethod.getContainingClass();
+                    if (containingClass == null) return null;
+
+                    VirtualFile virtualFile = MyPsiUtil.findVirtualFile(containingClass);
+
+                    final int offset = findBestOffset(psiMethod);
+
+                    return new Pair<>(virtualFile, offset);
+
+                })
+                .finishOnUiThread(ModalityState.defaultModalityState(), p -> {
+                    if (p != null)
+                        openInEditor(p.first, p.second);
+                })
+                .inSmartMode(_project)
+                .submit(NonUrgentExecutor.getInstance());
     }
 
     @Override
@@ -53,22 +88,37 @@ public class JavaSequenceNavigable implements SequenceNavigable {
     public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes,
                                        String toClass, String toMethod, List<String> toArgType, int offset) {
 
-        PsiMethod fromPsiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), fromClass, fromMethod, fromArgTypes);
-        if (fromPsiMethod == null) {
-            return;
-        }
+        ReadAction
+                .nonBlocking(() -> {
+                    PsiMethod fromPsiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), fromClass, fromMethod, fromArgTypes);
+                    if (fromPsiMethod == null) {
+                        return null;
+                    }
 
-        PsiClass containingClass = fromPsiMethod.getContainingClass();
+                    final PsiClass containingClass = fromPsiMethod.getContainingClass();
+                    if (containingClass == null) return null;
 
-        openInEditor(containingClass, offset);
+                    return MyPsiUtil.findVirtualFile(containingClass);
+                })
+                .finishOnUiThread(ModalityState.defaultModalityState(), containingClass -> openInEditor(containingClass, offset))
+                .inSmartMode(_project)
+                .submit(NonUrgentExecutor.getInstance());
+
     }
 
     @Override
     public void openLambdaExprInEditor(String fromClass, String methodName, List<String> methodArgTypes, List<String> argTypes, String returnType, int offset) {
-        PsiClass containingClass = MyPsiUtil.findPsiClass(getPsiManager(), fromClass);
-        if (containingClass == null) return;
 
-        openInEditor(containingClass, offset);
+        ReadAction
+                .nonBlocking(() -> {
+                    final PsiClass psiClass = MyPsiUtil.findPsiClass(getPsiManager(), fromClass);
+                    if (psiClass == null) return null;
+
+                    return MyPsiUtil.findVirtualFile(psiClass);
+                })
+                .finishOnUiThread(ModalityState.defaultModalityState(), containingClass -> openInEditor(containingClass, offset))
+                .inSmartMode(_project)
+                .submit(NonUrgentExecutor.getInstance());
 
     }
 
@@ -77,64 +127,101 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                                                        String enclosedMethodName, List<String> enclosedMethodArgTypes,
                                                        List<String> argTypes, String returnType,
                                                        String toClass, String toMethod, List<String> toArgTypes, int offset) {
-        PsiClass containingClass = MyPsiUtil.findPsiClass(getPsiManager(), fromClass);
-        if (containingClass == null) return;
+        ReadAction
+                .nonBlocking(() -> {
+                    final PsiClass psiClass = MyPsiUtil.findPsiClass(getPsiManager(), fromClass);
+                    if (psiClass == null) return null;
+                    return MyPsiUtil.findVirtualFile(psiClass);
+                })
+                .finishOnUiThread(ModalityState.defaultModalityState(), containingClass -> openInEditor(containingClass, offset))
+                .inSmartMode(_project)
+                .submit(NonUrgentExecutor.getInstance());
 
-        openInEditor(containingClass, offset);
     }
 
     @Override
     public List<String> findImplementations(String className) {
-        PsiClass psiClass = MyPsiUtil.findPsiClass(getPsiManager(), className);
 
-        if (MyPsiUtil.isAbstract(psiClass)) {
-            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiClass).toArray(PsiElement.EMPTY_ARRAY);
-            ArrayList<String> result = new ArrayList<>();
+        final @NotNull CancellablePromise<ArrayList<String>> readAction =
+                ReadAction
+                        .nonBlocking(() -> {
+                            ArrayList<String> result = new ArrayList<>();
+                            PsiClass psiClass = MyPsiUtil.findPsiClass(getPsiManager(), className);
 
-            for (PsiElement element : psiElements) {
-                if (element instanceof PsiClass) {
-                    PsiClass implClass = (PsiClass) element;
-                    result.add(implClass.getQualifiedName());
-                }
-            }
+                            if (MyPsiUtil.isAbstract(psiClass)) {
+                                PsiElement[] psiElements = DefinitionsScopedSearch.search(psiClass).toArray(PsiElement.EMPTY_ARRAY);
 
-            return result;
+                                for (PsiElement element : psiElements) {
+                                    if (element instanceof PsiClass) {
+                                        PsiClass implClass = (PsiClass) element;
+                                        result.add(implClass.getQualifiedName());
+                                    }
+                                }
+
+                            }
+                            return result;
+                        })
+                        .inSmartMode(_project)
+                        .submit(NonUrgentExecutor.getInstance());
+
+        try {
+            return readAction.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
+
         return new ArrayList<>();
 
     }
 
     @Override
     public List<String> findImplementations(String className, String methodName, List<String> argTypes) {
-        ArrayList<String> result = new ArrayList<>();
 
-        PsiMethod psiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
-        if (psiMethod == null) return result;
+        final @NotNull CancellablePromise<ArrayList<String>> readAction =
+                ReadAction
+                        .nonBlocking(() -> {
+                            ArrayList<String> result = new ArrayList<>();
 
-        PsiClass containingClass = psiMethod.getContainingClass();
-        if (containingClass == null) {
-            containingClass = (PsiClass) psiMethod.getParent().getContext();
+                            PsiMethod psiMethod = MyPsiUtil.findPsiMethod(getPsiManager(), className, methodName, argTypes);
+                            if (psiMethod == null) return result;
+
+                            PsiClass containingClass = psiMethod.getContainingClass();
+                            if (containingClass == null) {
+                                containingClass = (PsiClass) psiMethod.getParent().getContext();
+                            }
+                            if (MyPsiUtil.isAbstract(containingClass)) {
+                                PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
+
+                                for (PsiElement element : psiElements) {
+                                    if (element instanceof PsiMethod) {
+
+                                        PsiMethod method = (PsiMethod) element;
+                                        PsiClass implClass = method.getContainingClass();
+                                        if (implClass == null) {
+                                            implClass = (PsiClass) method.getParent().getContext();
+                                        }
+                                        if (implClass != null) {
+                                            result.add(implClass.getQualifiedName());
+                                        }
+                                    }
+                                }
+
+                                return result;
+                            }
+                            return result;
+                        })
+                        .inSmartMode(_project)
+                        .submit(NonUrgentExecutor.getInstance());
+
+
+        try {
+            return readAction.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-        if (MyPsiUtil.isAbstract(containingClass)) {
-            PsiElement[] psiElements = DefinitionsScopedSearch.search(psiMethod).toArray(PsiElement.EMPTY_ARRAY);
 
-            for (PsiElement element : psiElements) {
-                if (element instanceof PsiMethod) {
+        return new ArrayList<>();
 
-                    PsiMethod method = (PsiMethod) element;
-                    PsiClass implClass = method.getContainingClass();
-                    if (implClass == null) {
-                        implClass = (PsiClass) method.getParent().getContext();
-                    }
-                    if (implClass != null) {
-                        result.add(implClass.getQualifiedName());
-                    }
-                }
-            }
-
-            return result;
-        }
-        return result;
     }
 
     private PsiMethod getCurrentPsiMethod() {
@@ -164,8 +251,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
         return PsiManager.getInstance(_project);
     }
 
-    private void openInEditor(PsiClass psiClass, int offset) {
-        VirtualFile virtualFile = MyPsiUtil.findVirtualFile(psiClass);
+    private void openInEditor(VirtualFile virtualFile, int offset) {
         if (virtualFile == null)
             return;
 

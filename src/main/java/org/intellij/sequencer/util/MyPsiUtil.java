@@ -3,10 +3,12 @@ package org.intellij.sequencer.util;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.ClassUtil;
-import org.intellij.sequencer.generator.filters.MethodFilter;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.psi.*;
+import org.jetbrains.kotlin.psi.KtCallExpression;
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression;
+import org.jetbrains.kotlin.psi.KtExpression;
+import org.jetbrains.kotlin.psi.KtValueArgument;
 
 import java.util.List;
 import java.util.Objects;
@@ -18,12 +20,7 @@ public class MyPsiUtil {
 
     public static PsiMethod getEnclosingMethod(PsiFile psiFile, int position) {
         PsiElement psiElement = psiFile.findElementAt(position);
-        while (psiElement != null) {
-            if (psiElement instanceof PsiMethod)
-                return (PsiMethod) psiElement;
-            psiElement = psiElement.getContext();
-        }
-        return null;
+        return PsiTreeUtil.getParentOfType(psiElement, PsiMethod.class);
     }
 
     public static boolean isInClassFile(PsiElement psiElement) {
@@ -42,7 +39,7 @@ public class MyPsiUtil {
     }
 
     public static VirtualFile findVirtualFile(PsiClass psiClass) {
-        PsiFile containingFile = psiClass.getContainingFile();
+        PsiFile containingFile = psiClass.getNavigationElement().getContainingFile();
         if (containingFile == null)
             return null;
         return containingFile.getVirtualFile();
@@ -66,8 +63,8 @@ public class MyPsiUtil {
     public static boolean isAbstract(PsiClass psiClass) {
         return psiClass != null
                 && (psiClass.isInterface()
-                        || psiClass.getModifierList() != null
-                        && psiClass.getModifierList().hasModifierProperty(PsiModifier.ABSTRACT)
+                || psiClass.getModifierList() != null
+                && psiClass.getModifierList().hasModifierProperty(PsiModifier.ABSTRACT)
         );
     }
 
@@ -111,6 +108,7 @@ public class MyPsiUtil {
      * Check PsiCallExpression is like:
      * <code> a().b().c() </code>
      * Calls after one by one.
+     *
      * @param callExpression the expression
      * @return true if the expression are calls one by one.
      */
@@ -211,15 +209,14 @@ public class MyPsiUtil {
     }
 
     public static int findBestOffset(PsiElement psiElement) {
-        if (psiElement instanceof PsiMethod) {
-            return psiElement.getNavigationElement().getTextOffset();
-        } else if (psiElement instanceof PsiMethodCallExpression) {
-            return psiElement.getFirstChild().getNavigationElement().getTextOffset();
-        } else if (psiElement instanceof PsiLambdaExpression) {
-            return psiElement.getNavigationElement().getTextOffset();
-        } else if (psiElement instanceof PsiNewExpression) {
-            return psiElement.getNavigationElement().getTextOffset();
+        if (psiElement == null)
+            return 0;
+        int offset;
+        if (psiElement instanceof PsiMethodCallExpression) {
+            offset = psiElement.getFirstChild().getNavigationElement().getTextOffset();
+        } else {
+            offset = psiElement.getNavigationElement().getTextOffset();
         }
-        return psiElement.getNavigationElement().getTextOffset();
+        return offset;
     }
 }

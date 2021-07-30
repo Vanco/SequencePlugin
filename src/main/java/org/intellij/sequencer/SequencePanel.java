@@ -2,17 +2,24 @@ package org.intellij.sequencer;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.concurrency.NonUrgentExecutor;
 import com.intellij.util.ui.UIUtil;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.*;
-import org.intellij.sequencer.generator.filters.*;
+import org.intellij.sequencer.generator.filters.ImplementClassFilter;
+import org.intellij.sequencer.generator.filters.SingleClassFilter;
+import org.intellij.sequencer.generator.filters.SingleMethodFilter;
 import org.intellij.sequencer.impl.EmptySequenceNavigable;
 import org.intellij.sequencer.ui.MyButtonlessScrollBarUI;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +36,7 @@ import java.util.Objects;
 
 public class SequencePanel extends JPanel {
     private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
-
+    private final Project project;
     private final Display _display;
     private final Model _model;
     private final SequenceNavigable navigable;
@@ -38,9 +45,11 @@ public class SequencePanel extends JPanel {
     private String _titleName;
     private final JScrollPane _jScrollPane;
     private final HashMap<String, Integer> navIndexMap = new HashMap<>();
+    private GenerateFinishedListener finished = name -> {};
 
-    public SequencePanel(SequenceNavigable navigable, PsiElement psiMethod, SequenceParams sequenceParams) {
+    public SequencePanel(Project project, SequenceNavigable navigable, PsiElement psiMethod, SequenceParams sequenceParams) {
         super(new BorderLayout());
+        this.project = project;
 
         if (navigable == null) {
             this.navigable = new EmptySequenceNavigable();
@@ -68,6 +77,7 @@ public class SequencePanel extends JPanel {
         ActionManager actionManager = ActionManager.getInstance();
         ActionToolbar actionToolbar = actionManager.createActionToolbar("SequencerToolbar", actionGroup, false);
         add(actionToolbar.getComponent(), BorderLayout.WEST);
+        actionToolbar.setTargetComponent(this);
 
         MyButton birdViewButton = new MyButton(AllIcons.General.InspectionsEye);
         birdViewButton.setToolTipText("Bird view");
@@ -87,6 +97,11 @@ public class SequencePanel extends JPanel {
         return _model;
     }
 
+    public SequencePanel withFinishedListener(GenerateFinishedListener finished) {
+        this.finished = finished;
+        return this;
+    }
+
     private void generate(String query) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("sequence = " + query);
@@ -102,17 +117,34 @@ public class SequencePanel extends JPanel {
         }
         IGenerator generator = GeneratorFactory.createGenerator(psiElement.getLanguage(), _sequenceParams);
 
-        final CallStack callStack = generator.generate(psiElement);
-        buildNaviIndex(callStack, "1");
-        _titleName = callStack.getMethod().getTitleName();
-        generate(callStack.generateSequence());
+        final BackgroundableProcessIndicator progressIndicator =
+                new BackgroundableProcessIndicator(
+                        project,
+                        "Generate sequence...",
+                        PerformInBackgroundOption.ALWAYS_BACKGROUND,
+                        "Stop",
+                        "Stop",
+                        true);
+        ReadAction
+                .nonBlocking(() -> {
+                    final CallStack callStack = generator.generate(psiElement);
+                    buildNaviIndex(callStack, "1");
+                    _titleName = callStack.getMethod().getTitleName();
+                    generate(callStack.generateSequence());
+                    finished.onFinish(_titleName);
+                    progressIndicator.processFinish();
+                })
+                .wrapProgress(progressIndicator)
+                .inSmartMode(project)
+                .submit(NonUrgentExecutor.getInstance());
+
     }
 
     private void buildNaviIndex(CallStack callStack, String level) {
         navIndexMap.put(level, callStack.getMethod().getOffset());
         int i = 1;
         for (CallStack call : callStack.getCalls()) {
-            buildNaviIndex(call, level+"."+ i++);
+            buildNaviIndex(call, level + "." + i++);
         }
     }
 
@@ -136,7 +168,7 @@ public class SequencePanel extends JPanel {
 
     public String getTitleName() {
         if (_titleName == null) {
-            return "Unknown";
+            return "Generate...";
         }
         return _titleName;
     }

@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "vanstudio"
-version = "2.1.1"
+version = "2.1.2"
 
 repositories {
     jcenter()
@@ -46,7 +46,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("2020.1.4", "2020.2.4", "2020.3.4", "2021.1.1"))
+        ideVersions.set(listOf("2020.1.4", "2020.2.4", "2020.3.4", "2021.1.3"))
     }
 
 

@@ -1,6 +1,7 @@
 package org.intellij.sequencer.ui;
 
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
@@ -37,6 +38,8 @@ public class Welcome {
         JEditorPane myPanel = new JEditorPane();
         myHtmlPanelWrapper.add(new JScrollPane(myPanel), BorderLayout.CENTER);
         myHtmlPanelWrapper.repaint();
+
+        actionToolbar.setTargetComponent(myPanel);
 
         String currentHtml = loadWelcome();
         myPanel.setContentType("text/html");
@@ -93,12 +96,18 @@ public class Welcome {
                 File file = chooser.getSelectedFile();
                 String _titleName = file.getName();
 
+                final Project project = e.getProject();
+
+                if (project == null) return;
+
                 SequencePanel sequencePanel = new SequencePanel(
-                        new EmptySequenceNavigable(), null, new SequenceParams()
+                        project, new EmptySequenceNavigable(), null, new SequenceParams()
                 );
 
                 sequencePanel.getModel().readFromFile(file);
-                ToolWindow toolWindow = ToolWindowManager.getInstance(e.getProject()).getToolWindow(SequenceService.PLUGIN_NAME);
+                ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(SequenceService.PLUGIN_NAME);
+                if (toolWindow == null) return;
+
                 ContentManager contentManager = toolWindow.getContentManager();
                 final Content content = contentManager.getFactory().createContent(sequencePanel, _titleName, false);
                 contentManager.addContent(content);

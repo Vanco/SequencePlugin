@@ -14,6 +14,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.sequencer.config.SequenceParamsState;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.generator.filters.NoConstructorsFilter;
@@ -27,6 +28,7 @@ import org.jetbrains.kotlin.idea.KotlinLanguage;
 import org.jetbrains.kotlin.psi.KtFunction;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Show Sequence generate options dialog.
@@ -86,28 +88,15 @@ public class ShowSequenceAction extends AnAction {
 
             // try to get top PsiClass (java)
             if (psiElement == null && psiFile != null && psiFile.getLanguage() == JavaLanguage.INSTANCE) {
-                psiElement = Arrays.stream(psiFile.getChildren()).filter(e -> e instanceof PsiClass).findFirst().orElse(null);
+                final Collection<PsiClass> psiClassCollection = PsiTreeUtil.findChildrenOfType(psiFile, PsiClass.class);
+                for (PsiClass psiClass : psiClassCollection) {
+                    chooseMethodToGenerate(event, plugin, params, psiClass);
+                }
             }
         }
 
         if (psiElement instanceof PsiClass) {
-            PsiMethod[] methods = ((PsiClass) psiElement).getMethods();
-            // for PsiClass, show popup menu list method to choose
-            JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<PsiMethod>("Choose Method ...", Arrays.asList(methods)) {
-                @Override
-                public @NotNull
-                String getTextFor(PsiMethod value) {
-                    return value.getName();
-                }
-
-                @Override
-                public @Nullable
-                PopupStep<?> onChosen(PsiMethod selectedValue, boolean finalChoice) {
-                    return doFinalStep(() -> {
-                        plugin.showSequence(params, selectedValue);
-                    });
-                }
-            }).showInBestPositionFor(event.getDataContext());
+            chooseMethodToGenerate(event, plugin, params, (PsiClass) psiElement);
         } else if (psiElement instanceof PsiMethod) {
             PsiMethod method = (PsiMethod) psiElement;
             plugin.showSequence(params, method);
@@ -116,5 +105,23 @@ public class ShowSequenceAction extends AnAction {
             plugin.showSequence(params, psiElement);
         }
 
+    }
+
+    private void chooseMethodToGenerate(@NotNull AnActionEvent event, SequenceService plugin, SequenceParams params, PsiClass psiElement) {
+        PsiMethod[] methods = psiElement.getMethods();
+        // for PsiClass, show popup menu list method to choose
+        JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<PsiMethod>("Choose Method ...", Arrays.asList(methods)) {
+            @Override
+            public @NotNull
+            String getTextFor(PsiMethod value) {
+                return value.getName();
+            }
+
+            @Override
+            public @Nullable
+            PopupStep<?> onChosen(PsiMethod selectedValue, boolean finalChoice) {
+                return doFinalStep(() -> plugin.showSequence(params, selectedValue));
+            }
+        }).showInBestPositionFor(event.getDataContext());
     }
 }

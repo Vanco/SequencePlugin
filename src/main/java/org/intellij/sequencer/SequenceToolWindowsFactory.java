@@ -21,17 +21,6 @@ public class SequenceToolWindowsFactory implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        toolWindow.setToHideOnEmptyContent(true);
-
-        toolWindow.addContentManagerListener(new ContentManagerListener() {
-            @Override
-            public void contentRemoved(@NotNull ContentManagerEvent event) {
-               if (Objects.requireNonNull(event.getContent().getManager()).getContentCount() == 0) {
-                   addEmptyContent(project, toolWindow);
-               }
-            }
-
-        });
 
         addEmptyContent(project, toolWindow);
     }

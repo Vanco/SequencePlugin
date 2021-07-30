@@ -1,6 +1,6 @@
 # Welcome to SequenceDiagram
 
-version 2.1.1
+**version 2.1.2**
 
 - Kotlin support(experimental)
     - Support generate topLevel function
@@ -10,12 +10,16 @@ version 2.1.1
     - Code navigation is Not Implement Yet
 - Ui improvements
   - Use vector icons.
-  - Generate sequence diagram intention.
   - Add Icon to Toolbar.
   - Share Settings.
+  - Optimized performance issue
+  - Optimized java navigation
+  - Optimized Lambda generation
   
+<br/>
 
 **Attention**:
+
 The Kotlin support is on very early stage. Do not use in production.  
 
 ## Online Manual
