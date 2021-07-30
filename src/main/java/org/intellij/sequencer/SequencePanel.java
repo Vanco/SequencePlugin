@@ -2,6 +2,7 @@ package org.intellij.sequencer;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
@@ -131,10 +132,11 @@ public class SequencePanel extends JPanel {
                     buildNaviIndex(callStack, "1");
                     _titleName = callStack.getMethod().getTitleName();
                     generate(callStack.generateSequence());
-                    finished.onFinish(_titleName);
                     progressIndicator.processFinish();
+                    return _titleName;
                 })
                 .wrapProgress(progressIndicator)
+                .finishOnUiThread(ModalityState.defaultModalityState(), title -> finished.onFinish(title))
                 .inSmartMode(project)
                 .submit(NonUrgentExecutor.getInstance());
 
@@ -216,7 +218,7 @@ public class SequencePanel extends JPanel {
                     fromMethodInfo.getArgTypes(),
                     toMethodInfo.getArgTypes(),
                     toMethodInfo.getReturnType(),
-                    navIndexMap.get(toMethodInfo.getNumbering().getName())
+                    navIndexMap.getOrDefault(toMethodInfo.getNumbering().getName(),0)
             );
         } else if (isLambdaCall(fromMethodInfo)) {
             LambdaExprInfo lambdaExprInfo = (LambdaExprInfo) fromMethodInfo;
@@ -230,7 +232,7 @@ public class SequencePanel extends JPanel {
                     toMethodInfo.getObjectInfo().getFullName(),
                     toMethodInfo.getRealName(),
                     toMethodInfo.getArgTypes(),
-                    navIndexMap.get(toMethodInfo.getNumbering().getName())
+                    navIndexMap.getOrDefault(toMethodInfo.getNumbering().getName(), 0)
             );
         } else if (fromMethodInfo.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && fromMethodInfo.hasAttribute(Info.ABSTRACT_ATTRIBUTE)) {
             gotoMethod(toMethodInfo);
@@ -243,7 +245,7 @@ public class SequencePanel extends JPanel {
                     toMethodInfo.getObjectInfo().getFullName(),
                     toMethodInfo.getRealName(),
                     toMethodInfo.getArgTypes(),
-                    navIndexMap.get(toMethodInfo.getNumbering().getName())
+                    navIndexMap.getOrDefault(toMethodInfo.getNumbering().getName(),0)
             );
         }
     }
@@ -433,6 +435,11 @@ public class SequencePanel extends JPanel {
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             gotoSourceCode(_screenObject);
         }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            e.getPresentation().setEnabled(psiElement != null);
+        }
     }
 
     private class RemoveClassAction extends AnAction {
@@ -446,6 +453,11 @@ public class SequencePanel extends JPanel {
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             _sequenceParams.getMethodFilter().addFilter(new SingleClassFilter(_objectInfo.getFullName()));
             generate();
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            e.getPresentation().setEnabled(psiElement != null);
         }
     }
 
@@ -466,6 +478,11 @@ public class SequencePanel extends JPanel {
             generate();
 
         }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            e.getPresentation().setEnabled(psiElement != null);
+        }
     }
 
     private class ExpendInterfaceAction extends AnAction {
@@ -485,6 +502,11 @@ public class SequencePanel extends JPanel {
                     new ImplementClassFilter(impl)
             );
             generate();
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            e.getPresentation().setEnabled(psiElement != null);
         }
     }
 
