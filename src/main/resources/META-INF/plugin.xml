@@ -59,5 +59,6 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
         <annotator language="JAVA" implementationClass="org.intellij.sequencer.SequenceAnnotator"/>
 
+        <notificationGroup displayType="BALLOON" id="Sequence Diagram"/>
     </extensions>
 </idea-plugin>

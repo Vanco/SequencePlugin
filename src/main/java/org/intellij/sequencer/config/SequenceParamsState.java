@@ -5,8 +5,12 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.Transient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @State(name = "sequenceParams", storages = {@Storage("sequencePlugin.xml")})
 public class SequenceParamsState implements PersistentStateComponent<SequenceParamsState> {
@@ -17,11 +21,28 @@ public class SequenceParamsState implements PersistentStateComponent<SequencePar
     public boolean noConstructors = false;
     public boolean smartInterface = false;
 
+    @Transient
+    private final List<ConfigListener> _listeners = new ArrayList<>();
+
     public SequenceParamsState() {
     }
 
     public static @NotNull SequenceParamsState getInstance() {
         return ServiceManager.getService(SequenceParamsState.class);
+    }
+
+    public void addConfigListener(ConfigListener listener) {
+        _listeners.add(listener);
+    }
+
+    public void removeConfigListener(ConfigListener listener) {
+        _listeners.remove(listener);
+    }
+
+    public void fireConfigChanged() {
+        for (ConfigListener configListener : _listeners) {
+            configListener.configChanged();
+        }
     }
 
     @Override

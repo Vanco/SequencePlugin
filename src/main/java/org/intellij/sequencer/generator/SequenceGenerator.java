@@ -120,7 +120,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         super.visitCallExpression(callExpression);
         PsiMethod psiMethod = callExpression.resolveMethod();
         findAbstractImplFilter(callExpression, psiMethod);
-        methodCall(psiMethod, MyPsiUtil.findBestOffset(callExpression));
+        methodCall(psiMethod, MyPsiUtil.findNaviOffset(callExpression));
     }
 
     @Override

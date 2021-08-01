@@ -1,5 +1,10 @@
 # SequenceDiagram Changelog
 
+## [2.1.3]
+### Changed
+- Global share sequence diagram options.
+- Try to make loaded diagram navigable.
+- Add Notification when finish load .sdt file
 ## [2.1.2]
 ### Changed
 - Optimized performance issue

@@ -1,15 +1,23 @@
 package org.intellij.sequencer.util;
 
+import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.intellij.sequencer.SequenceService;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.psi.KtCallExpression;
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression;
 import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.psi.KtValueArgument;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -208,7 +216,12 @@ public class MyPsiUtil {
         return true;
     }
 
-    public static int findBestOffset(PsiElement psiElement) {
+    /**
+     * Find the best offset for navigation
+     * @param psiElement PsiElement like PsiClass, PsiMethod, PsiCallExpression etc.
+     * @return the offset.
+     */
+    public static int findNaviOffset(PsiElement psiElement) {
         if (psiElement == null)
             return 0;
         int offset;
@@ -219,4 +232,38 @@ public class MyPsiUtil {
         }
         return offset;
     }
+
+    /**
+     *  Create .sdt file chooser.
+     * @return JFileChooser
+     */
+    @NotNull
+    public static JFileChooser getFileChooser() {
+        final JFileChooser chooser = new JFileChooser();
+        chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        chooser.setDialogTitle("Open Diagram");
+        chooser.setFileFilter(new FileFilter() {
+            public boolean accept(File f) {
+                return f.isDirectory() || f.getName().endsWith("sdt");
+            }
+
+            public String getDescription() {
+                return "SequenceDiagram (.sdt) File";
+            }
+        });
+        return chooser;
+    }
+
+    /**
+     * Notification user with content.
+     * @param project the project
+     * @param content the content may have html tag as will
+     */
+    public static void notifyError(@Nullable Project project, String content) {
+        NotificationGroupManager.getInstance()
+                .getNotificationGroup(SequenceService.PLUGIN_NAME)
+                .createNotification(content, NotificationType.INFORMATION)
+                .notify(project);
+    }
+
 }

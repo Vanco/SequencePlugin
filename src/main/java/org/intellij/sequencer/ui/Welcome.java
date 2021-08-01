@@ -1,26 +1,38 @@
 package org.intellij.sequencer.ui;
 
+import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMethod;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import icons.SequencePluginIcons;
+import org.intellij.sequencer.SequenceNavigable;
 import org.intellij.sequencer.SequencePanel;
 import org.intellij.sequencer.SequenceParamsEditor;
 import org.intellij.sequencer.SequenceService;
-import org.intellij.sequencer.generator.SequenceParams;
+import org.intellij.sequencer.diagram.Parser;
+import org.intellij.sequencer.generator.MethodDescription;
 import org.intellij.sequencer.impl.EmptySequenceNavigable;
+import org.intellij.sequencer.impl.JavaSequenceNavigable;
+import org.intellij.sequencer.impl.KotlinSequenceNavigable;
 import org.intellij.sequencer.util.MdUtil;
+import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.idea.KotlinLanguage;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
+
+import static org.intellij.sequencer.util.ConfigUtil.loadSequenceParams;
+import static org.intellij.sequencer.util.MyPsiUtil.getFileChooser;
+import static org.intellij.sequencer.util.MyPsiUtil.notifyError;
 
 public class Welcome {
     private final JPanel myHtmlPanelWrapper;
@@ -79,41 +91,62 @@ public class Welcome {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            final JFileChooser chooser = new JFileChooser();
-            chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-            chooser.setDialogTitle("Open Diagram");
-            chooser.setFileFilter(new FileFilter() {
-                public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().endsWith("sdt");
-                }
-
-                public String getDescription() {
-                    return "SequenceDiagram (.sdt) File";
-                }
-            });
+            final JFileChooser chooser = getFileChooser();
             int returnVal = chooser.showOpenDialog(myHtmlPanelWrapper);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
-                String _titleName = file.getName();
+                String titleName = file.getName();
+
+                MethodDescription method = Parser.peek(file);
 
                 final Project project = e.getProject();
 
                 if (project == null) return;
 
+                SequenceNavigable navigable = new EmptySequenceNavigable();
+                PsiMethod psiMethod = null;
+
+                if (method != null) {
+                    psiMethod = MyPsiUtil.findPsiMethod(
+                            PsiManager.getInstance(project),
+                            method.getClassDescription().getClassName(),
+                            method.getMethodName(),
+                            method.getArgTypes()
+                    );
+
+                    if (psiMethod == null) {
+                        notifyError(project,  "Load success! <br/> Method source not found for the \""+ file.getName() +"\", the navigation is disabled.");
+                    } else {
+                        if (psiMethod.getLanguage().is(JavaLanguage.INSTANCE)) {
+                            navigable = new JavaSequenceNavigable(project);
+                        } else if (psiMethod.getLanguage().is(KotlinLanguage.INSTANCE)) {
+                            navigable = new KotlinSequenceNavigable(project);
+                        }
+
+                        titleName = method.getTitleName();
+
+                        notifyError(project,"Load success! <br/> the "+titleName+" are load from \""+ file.getName() +"\" file, the call link may out of date. Regenerate to fix navigation.");
+
+                    }
+                }
+
                 SequencePanel sequencePanel = new SequencePanel(
-                        project, new EmptySequenceNavigable(), null, new SequenceParams()
+                        project, navigable, psiMethod, loadSequenceParams()
                 );
 
+                sequencePanel.setTitleName(titleName);
                 sequencePanel.getModel().readFromFile(file);
                 ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(SequenceService.PLUGIN_NAME);
                 if (toolWindow == null) return;
 
                 ContentManager contentManager = toolWindow.getContentManager();
-                final Content content = contentManager.getFactory().createContent(sequencePanel, _titleName, false);
+                final Content content = contentManager.getFactory().createContent(sequencePanel, titleName, false);
                 contentManager.addContent(content);
                 contentManager.setSelectedContent(content);
             }
 
         }
     }
+
+
 }

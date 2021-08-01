@@ -32,6 +32,9 @@ public class SequenceParamsEditor extends AnAction {
             state.noPrivateMethods = dialogWrapper.isNoPrivateMethods();
             state.noConstructors = dialogWrapper.isNoConstructors();
 //            state.smartInterface = dialogWrapper.isSmartInterface();
+
+            // Notify parameter change.
+            state.fireConfigChanged();
         }
     }
 

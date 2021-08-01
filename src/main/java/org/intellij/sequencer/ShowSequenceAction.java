@@ -15,12 +15,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.intellij.sequencer.config.SequenceParamsState;
 import org.intellij.sequencer.generator.SequenceParams;
-import org.intellij.sequencer.generator.filters.NoConstructorsFilter;
-import org.intellij.sequencer.generator.filters.NoGetterSetterFilter;
-import org.intellij.sequencer.generator.filters.NoPrivateMethodsFilter;
-import org.intellij.sequencer.generator.filters.ProjectOnlyFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +24,8 @@ import org.jetbrains.kotlin.psi.KtFunction;
 
 import java.util.Arrays;
 import java.util.Collection;
+
+import static org.intellij.sequencer.util.ConfigUtil.loadSequenceParams;
 
 /**
  * Show Sequence generate options dialog.
@@ -67,15 +64,7 @@ public class ShowSequenceAction extends AnAction {
 
         SequenceService plugin = project.getService(SequenceService.class);
 
-        SequenceParamsState state = SequenceParamsState.getInstance();
-
-        SequenceParams params = new SequenceParams();
-        params.setMaxDepth(state.callDepth);
-        params.setSmartInterface(state.smartInterface);
-        params.getMethodFilter().addFilter(new ProjectOnlyFilter(state.projectClassesOnly));
-        params.getMethodFilter().addFilter(new NoGetterSetterFilter(state.noGetterSetters));
-        params.getMethodFilter().addFilter(new NoPrivateMethodsFilter(state.noPrivateMethods));
-        params.getMethodFilter().addFilter(new NoConstructorsFilter(state.noConstructors));
+        SequenceParams params = loadSequenceParams();
 
         PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
         if (psiElement == null) {

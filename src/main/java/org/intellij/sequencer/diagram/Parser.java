@@ -8,9 +8,11 @@ import org.intellij.sequencer.generator.LambdaExprDescription;
 import org.intellij.sequencer.generator.MethodDescription;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.*;
 
 public class Parser {
@@ -171,7 +173,7 @@ public class Parser {
 
     private void skipWhitespace(PushbackReader reader) throws IOException {
 
-        int c = -1;
+        int c;
         while (Character.isWhitespace((char) (c = reader.read()))) {
         }
         if (c != -1)
@@ -179,7 +181,7 @@ public class Parser {
     }
 
     private String readNonWhitespace(PushbackReader r) throws IOException {
-        int c = -1;
+        int c;
         StringBuilder sb = new StringBuilder();
         int deep = 0;
         boolean isGeneric = false;
@@ -188,7 +190,7 @@ public class Parser {
                 break;
             else if (c == '\\') {
                 int u = r.read();
-                if (u != -1 && u == 'u') {
+                if (u == 'u') {
                     StringBuilder tmp = new StringBuilder();
                     tmp.append((char) c).append((char) u);
                     for (int j = 0; j < 4; j++) {
@@ -231,6 +233,41 @@ public class Parser {
         return sb.toString();
     }
 
+    /**
+     * Peek a sdt tile read top method of Sequence Diagram.
+     * @param f a .sdt file
+     * @return MethodDescription
+     */
+    public static MethodDescription peek(File f) {
+        try {
+            List<String> query = Files.readAllLines(f.toPath());
+            for (String s : query) {
+                PushbackReader reader = new PushbackReader(new StringReader(s));
+
+                Parser parser = new Parser();
+                parser.skipWhitespace(reader);
+                int c = reader.read();
+                switch (c) {
+                    case -1:
+                        break;
+                    case '(':
+                        String firstMethod = parser.readIdent(reader);
+
+                        Gson gson = new Gson();
+                        return gson.fromJson(firstMethod, MethodDescription.class);
+                    default:
+                        return null;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /* Private classes */
     private class CallInfoStack {
         private Stack<CallInfo> stack = new Stack<>();
         private CallInfo nPointerCallInfo;
@@ -278,7 +315,7 @@ public class Parser {
 
         private Numbering _numbering;
         private Call _call;
-        private int _startingSeq = -1;
+        private int _startingSeq;
 
         CallInfo(ObjectInfo obj, String method, int startingSeq) {
             _obj = obj;

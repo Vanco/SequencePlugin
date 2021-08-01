@@ -8,13 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.util.IncorrectOperationException;
-import org.intellij.sequencer.config.SequenceParamsState;
 import org.intellij.sequencer.generator.SequenceParams;
-import org.intellij.sequencer.generator.filters.NoConstructorsFilter;
-import org.intellij.sequencer.generator.filters.NoGetterSetterFilter;
-import org.intellij.sequencer.generator.filters.NoPrivateMethodsFilter;
-import org.intellij.sequencer.generator.filters.ProjectOnlyFilter;
 import org.jetbrains.annotations.NotNull;
+
+import static org.intellij.sequencer.util.ConfigUtil.loadSequenceParams;
 
 public class SequenceIntentionAction extends PsiElementBaseIntentionAction {
     public SequenceIntentionAction() {
@@ -41,15 +38,7 @@ public class SequenceIntentionAction extends PsiElementBaseIntentionAction {
         ApplicationManager.getApplication().invokeLater(() -> {
             SequenceService plugin = project.getService(SequenceService.class);
 
-            SequenceParamsState state = SequenceParamsState.getInstance();
-
-            SequenceParams params = new SequenceParams();
-            params.setMaxDepth(state.callDepth);
-            params.setSmartInterface(state.smartInterface);
-            params.getMethodFilter().addFilter(new ProjectOnlyFilter(state.projectClassesOnly));
-            params.getMethodFilter().addFilter(new NoGetterSetterFilter(state.noGetterSetters));
-            params.getMethodFilter().addFilter(new NoPrivateMethodsFilter(state.noPrivateMethods));
-            params.getMethodFilter().addFilter(new NoConstructorsFilter(state.noConstructors));
+            SequenceParams params = loadSequenceParams();
 
             plugin.showSequence(params, element.getParent());
         });

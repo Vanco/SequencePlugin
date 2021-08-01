@@ -13,7 +13,7 @@ public class Model {
 
     private String _queryString = " ";
 
-    private SwingPropertyChangeSupport _changeSupport = null;
+    private SwingPropertyChangeSupport _changeSupport;
 
     private File _file = null;
     private boolean _modified = false;
@@ -40,38 +40,36 @@ public class Model {
     }
 
     public boolean readFromFile(File f) {
-        try {
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             StringBuilder sb = new StringBuilder(1024);
-            BufferedReader br = new BufferedReader(new FileReader(f));
+
             String s;
-            while((s = br.readLine()) != null) {
+            while ((s = br.readLine()) != null) {
                 sb.append(s);
                 sb.append("\n");
             }
-            br.close();
             setFile(f);
             internalSetText(sb.toString(), this);
             setModified(false);
             return true;
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             ioe.printStackTrace();
             return false;
         }
     }
 
     public boolean writeToFile(File f) {
-        try {
-            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)))){
+
             BufferedReader br = new BufferedReader(new StringReader(getText()));
             String s;
-            while((s = br.readLine()) != null) {
+            while ((s = br.readLine()) != null) {
                 out.println(s);
             }
-            out.close();
             setFile(f);
             setModified(false);
             return true;
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             ioe.printStackTrace();
             return false;
         }
@@ -84,9 +82,9 @@ public class Model {
     public void setModified(boolean modified) {
         boolean oldModified = _modified;
         _modified = modified;
-        if(LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
             LOGGER.debug("setModified(...) oldModified " + oldModified + " modified " + modified);
-        if(modified != oldModified)
+        if (modified != oldModified)
             _changeSupport.firePropertyChange("modified", oldModified, modified);
     }
 
@@ -125,9 +123,9 @@ public class Model {
     private synchronized void fireModelTextEvent(String s, Object setter) {
         ModelTextEvent mte = new ModelTextEvent(setter, s);
         Object[] listeners = _listenerList.getListenerList();
-        for(int i = listeners.length - 2; i >= 0; i -= 2) {
-            if(listeners[i] == ModelTextListener.class)
-                ((ModelTextListener)listeners[i + 1]).modelTextChanged(mte);
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == ModelTextListener.class)
+                ((ModelTextListener) listeners[i + 1]).modelTextChanged(mte);
         }
     }
 

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.intellij.sequencer.util.MyPsiUtil.findBestOffset;
+import static org.intellij.sequencer.util.MyPsiUtil.findNaviOffset;
 
 public class JavaSequenceNavigable implements SequenceNavigable {
     private final Project _project;
@@ -40,7 +40,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                     if (psiClass == null) return null;
 
                     VirtualFile virtualFile = MyPsiUtil.findVirtualFile(psiClass);
-                    final int offset = findBestOffset(psiClass);
+                    final int offset = findNaviOffset(psiClass);
 
                     return new Pair<>(virtualFile, offset);
                 })
@@ -66,7 +66,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
 
                     VirtualFile virtualFile = MyPsiUtil.findVirtualFile(containingClass);
 
-                    final int offset = findBestOffset(psiMethod);
+                    final int offset = findNaviOffset(psiMethod);
 
                     return new Pair<>(virtualFile, offset);
 

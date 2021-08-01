@@ -16,6 +16,8 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.concurrency.NonUrgentExecutor;
 import com.intellij.util.ui.UIUtil;
 import icons.SequencePluginIcons;
+import org.intellij.sequencer.config.ConfigListener;
+import org.intellij.sequencer.config.SequenceParamsState;
 import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.generator.*;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
@@ -35,13 +37,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class SequencePanel extends JPanel {
+import static org.intellij.sequencer.util.ConfigUtil.loadSequenceParams;
+import static org.intellij.sequencer.util.MyPsiUtil.getFileChooser;
+
+public class SequencePanel extends JPanel implements ConfigListener {
     private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
     private final Project project;
     private final Display _display;
     private final Model _model;
     private final SequenceNavigable navigable;
-    private final SequenceParams _sequenceParams;
+    private SequenceParams _sequenceParams;
     private PsiElement psiElement;
     private String _titleName;
     private final JScrollPane _jScrollPane;
@@ -101,6 +106,18 @@ public class SequencePanel extends JPanel {
     public SequencePanel withFinishedListener(GenerateFinishedListener finished) {
         this.finished = finished;
         return this;
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        SequenceParamsState.getInstance().addConfigListener(this);
+    }
+
+    @Override
+    public void removeNotify() {
+        SequenceParamsState.getInstance().removeConfigListener(this);
+        super.removeNotify();
     }
 
     private void generate(String query) {
@@ -173,6 +190,10 @@ public class SequencePanel extends JPanel {
             return "Generate...";
         }
         return _titleName;
+    }
+
+    public void setTitleName(String title) {
+        this._titleName = title;
     }
 
     private void gotoSourceCode(ScreenObject screenObject) {
@@ -254,6 +275,11 @@ public class SequencePanel extends JPanel {
         return Objects.equals(methodInfo.getRealName(), Constants.Lambda_Invoke);
     }
 
+    @Override
+    public void configChanged() {
+        _sequenceParams = loadSequenceParams();
+    }
+
     private class ReGenerateAction extends AnAction {
         public ReGenerateAction() {
             super("ReGenerate", "Regenerate diagram", SequencePluginIcons.PLAY_ICON);
@@ -314,18 +340,7 @@ public class SequencePanel extends JPanel {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            final JFileChooser chooser = new JFileChooser();
-            chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-            chooser.setDialogTitle("Open Diagram");
-            chooser.setFileFilter(new FileFilter() {
-                public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().endsWith("sdt");
-                }
-
-                public String getDescription() {
-                    return "SequenceDiagram (.sdt) File";
-                }
-            });
+            final JFileChooser chooser = getFileChooser();
             int returnVal = chooser.showOpenDialog(SequencePanel.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
