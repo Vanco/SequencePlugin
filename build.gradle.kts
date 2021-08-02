@@ -1,4 +1,3 @@
-import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -17,9 +16,9 @@ repositories {
 }
 
 intellij {
-//    version.set(properties("platformVersion"))
+    version.set(properties("platformVersion"))
     type.set(properties("platformType"))
-    localPath.set("C:\\Program Files\\JetBrains\\IntelliJ IDEA CE")
+//    localPath.set("C:\\Program Files\\JetBrains\\IntelliJ IDEA CE")
     pluginName.set(properties("pluginName"))
     plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
     updateSinceUntilBuild.set(true)
