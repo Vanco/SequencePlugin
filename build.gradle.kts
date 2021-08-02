@@ -1,24 +1,35 @@
+import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
 
+fun properties(key: String) = project.findProperty(key).toString()
+
 plugins {
-    java
-    id("org.jetbrains.intellij") version "1.1.2"
-    id("org.jetbrains.changelog") version "1.1.1"
+    id("java")
+    id("org.jetbrains.intellij") version "1.1.4"
+    id("org.jetbrains.changelog") version "1.2.1"
 }
 
-group = "vanstudio"
-version = "2.1.2"
+group = properties("pluginGroup")
+version = properties("pluginVersion")
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 intellij {
-    version.set("2021.1")
-    pluginName.set("SequenceDiagram")
-    plugins.set(listOf("com.intellij.java", "org.jetbrains.kotlin"))
+//    version.set(properties("platformVersion"))
+    type.set(properties("platformType"))
+    localPath.set("C:\\Program Files\\JetBrains\\IntelliJ IDEA CE")
+    pluginName.set(properties("pluginName"))
+    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
     updateSinceUntilBuild.set(true)
     sandboxDir.set("${project.rootDir}/.sandbox")
+    downloadSources.set(properties("platformDownloadSources").toBoolean())
+}
+
+changelog {
+    version.set(properties("pluginVersion"))
+    groups.set(emptyList())
 }
 
 tasks {
@@ -29,8 +40,9 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("201")
-        untilBuild.set("212.*")
+        version.set(properties("pluginVersion"))
+        sinceBuild.set(properties("pluginSinceBuild"))
+        untilBuild.set(properties("pluginUntilBuild"))
         pluginDescription.set(
             File(projectDir, "README.md").readText().lines().run {
                 val start = "<!-- Plugin description -->"
@@ -46,11 +58,15 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("2020.1.4", "2020.2.4", "2020.3.4", "2021.1.3"))
+        ideVersions.set(properties("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
     }
 
-
     publishPlugin {
+        dependsOn("patchChangelog")
         token.set(System.getenv("PUGLISH_TOKEN"))
+        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
+        // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
+        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
     }
 }
