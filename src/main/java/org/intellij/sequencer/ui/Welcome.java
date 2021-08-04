@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 import static org.intellij.sequencer.util.ConfigUtil.loadSequenceParams;
 import static org.intellij.sequencer.util.MyPsiUtil.getFileChooser;
-import static org.intellij.sequencer.util.MyPsiUtil.notifyError;
+import static org.intellij.sequencer.util.MyNotifier.notifyError;
 
 public class Welcome {
     private final JPanel myHtmlPanelWrapper;
@@ -115,7 +115,8 @@ public class Welcome {
                     );
 
                     if (psiMethod == null) {
-                        notifyError(project,  "Load success! <br/> Method source not found for the \""+ file.getName() +"\", the navigation is disabled.");
+                        String content = "Open success! Method source not found, the navigation is disabled.";
+                        notifyError(project, content);
                     } else {
                         if (psiMethod.getLanguage().is(JavaLanguage.INSTANCE)) {
                             navigable = new JavaSequenceNavigable(project);
@@ -125,7 +126,8 @@ public class Welcome {
 
                         titleName = method.getTitleName();
 
-                        notifyError(project,"Load success! <br/> the "+titleName+" are load from \""+ file.getName() +"\" file, the call link may out of date. Regenerate to fix navigation.");
+                        String content = "Open success! The call link may out of date. Regenerate to fix navigation.";
+                        notifyError(project, content);
 
                     }
                 }

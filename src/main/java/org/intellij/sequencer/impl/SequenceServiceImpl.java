@@ -1,16 +1,12 @@
 package org.intellij.sequencer.impl;
 
-import com.intellij.ide.util.DelegatingProgressIndicator;
 import com.intellij.lang.java.JavaLanguage;
-import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
-import com.intellij.util.concurrency.NonUrgentExecutor;
 import org.intellij.sequencer.SequenceNavigable;
 import org.intellij.sequencer.SequencePanel;
 import org.intellij.sequencer.SequenceService;

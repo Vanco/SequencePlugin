@@ -1,13 +1,9 @@
 package org.intellij.sequencer.util;
 
-import com.intellij.notification.NotificationGroupManager;
-import com.intellij.notification.NotificationType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.intellij.sequencer.SequenceService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.psi.KtCallExpression;
@@ -254,16 +250,5 @@ public class MyPsiUtil {
         return chooser;
     }
 
-    /**
-     * Notification user with content.
-     * @param project the project
-     * @param content the content may have html tag as will
-     */
-    public static void notifyError(@Nullable Project project, String content) {
-        NotificationGroupManager.getInstance()
-                .getNotificationGroup(SequenceService.PLUGIN_NAME)
-                .createNotification(content, NotificationType.INFORMATION)
-                .notify(project);
-    }
 
 }

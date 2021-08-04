@@ -135,7 +135,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     }
 
     /**
-     * If the psiMethod's containing class is Interface or abstract, then try to find it's implement class.
+     * If the psiMethod's containing class is Interface or abstract, then try to find its implement class.
      *
      * @param callExpression expression
      * @param psiMethod      method
