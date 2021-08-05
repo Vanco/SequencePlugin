@@ -1,3 +1,5 @@
+[![GitHub release](https://img.shields.io/github/v/release/Vanco/SequencePlugin)](https://github.com/Vanco/SequencePlugin/releases)
+
 # SequenceDiagram
 <!-- Plugin description -->
 SequenceDiagram for IntelliJ IDEA
