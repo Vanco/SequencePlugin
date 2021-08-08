@@ -1,6 +1,10 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+### Added
+- Kotlin support(experimental)
+  - Support code navigation
+  - Support Java code call kotlin
 ### Changed
 - Global share sequence diagram options.
 - Try to make loaded diagram navigable.

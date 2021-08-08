@@ -38,7 +38,7 @@ public class SequenceServiceImpl implements SequenceService {
         if (psiElement.getLanguage().is(JavaLanguage.INSTANCE)) {
             navigable = new JavaSequenceNavigable(_project);
         } else if (psiElement.getLanguage().is(KotlinLanguage.INSTANCE)) {
-            navigable = new KotlinSequenceNavigable(_project);
+            navigable = new KtSequenceNavigable(_project);
         }
 
         final SequencePanel sequencePanel = new SequencePanel(_project, navigable, psiElement, params);

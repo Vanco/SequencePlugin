@@ -18,10 +18,11 @@ import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
+public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator {
+    private static final Logger LOGGER = Logger.getInstance(KtSequenceGenerator.class.getName());
     private final Stack<KtCallExpression> exprStack = new Stack<>();
     private final Stack<CallStack> callStack = new Stack<>();
-    private static final Logger LOGGER = Logger.getInstance(KtSequenceGenerator.class.getName());
+    private final Stack<Integer> offsetStack = new Stack<>();
 
     private CallStack topStack;
     private CallStack currentStack;
@@ -30,7 +31,13 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
 
     public KtSequenceGenerator(SequenceParams params) {
         this.params = params;
-//        LOGGER.setLevel(Level.DEBUG);
+    }
+
+    public KtSequenceGenerator(SequenceParams params, int offset, int depth) {
+        this(params);
+        offsetStack.push(offset);
+        this.depth = depth;
+
     }
 
     @Override
@@ -42,11 +49,20 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
             return generate((KtFunction) psiElement);
         } else if (psiElement instanceof PsiMethod) {
             return generate((PsiMethod) psiElement);
+        } else if (psiElement instanceof KtClass) {
+            final int naviOffset = offsetStack.isEmpty() ? MyPsiUtil.findNaviOffset(psiElement) : offsetStack.pop();
+            generateClass((KtClass) psiElement, naviOffset);
         } else {
+            psiElement.accept(this);
             LOGGER.warn("unsupported" + psiElement.getText());
         }
 
         return topStack;
+    }
+
+    private void generateClass(KtClass psiElement, int textOffset) {
+        final MethodDescription method = createMethod(psiElement, textOffset);
+        makeMethodCallExceptCurrentStackIsRecursive(method);
     }
 
     public CallStack generate(KtFunction ktFunction) {
@@ -55,7 +71,9 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
     }
 
     public CallStack generate(PsiMethod psiMethod) {
-        CallStack javaCall = new SequenceGenerator(params).generate(psiMethod);
+        final SequenceGenerator sequenceGenerator =
+                offsetStack.isEmpty() ? new SequenceGenerator(params) : new SequenceGenerator(params, offsetStack.pop(), depth);
+        CallStack javaCall = sequenceGenerator.generate(psiMethod);
         LOGGER.debug("[JAVACall]:" + javaCall.generateText());
         if (topStack == null) {
             topStack = javaCall;
@@ -67,18 +85,12 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
     }
 
     @Override
-    public void visitKtElement(@NotNull KtElement element) {
-        super.visitKtElement(element);
-
-        element.acceptChildren(this);
-    }
-
-    @Override
     public void visitNamedFunction(@NotNull KtNamedFunction function) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("[visitNamedFunction]" + function.getText());
         }
-        MethodDescription method = createMethod(function, function.getTextOffset());
+        final int naviOffset = offsetStack.isEmpty() ? function.getTextOffset() : offsetStack.pop();
+        MethodDescription method = createMethod(function, naviOffset);
         if (makeMethodCallExceptCurrentStackIsRecursive(method)) return;
         super.visitNamedFunction(function);
     }
@@ -120,19 +132,15 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
                 currentStack = old;
             }
         } else {
-            resolveAndCall(expression);
             super.visitCallExpression(expression);
+            resolveAndCall(expression);
         }
 
     }
 
     private void resolveAndCall(@NotNull KtCallExpression expression) {
         PsiElement psiElement = resolveFunction(expression);
-        if (psiElement instanceof KtClass) {
-            currentStack.methodCall(createMethod((KtClass) psiElement, expression.getTextOffset()));
-        } else {
-            methodCall(psiElement, expression.getTextOffset());
-        }
+        methodCall( psiElement, expression.getTextOffset());
     }
 
 
@@ -152,6 +160,7 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
             CallStack oldStack = currentStack;
             depth++;
             LOGGER.debug("+ depth = " + depth + " method = " + psiElement.getText());
+            offsetStack.push(offset);
             generate(psiElement);
             depth--;
             LOGGER.debug("- depth = " + depth + " method = " + psiElement.getText());
@@ -276,6 +285,10 @@ public class KtSequenceGenerator extends KtVisitorVoid implements IGenerator {
 
         if (typeElement instanceof KtUserType) {
             return ((KtUserType) typeElement).getReferencedName();
+        }
+
+        if (typeElement instanceof KtFunctionType) {
+            return typeElement.getText().replaceAll("[\\(|\\)]", "_").replaceAll(" ","");//.replaceAll("->", "→");
         }
 
         return "Unit";

@@ -1,5 +1,6 @@
 package org.intellij.sequencer.generator;
 
+import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
@@ -7,6 +8,7 @@ import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
+import org.jetbrains.kotlin.idea.KotlinLanguage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +28,12 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
 
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
+    }
+
+    public SequenceGenerator(SequenceParams params, int offset, int depth) {
+        this(params);
+        offsetStack.push(offset);
+        this.depth = depth;
     }
 
     @Override
@@ -52,6 +60,30 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     }
 
     public CallStack generate(PsiMethod psiMethod) {
+        if (psiMethod.getLanguage().equals(JavaLanguage.INSTANCE)) {
+            return generateJava(psiMethod);
+        } else if (psiMethod.getLanguage().equals(KotlinLanguage.INSTANCE)) {
+            return generateKotlin(psiMethod);
+        } else {
+            return topStack;
+        }
+    }
+
+    private CallStack generateKotlin(PsiMethod psiMethod) {
+
+        final KtSequenceGenerator ktSequenceGenerator =
+                offsetStack.isEmpty() ? new KtSequenceGenerator(params) : new KtSequenceGenerator(params, offsetStack.pop(), depth);
+        CallStack kotlinCall = ktSequenceGenerator.generate(psiMethod.getNavigationElement());
+        if (topStack == null) {
+            topStack = kotlinCall;
+            currentStack = topStack;
+        } else {
+            currentStack.merge(kotlinCall);
+        }
+        return topStack;
+    }
+
+    private CallStack generateJava(PsiMethod psiMethod) {
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {
             containingClass = (PsiClass) psiMethod.getParent().getContext();

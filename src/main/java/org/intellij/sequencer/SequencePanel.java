@@ -215,10 +215,21 @@ public class SequencePanel extends JPanel implements ConfigListener {
     }
 
     private void gotoMethod(MethodInfo methodInfo) {
-        String className = methodInfo.getObjectInfo().getFullName();
-        String methodName = methodInfo.getRealName();
-        List<String> argTypes = methodInfo.getArgTypes();
-        navigable.openMethodInEditor(className, methodName, argTypes);
+        if (isLambdaCall(methodInfo)) {
+            navigable.openLambdaExprInEditor(
+                    methodInfo.getObjectInfo().getFullName(),
+                    methodInfo.getRealName(),
+                    methodInfo.getArgTypes(),
+                    methodInfo.getArgTypes(),
+                    methodInfo.getReturnType(),
+                    navIndexMap.getOrDefault(methodInfo.getNumbering().getName(),0)
+            );
+        } else {
+            String className = methodInfo.getObjectInfo().getFullName();
+            String methodName = methodInfo.getRealName();
+            List<String> argTypes = methodInfo.getArgTypes();
+            navigable.openMethodInEditor(className, methodName, argTypes);
+        }
     }
 
     private void gotoCall(MethodInfo fromMethodInfo, MethodInfo toMethodInfo) {

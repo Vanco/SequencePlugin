@@ -6,10 +6,8 @@ import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.psi.KtCallExpression;
-import org.jetbrains.kotlin.psi.KtDotQualifiedExpression;
-import org.jetbrains.kotlin.psi.KtExpression;
-import org.jetbrains.kotlin.psi.KtValueArgument;
+import org.jetbrains.kotlin.idea.KotlinLanguage;
+import org.jetbrains.kotlin.psi.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -206,8 +204,15 @@ public class MyPsiUtil {
             return false;
         for (int i = 0; i < psiParameters.length; i++) {
             PsiParameter psiParameter = psiParameters[i];
-            if (!psiParameter.getType().getCanonicalText().equals(argTypes.get(i)))
-                return false;
+            if (psiParameter.getLanguage().equals(KotlinLanguage.INSTANCE)) {
+                final KtTypeReference typeReference = ((KtParameter) psiParameter.getNavigationElement()).getTypeReference();
+                if (!getKtType(typeReference).equals(argTypes.get(i))) {
+                    return false;
+                }
+            } else {
+                if (!psiParameter.getType().getPresentableText().equals(argTypes.get(i)))
+                    return false;
+            }
         }
         return true;
     }
@@ -251,4 +256,48 @@ public class MyPsiUtil {
     }
 
 
+    public static boolean isKtFileName(String fromClass) {
+        return fromClass != null && fromClass.endsWith("_kt");
+    }
+
+    public static boolean isParameterEquals(List<String> argTypes, List<KtParameter> typeParameters) {
+        if (typeParameters.size() != argTypes.size())
+            return false;
+        for (int i = 0; i < typeParameters.size(); i++) {
+            KtParameter ktParameter = typeParameters.get(i);
+            final KtTypeReference typeReference = ktParameter.getTypeReference();
+            final String stype = argTypes.get(i);
+            if (typeReference == null || !stype.equals(getKtType(typeReference)))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Get Type reference string.
+     *
+     * @param typeReference KtTypeReference
+     * @return String
+     */
+    public static String getKtType(@Nullable KtTypeReference typeReference) {
+        if (typeReference == null) {
+            return "Unit";
+        }
+
+        KtTypeElement typeElement = typeReference.getTypeElement();
+
+        if (typeElement instanceof KtNullableType) {
+            typeElement = ((KtNullableType) typeElement).getInnerType();
+        }
+
+        if (typeElement instanceof KtUserType) {
+            return ((KtUserType) typeElement).getReferencedName();
+        }
+
+        if (typeElement instanceof KtFunctionType) {
+            return typeElement.getText().replaceAll("[\\(|\\)]", "_").replaceAll(" ","");//.replaceAll("->", "→");
+        }
+
+        return "Unit";
+    }
 }

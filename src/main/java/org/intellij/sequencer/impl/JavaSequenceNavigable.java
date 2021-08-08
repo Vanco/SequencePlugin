@@ -27,10 +27,10 @@ import java.util.concurrent.ExecutionException;
 import static org.intellij.sequencer.util.MyPsiUtil.findNaviOffset;
 
 public class JavaSequenceNavigable implements SequenceNavigable {
-    private final Project _project;
+    protected final Project project;
 
     public JavaSequenceNavigable(Project project) {
-        this._project = project;
+        this.project = project;
     }
 
     public void openClassInEditor(final String className) {
@@ -48,7 +48,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                     if (p != null)
                         openInEditor(p.first, p.second);
                 })
-                .inSmartMode(_project)
+                .inSmartMode(project)
                 .submit(NonUrgentExecutor.getInstance());
 
     }
@@ -75,7 +75,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                     if (p != null)
                         openInEditor(p.first, p.second);
                 })
-                .inSmartMode(_project)
+                .inSmartMode(project)
                 .submit(NonUrgentExecutor.getInstance());
     }
 
@@ -101,7 +101,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                     return MyPsiUtil.findVirtualFile(containingClass);
                 })
                 .finishOnUiThread(ModalityState.defaultModalityState(), containingClass -> openInEditor(containingClass, offset))
-                .inSmartMode(_project)
+                .inSmartMode(project)
                 .submit(NonUrgentExecutor.getInstance());
 
     }
@@ -117,7 +117,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                     return MyPsiUtil.findVirtualFile(psiClass);
                 })
                 .finishOnUiThread(ModalityState.defaultModalityState(), containingClass -> openInEditor(containingClass, offset))
-                .inSmartMode(_project)
+                .inSmartMode(project)
                 .submit(NonUrgentExecutor.getInstance());
 
     }
@@ -134,7 +134,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                     return MyPsiUtil.findVirtualFile(psiClass);
                 })
                 .finishOnUiThread(ModalityState.defaultModalityState(), containingClass -> openInEditor(containingClass, offset))
-                .inSmartMode(_project)
+                .inSmartMode(project)
                 .submit(NonUrgentExecutor.getInstance());
 
     }
@@ -161,7 +161,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                             }
                             return result;
                         })
-                        .inSmartMode(_project)
+                        .inSmartMode(project)
                         .submit(NonUrgentExecutor.getInstance());
 
         try {
@@ -210,7 +210,7 @@ public class JavaSequenceNavigable implements SequenceNavigable {
                             }
                             return result;
                         })
-                        .inSmartMode(_project)
+                        .inSmartMode(project)
                         .submit(NonUrgentExecutor.getInstance());
 
 
@@ -240,22 +240,22 @@ public class JavaSequenceNavigable implements SequenceNavigable {
     }
 
     private FileEditorManager getFileEditorManager() {
-        return FileEditorManager.getInstance(_project);
+        return FileEditorManager.getInstance(project);
     }
 
     private PsiFile getPsiFile(VirtualFile virtualFile) {
-        return PsiManager.getInstance(_project).findFile(virtualFile);
+        return PsiManager.getInstance(project).findFile(virtualFile);
     }
 
-    private PsiManager getPsiManager() {
-        return PsiManager.getInstance(_project);
+    protected PsiManager getPsiManager() {
+        return PsiManager.getInstance(project);
     }
 
-    private void openInEditor(VirtualFile virtualFile, int offset) {
+    protected void openInEditor(VirtualFile virtualFile, int offset) {
         if (virtualFile == null)
             return;
 
-        getFileEditorManager().openTextEditor(new OpenFileDescriptor(_project,
+        getFileEditorManager().openTextEditor(new OpenFileDescriptor(project,
                 virtualFile, offset), true);
     }
 

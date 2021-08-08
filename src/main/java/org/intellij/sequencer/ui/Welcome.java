@@ -18,7 +18,7 @@ import org.intellij.sequencer.diagram.Parser;
 import org.intellij.sequencer.generator.MethodDescription;
 import org.intellij.sequencer.impl.EmptySequenceNavigable;
 import org.intellij.sequencer.impl.JavaSequenceNavigable;
-import org.intellij.sequencer.impl.KotlinSequenceNavigable;
+import org.intellij.sequencer.impl.KtSequenceNavigable;
 import org.intellij.sequencer.util.MdUtil;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
@@ -121,7 +121,7 @@ public class Welcome {
                         if (psiMethod.getLanguage().is(JavaLanguage.INSTANCE)) {
                             navigable = new JavaSequenceNavigable(project);
                         } else if (psiMethod.getLanguage().is(KotlinLanguage.INSTANCE)) {
-                            navigable = new KotlinSequenceNavigable(project);
+                            navigable = new KtSequenceNavigable(project);
                         }
 
                         titleName = method.getTitleName();
