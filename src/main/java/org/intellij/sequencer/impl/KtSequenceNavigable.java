@@ -7,14 +7,17 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.concurrency.NonUrgentExecutor;
 import org.intellij.sequencer.SequenceNavigable;
 import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
 import org.intellij.sequencer.generator.filters.MethodFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.psi.*;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,18 +35,49 @@ public class KtSequenceNavigable extends JavaSequenceNavigable implements Sequen
 
     @Override
     public void openMethodInEditor(String className, String methodName, List<String> argTypes) {
-        if (MyPsiUtil.isKtFileName(className)) {
+        if (MyPsiUtil.isKtFileName(className) || MyPsiUtil.isKtObjectLiteral(className)) {
             ReadAction
                     .nonBlocking(() -> {
-                        final String filename = className.replace("_", ".");
+                        final int idx = className.lastIndexOf(".");
+                        final int odx = className.indexOf("#");
+                        final String objLiteralType = odx == -1 ? "": className.substring(odx + 1);
+                        final String className1 = odx == -1 ? className : className.substring(0, odx);
+
+                        final String pathSegment = className1.replace(".", "/").replace("_", ".");
+                        final String filename = className1.substring(idx + 1).replace("_", ".");
+
                         final PsiFile[] psiFiles = FilenameIndex.getFilesByName(project, filename, GlobalSearchScope.allScope(project));
+
                         for (PsiFile psiFile : psiFiles) {
-                            final KtNamedFunction[] functions = ((KtFile) psiFile).findChildrenByClass(KtNamedFunction.class);
-                            for (KtNamedFunction function : functions) {
-                                if (methodName.equals(function.getName()) && MyPsiUtil.isParameterEquals(argTypes, function.getValueParameters())) {
-                                    return new Pair<>(psiFile.getVirtualFile(), function.getTextOffset());
+                            final String path = psiFile.getVirtualFile().getPath();
+                            if (!path.endsWith(pathSegment)) continue;
+
+                            if (odx == -1) {
+                                final @NotNull Collection<KtNamedFunction> functions = PsiTreeUtil.findChildrenOfAnyType(psiFile, KtNamedFunction.class);
+                                for (KtNamedFunction function : functions) {
+                                    if (methodName.equals(function.getName()) && MyPsiUtil.isParameterEquals(argTypes, function.getValueParameters())) {
+                                        return new Pair<>(psiFile.getVirtualFile(), function.getTextOffset());
+                                    }
                                 }
+                            } else {
+
+                                final @NotNull Collection<KtObjectDeclaration> ktObjectDeclarations = PsiTreeUtil.findChildrenOfAnyType(psiFile, KtObjectDeclaration.class);
+                                for (KtObjectDeclaration ktObjectDeclaration : ktObjectDeclarations) {
+                                    for (KtSuperTypeListEntry entry : ktObjectDeclaration.getSuperTypeListEntries()) {
+                                        if (objLiteralType.equals(entry.getTypeAsUserType().getReferencedName())) {
+                                            final Collection<KtNamedFunction> children = PsiTreeUtil.findChildrenOfAnyType(ktObjectDeclaration, KtNamedFunction.class);
+                                            for (KtNamedFunction child : children) {
+                                                if (methodName.equals(child.getName()) && MyPsiUtil.isParameterEquals(argTypes, child.getValueParameters())) {
+                                                    return new Pair<>(psiFile.getVirtualFile(), child.getTextOffset());
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                             }
+
+
                         }
 
                         return null;
@@ -68,17 +102,44 @@ public class KtSequenceNavigable extends JavaSequenceNavigable implements Sequen
 
     @Override
     public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes, String toClass, String toMethod, List<String> toArgType, int offset) {
-        if (MyPsiUtil.isKtFileName(fromClass)) {
+        if (MyPsiUtil.isKtFileName(fromClass) || MyPsiUtil.isKtObjectLiteral(fromClass)) {
             ReadAction
                     .nonBlocking(() -> {
-                        final String filename = fromClass.replace("_", ".");
+                        final int idx = fromClass.lastIndexOf(".");
+                        final int odx = fromClass.indexOf("#");
+                        final String objLiteralType = odx == -1 ? "": fromClass.substring(odx + 1);
+                        final String fromClass1 = odx == -1 ? fromClass : fromClass.substring(0, odx);
+
+                        final String pathSegment = fromClass1.replace(".", "/").replace("_", ".");
+
+                        final String filename = fromClass1.substring(idx + 1).replace("_", ".");
+
                         final PsiFile[] psiFiles = FilenameIndex.getFilesByName(project, filename, GlobalSearchScope.allScope(project));
 
                         for (PsiFile psiFile : psiFiles) {
-                            final KtNamedFunction[] functions = ((KtFile) psiFile).findChildrenByClass(KtNamedFunction.class);
-                            for (KtNamedFunction function : functions) {
-                                if (fromMethod.equals(function.getName()) && MyPsiUtil.isParameterEquals(fromArgTypes, function.getValueParameters())) {
-                                    return psiFile.getVirtualFile();
+                            final String path = psiFile.getVirtualFile().getPath();
+                            if (!path.endsWith(pathSegment)) continue;
+
+                            if (odx == -1) {
+                                final @NotNull Collection<KtNamedFunction> functions = PsiTreeUtil.findChildrenOfAnyType(psiFile, KtNamedFunction.class);
+                                for (KtNamedFunction function : functions) {
+                                    if (fromMethod.equals(function.getName()) && MyPsiUtil.isParameterEquals(fromArgTypes, function.getValueParameters())) {
+                                        return psiFile.getVirtualFile();
+                                    }
+                                }
+                            } else {
+                                final @NotNull Collection<KtObjectDeclaration> ktObjectDeclarations = PsiTreeUtil.findChildrenOfAnyType(psiFile, KtObjectDeclaration.class);
+                                for (KtObjectDeclaration ktObjectDeclaration : ktObjectDeclarations) {
+                                    for (KtSuperTypeListEntry entry : ktObjectDeclaration.getSuperTypeListEntries()) {
+                                       if (objLiteralType.equals(entry.getTypeAsUserType().getReferencedName())) {
+                                           final Collection<KtNamedFunction> children = PsiTreeUtil.findChildrenOfAnyType(ktObjectDeclaration, KtNamedFunction.class);
+                                           for (KtNamedFunction child : children) {
+                                               if (fromMethod.equals(child.getName()) && MyPsiUtil.isParameterEquals(fromArgTypes, child.getValueParameters())) {
+                                                   return psiFile.getVirtualFile();
+                                               }
+                                           }
+                                       }
+                                    }
                                 }
                             }
                         }

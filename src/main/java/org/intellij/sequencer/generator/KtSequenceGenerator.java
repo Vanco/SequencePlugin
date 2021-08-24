@@ -3,6 +3,7 @@ package org.intellij.sequencer.generator;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.Constants;
 import org.intellij.sequencer.util.MyPsiUtil;
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator {
@@ -52,11 +54,22 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         } else if (psiElement instanceof KtClass) {
             final int naviOffset = offsetStack.isEmpty() ? MyPsiUtil.findNaviOffset(psiElement) : offsetStack.pop();
             generateClass((KtClass) psiElement, naviOffset);
+        } else if (psiElement instanceof KtObjectDeclaration) {
+            return generateObject((KtObjectDeclaration) psiElement);
         } else {
             psiElement.accept(this);
-            LOGGER.warn("unsupported" + psiElement.getText());
+            LOGGER.warn("unsupported " + psiElement.getText());
         }
 
+        return topStack;
+    }
+
+    private CallStack generateObject(KtObjectDeclaration psiElement) {
+        final Collection<KtNamedFunction> children = PsiTreeUtil.findChildrenOfAnyType(psiElement, KtNamedFunction.class);
+        for (KtNamedFunction function : children) {
+            generate(function);
+            break; //fixme: What should do with others
+        }
         return topStack;
     }
 
@@ -138,9 +151,16 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
 
     }
 
+    @Override
+    public void visitObjectLiteralExpression(@NotNull KtObjectLiteralExpression expression) {
+        CallStack objLiteralExpr = new KtSequenceGenerator(params).generate(expression.getObjectDeclaration());
+        currentStack = currentStack.merge(objLiteralExpr);
+        //super.visitObjectLiteralExpression(expression);
+    }
+
     private void resolveAndCall(@NotNull KtCallExpression expression) {
         PsiElement psiElement = resolveFunction(expression);
-        methodCall( psiElement, expression.getTextOffset());
+        methodCall(psiElement, MyPsiUtil.findNaviOffset(expression));
     }
 
 
@@ -154,7 +174,8 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
 
     private void methodCall(PsiElement psiElement, int offset) {
         if (psiElement == null) return;
-        // if (!params.getMethodFilter().allow(psiMethod)) return;
+        //fixme: should support kotlin filter
+        if (psiElement instanceof PsiMethod && !params.getMethodFilter().allow((PsiMethod) psiElement)) return;
 
         if (depth < params.getMaxDepth() - 1) {
             CallStack oldStack = currentStack;
@@ -166,7 +187,9 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
             LOGGER.debug("- depth = " + depth + " method = " + psiElement.getText());
             currentStack = oldStack;
         } else {
-            currentStack.methodCall(createMethod(psiElement, offset));
+            final MethodDescription method = createMethod(psiElement, offset);
+            if (method != null) //fixme
+                currentStack.methodCall(method);
         }
     }
 
@@ -180,18 +203,26 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
     private MethodDescription createMethod(KtNamedFunction function, int offset) {
         ParamPair paramPair = extractParameters(function.getValueParameters());
         ClassDescription classDescription;
+        final KtFile containingKtFile = function.getContainingKtFile();
+        String filename = containingKtFile.getPackageFqName() + "." + containingKtFile.getName();
+        filename = filename.replace(".kt", "_kt");
         if (function.isTopLevel()) {
-            String filename = function.getContainingKtFile().getName();
-            filename = filename.replace(".kt", "_kt");
             classDescription = ClassDescription.getFileNameAsClass(filename); //ClassDescription.TOP_LEVEL_FUN;
         } else if (function.isLocal()) {
-            classDescription = ClassDescription.ANONYMOUS_CLASS;
+            classDescription = ClassDescription.getFileNameAsClass(filename + "#" + Constants.ANONYMOUS_CLASS_NAME);
         } else {
             if (function.getFqName() != null) {
                 String className = function.getFqName().parent().asString();
                 classDescription = new ClassDescription(className, new ArrayList<>());
             } else {
-                classDescription = ClassDescription.ANONYMOUS_CLASS;
+                final KtObjectDeclaration ktObjectDeclaration = PsiTreeUtil.getParentOfType(function, KtObjectDeclaration.class);
+                if (ktObjectDeclaration != null && !ktObjectDeclaration.getSuperTypeListEntries().isEmpty()) {
+                    final KtSuperTypeListEntry entry = ktObjectDeclaration.getSuperTypeListEntries().get(0);
+                    String typeName = entry.getTypeAsUserType().getReferencedName();
+                    classDescription = ClassDescription.getFileNameAsClass(filename + "#" + typeName);
+                } else {
+                    classDescription = ClassDescription.getFileNameAsClass(filename + "#" + Constants.ANONYMOUS_CLASS_NAME);
+                }
             }
         }
         List<String> attributes = createAttributes(function.getModifierList());
@@ -288,7 +319,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         }
 
         if (typeElement instanceof KtFunctionType) {
-            return typeElement.getText().replaceAll("[\\(|\\)]", "_").replaceAll(" ","");//.replaceAll("->", "→");
+            return typeElement.getText().replaceAll("[\\(|\\)]", "_").replaceAll(" ", "");//.replaceAll("->", "→");
         }
 
         return "Unit";

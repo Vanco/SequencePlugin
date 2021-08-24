@@ -160,6 +160,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
     }
 
     private void buildNaviIndex(CallStack callStack, String level) {
+        if  (callStack.getMethod() == null)  return;
         navIndexMap.put(level, callStack.getMethod().getOffset());
         int i = 1;
         for (CallStack call : callStack.getCalls()) {

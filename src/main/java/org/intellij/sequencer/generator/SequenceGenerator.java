@@ -42,8 +42,11 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
             return generate((PsiMethod) psiElement);
         else if (psiElement instanceof PsiLambdaExpression) {
             return generate((PsiLambdaExpression) psiElement);
-        } else
-            return topStack;
+        } else {
+            LOGGER.warn("unsupported " + psiElement.getText());
+        }
+
+        return topStack;
     }
 
     /**
@@ -69,6 +72,12 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         }
     }
 
+    /**
+     * Generate kotlin call in java code. Invoke `KtSequenceGenerator` to generate subtree of `CallStack`.
+     *
+     * @param psiMethod kotlin fun
+     * @return CallStack
+     */
     private CallStack generateKotlin(PsiMethod psiMethod) {
 
         final KtSequenceGenerator ktSequenceGenerator =
@@ -83,6 +92,11 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         return topStack;
     }
 
+    /**
+     * Generate Java method
+     * @param psiMethod Java method
+     * @return CallStack
+     */
     private CallStack generateJava(PsiMethod psiMethod) {
         PsiClass containingClass = psiMethod.getContainingClass();
         if (containingClass == null) {

@@ -1,5 +1,7 @@
 package org.intellij.sequencer.generator;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,16 +11,16 @@ public class CallStack {
     private CallStack _parent;
     private final List<CallStack> _calls = new ArrayList<>();
 
-    public CallStack(MethodDescription method) {
+    public CallStack(@NotNull MethodDescription method) {
         _method = method;
     }
 
-    public CallStack(MethodDescription method, CallStack parent) {
+    public CallStack(@NotNull MethodDescription method, CallStack parent) {
         _method = method;
         _parent = parent;
     }
 
-    public CallStack methodCall(MethodDescription method) {
+    public CallStack methodCall(@NotNull MethodDescription method) {
         CallStack callStack = new CallStack(method, this);
         _calls.add(callStack);
         return callStack;

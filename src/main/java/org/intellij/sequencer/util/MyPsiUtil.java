@@ -260,6 +260,10 @@ public class MyPsiUtil {
         return fromClass != null && fromClass.endsWith("_kt");
     }
 
+    public static boolean isKtObjectLiteral(String fromClass) {
+        return fromClass != null && fromClass.contains("#");
+    }
+
     public static boolean isParameterEquals(List<String> argTypes, List<KtParameter> typeParameters) {
         if (typeParameters.size() != argTypes.size())
             return false;
