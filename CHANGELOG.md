@@ -1,6 +1,7 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.1.3]
 ### Added
 - Kotlin support(experimental)
   - Support code navigation
