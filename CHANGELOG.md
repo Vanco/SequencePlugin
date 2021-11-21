@@ -1,6 +1,9 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.1.4]
+### Fixed
+- V2.1.3 does not jump to the code #113
 ## [2.1.3]
 ### Added
 - Kotlin support(experimental)

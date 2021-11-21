@@ -210,7 +210,7 @@ public class MyPsiUtil {
                     return false;
                 }
             } else {
-                if (!psiParameter.getType().getPresentableText().equals(argTypes.get(i)))
+                if (!psiParameter.getType().getCanonicalText().equals(argTypes.get(i)))
                     return false;
             }
         }
