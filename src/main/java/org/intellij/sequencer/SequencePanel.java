@@ -547,6 +547,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
             DefaultActionGroup actionGroup = new DefaultActionGroup("SequencePopup", true);
             actionGroup.add(new GotoSourceAction(screenObject));
             if (screenObject instanceof DisplayObject) {
+                actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
                 DisplayObject displayObject = (DisplayObject) screenObject;
                 if (displayObject.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && !_sequenceParams.isSmartInterface()) {
                     String className = displayObject.getObjectInfo().getFullName();
@@ -557,7 +558,6 @@ public class SequencePanel extends JPanel implements ConfigListener {
                     }
                     actionGroup.addSeparator();
                 }
-                actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
             } else if (screenObject instanceof DisplayMethod) {
                 DisplayMethod displayMethod = (DisplayMethod) screenObject;
                 if (displayMethod.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && !_sequenceParams.isSmartInterface()) {
