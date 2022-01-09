@@ -1,6 +1,12 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+### Fixed
+- Can you raise this label “Remove Class XXXXX” to the top？#116
+
+### Changed
+- Only show implementation class menu list for interface in project scope.
+
 ## [2.1.4]
 ### Fixed
 - V2.1.3 does not jump to the code #113
@@ -9,6 +15,7 @@
 - Kotlin support(experimental)
   - Support code navigation
   - Support Java code call kotlin
+
 ### Changed
 - Global share sequence diagram options.
 - Try to make loaded diagram navigable.
