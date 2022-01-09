@@ -1,6 +1,7 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.1.5]
 ### Fixed
 - Can you raise this label “Remove Class XXXXX” to the top？#116
 
