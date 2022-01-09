@@ -160,7 +160,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
     }
 
     private void buildNaviIndex(CallStack callStack, String level) {
-        if  (callStack.getMethod() == null)  return;
+        if (callStack.getMethod() == null) return;
         navIndexMap.put(level, callStack.getMethod().getOffset());
         int i = 1;
         for (CallStack call : callStack.getCalls()) {
@@ -223,7 +223,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
                     methodInfo.getArgTypes(),
                     methodInfo.getArgTypes(),
                     methodInfo.getReturnType(),
-                    navIndexMap.getOrDefault(methodInfo.getNumbering().getName(),0)
+                    navIndexMap.getOrDefault(methodInfo.getNumbering().getName(), 0)
             );
         } else {
             String className = methodInfo.getObjectInfo().getFullName();
@@ -251,7 +251,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
                     fromMethodInfo.getArgTypes(),
                     toMethodInfo.getArgTypes(),
                     toMethodInfo.getReturnType(),
-                    navIndexMap.getOrDefault(toMethodInfo.getNumbering().getName(),0)
+                    navIndexMap.getOrDefault(toMethodInfo.getNumbering().getName(), 0)
             );
         } else if (isLambdaCall(fromMethodInfo)) {
             LambdaExprInfo lambdaExprInfo = (LambdaExprInfo) fromMethodInfo;
@@ -278,7 +278,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
                     toMethodInfo.getObjectInfo().getFullName(),
                     toMethodInfo.getRealName(),
                     toMethodInfo.getArgTypes(),
-                    navIndexMap.getOrDefault(toMethodInfo.getNumbering().getName(),0)
+                    navIndexMap.getOrDefault(toMethodInfo.getNumbering().getName(), 0)
             );
         }
     }
@@ -547,9 +547,11 @@ public class SequencePanel extends JPanel implements ConfigListener {
             DefaultActionGroup actionGroup = new DefaultActionGroup("SequencePopup", true);
             actionGroup.add(new GotoSourceAction(screenObject));
             if (screenObject instanceof DisplayObject) {
-                actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
                 DisplayObject displayObject = (DisplayObject) screenObject;
-                if (displayObject.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && !_sequenceParams.isSmartInterface()) {
+                actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
+                if (displayObject.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE)
+                        && !displayObject.getObjectInfo().hasAttribute(Info.EXTERNAL_ATTRIBUTE)
+                        && !_sequenceParams.isSmartInterface()) {
                     String className = displayObject.getObjectInfo().getFullName();
                     List<String> impls = navigable.findImplementations(className);
                     actionGroup.addSeparator();
@@ -560,7 +562,10 @@ public class SequencePanel extends JPanel implements ConfigListener {
                 }
             } else if (screenObject instanceof DisplayMethod) {
                 DisplayMethod displayMethod = (DisplayMethod) screenObject;
-                if (displayMethod.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) && !_sequenceParams.isSmartInterface()) {
+                actionGroup.add(new RemoveMethodAction(displayMethod.getMethodInfo()));
+                if (displayMethod.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE)
+                        && !displayMethod.getObjectInfo().hasAttribute(Info.EXTERNAL_ATTRIBUTE)
+                        && !_sequenceParams.isSmartInterface()) {
 
                     String className = displayMethod.getObjectInfo().getFullName();
                     String methodName = displayMethod.getMethodInfo().getRealName();
@@ -574,7 +579,6 @@ public class SequencePanel extends JPanel implements ConfigListener {
                     actionGroup.addSeparator();
 
                 }
-                actionGroup.add(new RemoveMethodAction(displayMethod.getMethodInfo()));
             } else if (screenObject instanceof DisplayLink) {
                 DisplayLink displayLink = (DisplayLink) screenObject;
                 if (!displayLink.isReturnLink())
