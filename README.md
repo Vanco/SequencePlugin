@@ -101,7 +101,7 @@ Please try to experience it and find what happen.
 Have fun!
 
 ## Version History
-**Current Version 2.1.4**
+**Current Version 2.1.6**
 
 versions:
 [Changelog](CHANGELOG.md)
