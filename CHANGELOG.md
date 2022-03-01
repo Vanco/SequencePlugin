@@ -1,6 +1,10 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.1.6]
+### Changed
+- Build for 221.x
+- Fix code which invoke removed api.
 ## [2.1.5]
 ### Fixed
 - Can you raise this label “Remove Class XXXXX” to the top？#116

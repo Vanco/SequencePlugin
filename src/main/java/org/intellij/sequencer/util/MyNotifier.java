@@ -1,10 +1,10 @@
 package org.intellij.sequencer.util;
 
-import com.intellij.notification.NotificationDisplayType;
+//import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.extensions.PluginId;
+//import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import icons.SequencePluginIcons;
 import org.intellij.sequencer.SequenceService;
@@ -12,15 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MyNotifier {
     private static final NotificationGroup NOTIFICATION_GROUP =
-            new NotificationGroup(
-                    SequenceService.PLUGIN_NAME,
-                    NotificationDisplayType.BALLOON,
-                    true,
-                    SequenceService.PLUGIN_NAME,
-                    SequencePluginIcons.SEQUENCE_ICON_13,
-                    SequenceService.PLUGIN_NAME,
-                    PluginId.getId(SequenceService.PLUGIN_ID)
-            );
+            NotificationGroup.toolWindowGroup(SequenceService.PLUGIN_NAME, SequenceService.PLUGIN_NAME);
 
     /**
      * Notification user with content.
@@ -29,9 +21,8 @@ public class MyNotifier {
      */
     public static void notifyError(@Nullable Project project, String content) {
         NOTIFICATION_GROUP
-                .createNotification(NotificationType.INFORMATION)
+                .createNotification(content, NotificationType.INFORMATION)
                 .setTitle(SequenceService.PLUGIN_NAME)
-                .setContent(content)
                 .setIcon(SequencePluginIcons.SEQUENCE_ICON_13)
                 .notify(project);
     }
@@ -44,9 +35,8 @@ public class MyNotifier {
      */
     public static void notifyWithAction(@Nullable Project project, String content, AnAction action) {
         NOTIFICATION_GROUP
-                .createNotification(NotificationType.INFORMATION)
+                .createNotification(content, NotificationType.INFORMATION)
                 .setTitle(SequenceService.PLUGIN_NAME)
-                .setContent(content)
                 .setIcon(SequencePluginIcons.SEQUENCE_ICON_13)
                 .addAction(action)
                 .notify(project);

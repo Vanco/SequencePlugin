@@ -19,7 +19,6 @@ import org.intellij.sequencer.generator.MethodDescription;
 import org.intellij.sequencer.impl.EmptySequenceNavigable;
 import org.intellij.sequencer.impl.JavaSequenceNavigable;
 import org.intellij.sequencer.impl.KtSequenceNavigable;
-import org.intellij.sequencer.util.MdUtil;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.idea.KotlinLanguage;
@@ -64,7 +63,7 @@ public class Welcome {
     private String loadWelcome() {
         String text = "Welcome to use SequenceDiagram Plugin";
 
-        try (InputStream inputStream = Welcome.class.getResourceAsStream("/welcome.md")) {
+        try (InputStream inputStream = Welcome.class.getResourceAsStream("/welcome.html")) {
             if (inputStream != null)
                 try (InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
                      BufferedReader reader = new BufferedReader(isr)) {
@@ -74,9 +73,7 @@ public class Welcome {
             e.printStackTrace();
         }
 
-        String html = MdUtil.generateMarkdownHtml(text);
-
-        return "<html><head></head>" + html + "</html>";
+        return text;
     }
 
     public JPanel getMainPanel() {

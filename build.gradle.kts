@@ -4,7 +4,7 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.2.0"
+    id("org.jetbrains.intellij") version "1.4.0"
     id("org.jetbrains.changelog") version "1.2.1"
 }
 
@@ -12,13 +12,17 @@ group = properties("pluginGroup")
 version = properties("pluginVersion")
 
 repositories {
-    mavenCentral()
+    mavenLocal()
+    google()
+    maven { url = uri("https://maven.aliyun.com/repository/public") }
+    maven { url = uri("https://www.jetbrains.com/intellij-repository/releases") }
+    maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
 }
 
 intellij {
     version.set(properties("platformVersion"))
     type.set(properties("platformType"))
-//    localPath.set("C:\\Program Files\\JetBrains\\IntelliJ IDEA CE")
+//    localPath.set("/Applications/IntelliJ IDEA CE.app")
     pluginName.set(properties("pluginName"))
     plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
     updateSinceUntilBuild.set(true)
