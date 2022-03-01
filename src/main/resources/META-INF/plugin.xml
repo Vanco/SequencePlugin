@@ -53,6 +53,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
         <applicationService serviceImplementation="org.intellij.sequencer.config.SequenceParamsState"/>
         <toolWindow id="Sequence Diagram" icon="SequencePluginIcons.SEQUENCE_ICON_13" anchor="bottom"
                     factoryClass="org.intellij.sequencer.SequenceToolWindowsFactory" canCloseContents="true"/>
+        <notificationGroup displayType="BALLOON" id="Sequence Diagram"/>
 
         <projectService serviceInterface="org.intellij.sequencer.SequenceService"
                         serviceImplementation="org.intellij.sequencer.impl.SequenceServiceImpl"/>
