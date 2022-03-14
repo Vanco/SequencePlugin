@@ -1,5 +1,6 @@
 package org.intellij.sequencer.generator;
 
+import org.intellij.sequencer.Constants;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -119,4 +120,34 @@ public class CallStack {
 
     }
 
+    // Generate mermaid file https://mermaid-js.github.io/mermaid/
+    public String generateMmd() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("sequenceDiagram").append('\n');
+        buffer.append("actor User").append('\n');
+        String classA = _method.getClassDescription().getClassShortName();
+        String method = _method.getMethodName();
+        buffer.append("User").append(" ->> ").append(classA).append(" : ").append(method).append('\n');
+        buffer.append("activate ").append(classA).append('\n');
+        generateMmdStr(buffer);
+        buffer.append("deactivate ").append(classA).append('\n');
+//        buffer.append("@enduml");
+        return buffer.toString();
+    }
+
+    private void generateMmdStr(StringBuffer buffer) {
+        String classA = _method.getClassDescription().getClassShortName();
+
+        for (CallStack callStack : _calls) {
+            String classB = callStack.getMethod().getClassDescription().getClassShortName();
+            String method = callStack.getMethod().getMethodName();
+            if (method.equals(Constants.Lambda_Invoke)) method = "#955;#8594;";
+            buffer.append(classA).append(" ->> ").append(classB).append(" : ").append(method).append('\n');
+            buffer.append("activate ").append(classB).append('\n');
+            callStack.generateMmdStr(buffer);
+            buffer.append(classB).append(" -->> ").append(classA).append(" : #32; ").append('\n');
+            buffer.append("deactivate ").append(classB).append('\n');
+        }
+
+    }
 }

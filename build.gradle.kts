@@ -20,9 +20,9 @@ repositories {
 }
 
 intellij {
-//    version.set(properties("platformVersion"))
-//    type.set(properties("platformType"))
-    localPath.set("/Applications/IntelliJ IDEA CE.app")
+    version.set(properties("platformVersion"))
+    type.set(properties("platformType"))
+//    localPath.set("/Applications/IntelliJ IDEA CE.app")
     pluginName.set(properties("pluginName"))
     plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
     updateSinceUntilBuild.set(true)

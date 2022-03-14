@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.psi.KtFunction;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.io.File;
@@ -168,7 +169,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
         }
     }
 
-    public String generatePuml() {
+    public String generatePumlMmd(String ext) {
         if (psiElement == null || !psiElement.isValid() || !(psiElement instanceof PsiMethod || psiElement instanceof KtFunction)) {
             psiElement = null;
             return "";
@@ -177,6 +178,9 @@ public class SequencePanel extends JPanel implements ConfigListener {
         IGenerator generator = GeneratorFactory.createGenerator(psiElement.getLanguage(), _sequenceParams);
 
         final CallStack callStack = generator.generate(psiElement);
+
+        if ("mmd".equalsIgnoreCase(ext))
+            return callStack.generateMmd();
 
         return callStack.generatePuml();
     }
@@ -371,7 +375,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
     private class SaveAsAction extends AnAction {
 
         public SaveAsAction() {
-            super("Save As ...", "Export Diagram to file", SequencePluginIcons.SAVE_ICON);
+            super("Save As ...", "Save Diagram to SequenceDiagram text (.sdt) file", SequencePluginIcons.SAVE_ICON);
         }
 
         @Override
@@ -411,32 +415,27 @@ public class SequencePanel extends JPanel implements ConfigListener {
     private class ExportPumlAction extends AnAction {
 
         public ExportPumlAction() {
-            super("Export PlantUML ...", "Export Diagram to PlantUML file", SequencePluginIcons.PUML_ICON);
+            super("Export ...", "Export Diagram to PlantUML, Mermaid file", SequencePluginIcons.PUML_ICON);
         }
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_") + ".puml"));
+            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_")));
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-            fileChooser.setFileFilter(new FileFilter() {
-                public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().endsWith("puml");
-                }
-
-                public String getDescription() {
-                    return "PlantUML (.puml) File";
-                }
-            });
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("PlantUML (.puml) File", "puml"));
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Mermaid (.mmd) File", "mmd"));
+            fileChooser.setAcceptAllFileFilterUsed(false);
             try {
                 if (fileChooser.showSaveDialog(SequencePanel.this) == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    if (!selectedFile.getName().endsWith("puml"))
-                        selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".puml");
+                    FileFilter fileFilter = fileChooser.getFileFilter();
+                    String extension = ((FileNameExtensionFilter) fileFilter).getExtensions()[0];
 
-                    String uml = generatePuml();
+                    String uml = generatePumlMmd(extension);
 
-                    FileUtil.writeToFile(selectedFile, uml);
+                    File fileToSave = new File(selectedFile.getParentFile(), selectedFile.getName() + '.' + extension);
+                    FileUtil.writeToFile(fileToSave, uml);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
