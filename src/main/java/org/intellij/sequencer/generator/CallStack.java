@@ -1,6 +1,8 @@
 package org.intellij.sequencer.generator;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.intellij.sequencer.Constants;
+import org.intellij.sequencer.config.SequenceSettingsState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -96,8 +98,11 @@ public class CallStack {
         buffer.append("@startuml").append('\n');
         buffer.append("participant Actor").append('\n');
         String classA = _method.getClassDescription().getClassShortName();
-        String method = _method.getMethodName();
-        buffer.append("Actor").append(" -> ").append(classA).append(" : ").append(method).append('\n');
+        String method = getMethodName(_method);
+        if (Constants.CONSTRUCTOR_METHOD_NAME.equals(_method.getMethodName())) {
+            buffer.append("create ").append(classA).append('\n');
+        }
+        buffer.append("Actor").append(" -> ").append(classA).append(" : ").append(method).append("\n");
         buffer.append("activate ").append(classA).append('\n');
         generatePumlStr(buffer);
         buffer.append("return").append('\n');
@@ -110,8 +115,11 @@ public class CallStack {
 
         for (CallStack callStack : _calls) {
             String classB = callStack.getMethod().getClassDescription().getClassShortName();
-            String method = callStack.getMethod().getMethodName();
-            buffer.append(classA).append(" -> ").append(classB).append(" : ").append(method).append('\n');
+            String method = getMethodName(callStack.getMethod());
+            if (Constants.CONSTRUCTOR_METHOD_NAME.equals(callStack.getMethod().getMethodName())) {
+                buffer.append("create ").append(classB).append('\n');
+            }
+            buffer.append(classA).append(" -> ").append(classB).append(" : ").append(method).append("\n");
             buffer.append("activate ").append(classB).append('\n');
             callStack.generatePumlStr(buffer);
             buffer.append(classB).append(" --> ").append(classA).append('\n');
@@ -126,8 +134,8 @@ public class CallStack {
         buffer.append("sequenceDiagram").append('\n');
         buffer.append("actor User").append('\n');
         String classA = _method.getClassDescription().getClassShortName();
-        String method = _method.getMethodName();
-        buffer.append("User").append(" ->> ").append(classA).append(" : ").append(method).append('\n');
+        String method = getMethodName(_method);
+        buffer.append("User").append(" ->> ").append(classA).append(" : ").append(escape(method)).append('\n');
         buffer.append("activate ").append(classA).append('\n');
         generateMmdStr(buffer);
         buffer.append("deactivate ").append(classA).append('\n');
@@ -135,18 +143,32 @@ public class CallStack {
         return buffer.toString();
     }
 
+    private String escape(String method) {
+        return StringEscapeUtils.escapeHtml(method);
+    }
+
     private void generateMmdStr(StringBuffer buffer) {
         String classA = _method.getClassDescription().getClassShortName();
 
         for (CallStack callStack : _calls) {
             String classB = callStack.getMethod().getClassDescription().getClassShortName();
-            String method = callStack.getMethod().getMethodName();
-            if (method.equals(Constants.Lambda_Invoke)) method = "#955;#8594;";
-            buffer.append(classA).append(" ->> ").append(classB).append(" : ").append(method).append('\n');
+            String method = getMethodName(callStack.getMethod());
+            buffer.append(classA).append(" ->> ").append(classB).append(" : ").append(escape(method)).append('\n');
             buffer.append("activate ").append(classB).append('\n');
             callStack.generateMmdStr(buffer);
             buffer.append(classB).append(" -->> ").append(classA).append(" : #32; ").append('\n');
             buffer.append("deactivate ").append(classB).append('\n');
+        }
+
+    }
+
+    private String getMethodName(MethodDescription method) {
+        if (method == null) return "";
+
+        if (SequenceSettingsState.getInstance().SHOW_SIMPLIFY_CALL_NAME) {
+            return method.getMethodName();
+        } else {
+            return method.getFullName();
         }
 
     }

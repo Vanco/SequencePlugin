@@ -1,10 +1,15 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+### Fixed
+- Support for Mermaid when export diagram.
+- Support export PlantUML and Mermaid when unchecked `Show simple call name`.
+
 ## [2.1.6]
 ### Changed
 - Build for 221.x
 - Fix code which invoke removed api.
+
 ## [2.1.5]
 ### Fixed
 - Can you raise this label “Remove Class XXXXX” to the top？#116
@@ -15,6 +20,7 @@
 ## [2.1.4]
 ### Fixed
 - V2.1.3 does not jump to the code #113
+
 ## [2.1.3]
 ### Added
 - Kotlin support(experimental)

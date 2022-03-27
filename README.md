@@ -11,7 +11,7 @@ with this plugin, you can
 + Navigate the code by click the diagram shape.
 + Delete Class from diagram.
 + Export the diagram as image.
-+ Export the diagram as PlantUML file.
++ Export the diagram as PlantUML, Mermaid format file.
 + Exclude classes from diagram by Settings > Tools > Sequence Diagram
 + Smart Interface(experimental)
 + Lambda Expression(experimental)

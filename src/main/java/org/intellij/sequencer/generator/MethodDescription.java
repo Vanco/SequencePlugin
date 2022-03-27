@@ -2,6 +2,8 @@ package org.intellij.sequencer.generator;
 
 import com.google.gson.GsonBuilder;
 import org.intellij.sequencer.Constants;
+import org.intellij.sequencer.model.GenericType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -57,6 +59,27 @@ public class MethodDescription {
     public String getTitleName() {
         return getClassDescription().getClassShortName() + '.' +
                 getMethodName() ;
+    }
+
+    public String getFullName() {
+        String name = Constants.CONSTRUCTOR_METHOD_NAME.equals(_methodName) ? "<<create>>" : _methodName;
+        StringBuilder sb = new StringBuilder();
+        sb.append(name).append("(");
+        for (int i = 0; i < _argNames.size(); i++) {
+            if (i > 0) sb.append(", ");
+            String argName = _argNames.get(i);
+            String argType = _argTypes.get(i);
+            argType = shortTypeName(argType);
+            sb.append(argName).append(": ").append(argType);
+        }
+        sb.append(")").append(": ").append(shortTypeName(_returnType));
+        return sb.toString();
+    }
+
+    @NotNull
+    private String shortTypeName(String argType) {
+        GenericType genericType = GenericType.create(argType);
+        return genericType.getName();
     }
 
     public List<String> getAttributes() {

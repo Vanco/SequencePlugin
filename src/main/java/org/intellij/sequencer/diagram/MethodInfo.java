@@ -1,10 +1,9 @@
 package org.intellij.sequencer.diagram;
 
-import com.intellij.ui.JBColor;
 import org.intellij.sequencer.Constants;
+import org.intellij.sequencer.model.GenericType;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.List;
 
 public class MethodInfo extends Info {
@@ -60,10 +59,8 @@ public class MethodInfo extends Info {
 
     @NotNull
     private String shortTypeName(String argType) {
-        String result = argType;
-        int idx = argType.lastIndexOf(".");
-        if (idx != -1) result = argType.substring(idx + 1);
-        return result;
+        GenericType genericType = GenericType.create(argType);
+        return genericType.getName();
     }
 
     public ObjectInfo getObjectInfo() {
