@@ -5,25 +5,26 @@ import org.apache.log4j.Logger;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Diagram {
     private static final Logger LOGGER = Logger.getLogger(Diagram.class);
 
-    private List<DisplayObject> _objectLifeLines = new ArrayList<>();
-    private List<DisplayLink> _links = new ArrayList<>();
+    private final List<DisplayObject> _objectLifeLines = Collections.synchronizedList(new ArrayList<>());
+    private final List<DisplayLink> _links = Collections.synchronizedList(new ArrayList<>());
 
     public Diagram() {
     }
 
     public void build(String queryString) {
-        _objectLifeLines = new ArrayList<>();
-        _links = new ArrayList<>();
+        _objectLifeLines.clear();
+        _links.clear();
 
         Parser p = new Parser();
         try {
             p.parse(queryString);
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             LOGGER.error("IOException", ioe);
             return;
         }
@@ -35,40 +36,44 @@ public class Diagram {
 
         List<Link> theDisplayLinks = p.getLinks();
         int seq = 0;
-        for (Link link : theDisplayLinks) {
-            int fromSeq = link.getFrom().getSeq();
-            int toSeq = link.getTo().getSeq();
-            DisplayObject fromObj = _objectLifeLines.get(fromSeq);
-            DisplayObject toObj = _objectLifeLines.get(toSeq);
-            DisplayLink displayLink = null;
-            if (link instanceof Call) {
-                if (fromSeq == toSeq)
-                    displayLink = new DisplaySelfCall(link, fromObj, toObj, seq);
-                else
-                    displayLink = new DisplayCall(link, fromObj, toObj, seq);
-            } else if (link instanceof CallReturn) {
-                if (fromSeq == toSeq)
-                    displayLink = new DisplaySelfCallReturn(link, fromObj, toObj, seq);
-                else
-                    displayLink = new DisplayCallReturn(link, fromObj, toObj, seq);
-            } else {
-                LOGGER.error("Unknown link: " + link);
-            }
-            if (displayLink != null) {
-                _links.add(displayLink);
-                ++seq;
+        synchronized (_objectLifeLines) {
+            for (Link link : theDisplayLinks) {
+                int fromSeq = link.getFrom().getSeq();
+                int toSeq = link.getTo().getSeq();
+                DisplayObject fromObj = _objectLifeLines.get(fromSeq);
+                DisplayObject toObj = _objectLifeLines.get(toSeq);
+                DisplayLink displayLink = null;
+                if (link instanceof Call) {
+                    if (fromSeq == toSeq)
+                        displayLink = new DisplaySelfCall(link, fromObj, toObj, seq);
+                    else
+                        displayLink = new DisplayCall(link, fromObj, toObj, seq);
+                } else if (link instanceof CallReturn) {
+                    if (fromSeq == toSeq)
+                        displayLink = new DisplaySelfCallReturn(link, fromObj, toObj, seq);
+                    else
+                        displayLink = new DisplayCallReturn(link, fromObj, toObj, seq);
+                } else {
+                    LOGGER.error("Unknown link: " + link);
+                }
+                if (displayLink != null) {
+                    _links.add(displayLink);
+                    ++seq;
+                }
             }
         }
 
-        for (ObjectInfo info : theObjects) {
-            DisplayObject displayInfo = _objectLifeLines.get(info.getSeq());
-            for (MethodInfo methodInfo : info.getMethods()) {
-                int startSeq = methodInfo.getStartSeq();
-                int endSeq = methodInfo.getEndSeq();
-                if ((startSeq < _links.size()) && (endSeq < _links.size())) {
-                    DisplayMethod methodBox = new DisplayMethod(info, methodInfo,
-                            _links.get(startSeq), _links.get(endSeq));
-                    displayInfo.addMethod(methodBox);
+        synchronized (_objectLifeLines) {
+            for (ObjectInfo info : theObjects) {
+                DisplayObject displayInfo = _objectLifeLines.get(info.getSeq());
+                for (MethodInfo methodInfo : info.getMethods()) {
+                    int startSeq = methodInfo.getStartSeq();
+                    int endSeq = methodInfo.getEndSeq();
+                    if ((startSeq < _links.size()) && (endSeq < _links.size())) {
+                        DisplayMethod methodBox = new DisplayMethod(info, methodInfo,
+                                _links.get(startSeq), _links.get(endSeq));
+                        displayInfo.addMethod(methodBox);
+                    }
                 }
             }
         }
@@ -85,49 +90,53 @@ public class Diagram {
         }
 
         int maxX = 200;
-        for(int i = 0; i < _objectLifeLines.size(); ++i) {
-            DisplayObject obj = _objectLifeLines.get(i);
-            if(LOGGER.isDebugEnabled())
-                LOGGER.debug("Laying out " + obj);
-            for (DisplayLink call : obj.getCalls()) {
-                int availableGap;
-                if (call.isSelfCall()) {
-                    if (i == _objectLifeLines.size() - 1) {
-                        int width = obj.getWidth();
-                        if (width < call.getTextWidth())
-                            obj.setWidth(obj.getTextWidth() + call.getTextWidth());
-                        continue;
+        synchronized (_objectLifeLines) {
+            for (int i = 0; i < _objectLifeLines.size(); ++i) {
+                DisplayObject obj = _objectLifeLines.get(i);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("Laying out " + obj);
+                for (DisplayLink call : obj.getCalls()) {
+                    int availableGap;
+                    if (call.isSelfCall()) {
+                        if (i == _objectLifeLines.size() - 1) {
+                            int width = obj.getWidth();
+                            if (width < call.getTextWidth())
+                                obj.setWidth(obj.getTextWidth() + call.getTextWidth());
+                            continue;
+                        } else {
+                            availableGap = obj.calcCurrentGap(
+                                    _objectLifeLines.get(i + 1), call.getSeq());
+                        }
                     } else {
-                        availableGap = obj.calcCurrentGap(
-                                _objectLifeLines.get(i + 1), call.getSeq());
+                        availableGap = obj.calcCurrentGap(call.getTo(), call.getSeq());
                     }
-                } else {
-                    availableGap = obj.calcCurrentGap(call.getTo(), call.getSeq());
-                }
 
-                if (availableGap < call.getTextWidth()) {
-                    int offset = call.getTextWidth() - availableGap;
-                    if (LOGGER.isDebugEnabled())
-                        LOGGER.debug("gap too small by " + offset);
-                    int startJ = i + 1;
-                    if (call.getTo().getSeq() < startJ)
-                        startJ = call.getTo().getSeq() + 1;
-                    for (int j = startJ; j < _objectLifeLines.size(); ++j) {
-                        (_objectLifeLines.get(j)).translate(offset);
+                    if (availableGap < call.getTextWidth()) {
+                        int offset = call.getTextWidth() - availableGap;
+                        if (LOGGER.isDebugEnabled())
+                            LOGGER.debug("gap too small by " + offset);
+                        int startJ = i + 1;
+                        if (call.getTo().getSeq() < startJ)
+                            startJ = call.getTo().getSeq() + 1;
+                        for (int j = startJ; j < _objectLifeLines.size(); ++j) {
+                            (_objectLifeLines.get(j)).translate(offset);
+                        }
                     }
                 }
+                maxX = obj.getX() + 2 * obj.getWidth() + inset;
             }
-            maxX = obj.getX() + 2 * obj.getWidth() + inset;
-        }
 
-        if(_objectLifeLines.isEmpty())
-            y = 100;
-        else
-            y += (_objectLifeLines.get(0)).getHeight();
-        for (DisplayLink link : _links) {
-            link.setY(y);
-            link.initTwo();
-            y += link.getTextHeight() + link.getLinkHeight();
+            if (_objectLifeLines.isEmpty())
+                y = 100;
+            else
+                y += (_objectLifeLines.get(0)).getHeight();
+        }
+        synchronized (_links) {
+            for (DisplayLink link : _links) {
+                link.setY(y);
+                link.initTwo();
+                y += link.getTextHeight() + link.getLinkHeight();
+            }
         }
         y += 10;
         calculateFullSize(y);
@@ -135,61 +144,73 @@ public class Diagram {
     }
 
     private void calculateFullSize(int height) {
-        for(int i = 0; i < _objectLifeLines.size(); i++) {
-            DisplayObject displayObject = _objectLifeLines.get(i);
-            displayObject.setFullHeight(height);
-            if(i + 1 == _objectLifeLines.size())
-                displayObject.setFullWidth(displayObject.getWidth());
-            else {
-                DisplayObject nextDisplayObject = _objectLifeLines.get(i + 1);
-                displayObject.setFullWidth(nextDisplayObject.getCenterX() - displayObject.getX());
+        synchronized (_objectLifeLines) {
+            for (int i = 0; i < _objectLifeLines.size(); i++) {
+                DisplayObject displayObject = _objectLifeLines.get(i);
+                displayObject.setFullHeight(height);
+                if (i + 1 == _objectLifeLines.size())
+                    displayObject.setFullWidth(displayObject.getWidth());
+                else {
+                    DisplayObject nextDisplayObject = _objectLifeLines.get(i + 1);
+                    displayObject.setFullWidth(nextDisplayObject.getCenterX() - displayObject.getX());
+                }
             }
         }
     }
 
     public Dimension getPreferredHeaderSize() {
         int maxHeight = 0, width = 0;
-        for (DisplayObject displayObjectInfo : _objectLifeLines) {
-            int preferredHeight = displayObjectInfo.getPreferredHeaderHeight();
-            if (maxHeight < preferredHeight)
-                maxHeight = preferredHeight;
-            width += displayObjectInfo.getPreferredHeaderWidth();
+        synchronized (_objectLifeLines) {
+            for (DisplayObject displayObjectInfo : _objectLifeLines) {
+                int preferredHeight = displayObjectInfo.getPreferredHeaderHeight();
+                if (maxHeight < preferredHeight)
+                    maxHeight = preferredHeight;
+                width += displayObjectInfo.getPreferredHeaderWidth();
+            }
         }
         return new Dimension(width, maxHeight);
     }
 
     public ScreenObject findScreenObjectByXY(int x, int y) {
         DisplayMethod selectedMethodBox = null;
-        for (DisplayObject displayObject : _objectLifeLines) {
-            if (displayObject.isInRange(x, y))
-                return displayObject;
-            DisplayMethod methodBox = displayObject.findMethod(x, y);
-            if (methodBox != null) {
-                if (selectedMethodBox == null || selectedMethodBox.getX() < methodBox.getX()) {
-                    selectedMethodBox = methodBox;
+        synchronized (_objectLifeLines) {
+            for (DisplayObject displayObject : _objectLifeLines) {
+                if (displayObject.isInRange(x, y))
+                    return displayObject;
+                DisplayMethod methodBox = displayObject.findMethod(x, y);
+                if (methodBox != null) {
+                    if (selectedMethodBox == null || selectedMethodBox.getX() < methodBox.getX()) {
+                        selectedMethodBox = methodBox;
+                    }
                 }
             }
         }
-        if(selectedMethodBox == null) {
-            for (DisplayLink displayLink : _links) {
-                if (displayLink.isReturnLink())
-                    continue;
-                if (displayLink.isInRange(x, y))
-                    return displayLink;
+        if (selectedMethodBox == null) {
+            synchronized (_links) {
+                for (DisplayLink displayLink : _links) {
+                    if (displayLink.isReturnLink())
+                        continue;
+                    if (displayLink.isInRange(x, y))
+                        return displayLink;
+                }
             }
         }
         return selectedMethodBox;
     }
 
     public void paint(Graphics2D g2) {
-        for (DisplayObject displayObject : _objectLifeLines) {
-            displayObject.paint(g2);
+        synchronized (_objectLifeLines) {
+            for (DisplayObject displayObject : _objectLifeLines) {
+                displayObject.paint(g2);
+            }
         }
     }
 
     public void paintHeader(Graphics2D g2) {
-        for (DisplayObject displayObject : _objectLifeLines) {
-            displayObject.paintHeader(g2);
+        synchronized (_objectLifeLines) {
+            for (DisplayObject displayObject : _objectLifeLines) {
+                displayObject.paintHeader(g2);
+            }
         }
     }
 
@@ -202,6 +223,6 @@ public class Diagram {
     }
 
     public boolean nonEmpty() {
-        return ! isEmpty();
+        return !isEmpty();
     }
 }

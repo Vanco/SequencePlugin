@@ -7,6 +7,7 @@ import org.intellij.sequencer.config.SequenceSettingsState;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DisplayObject extends ScreenObject {
@@ -31,9 +32,9 @@ public class DisplayObject extends ScreenObject {
     private int _fullWidth;
     private final ObjectInfo _objectInfo;
 
-    private final List<DisplayLink> _calls = new ArrayList<>();
-    private final List<DisplayLink> _returns = new ArrayList<>();
-    private final List<DisplayMethod> _methods = new ArrayList<>();
+    private final List<DisplayLink> _calls = Collections.synchronizedList(new ArrayList<>());
+    private final List<DisplayLink> _returns = Collections.synchronizedList(new ArrayList<>());
+    private final List<DisplayMethod> _methods = Collections.synchronizedList(new ArrayList<>());
 
     DisplayObject(ObjectInfo objectInfo) {
         _objectInfo = objectInfo;
@@ -83,10 +84,12 @@ public class DisplayObject extends ScreenObject {
             displayMethod.setHorizontalSeq(0);
         } else {
             int enclosingCount = 0;
-            for (DisplayMethod otherMb : _methods) {
-                if ((otherMb.getStartSeq() < displayMethod.getStartSeq()) &&
-                        (otherMb.getEndSeq() > displayMethod.getEndSeq()))
-                    ++enclosingCount;
+            synchronized (_methods) {
+                for (DisplayMethod otherMb : _methods) {
+                    if ((otherMb.getStartSeq() < displayMethod.getStartSeq()) &&
+                            (otherMb.getEndSeq() > displayMethod.getEndSeq()))
+                        ++enclosingCount;
+                }
             }
             displayMethod.setHorizontalSeq(enclosingCount);
         }
@@ -190,10 +193,12 @@ public class DisplayObject extends ScreenObject {
 
     public DisplayMethod findMethod(int x, int y) {
         DisplayMethod selectedMethodBox = null;
-        for (DisplayMethod methodBox : _methods) {
-            if (methodBox.isInRange(x, y))
-                if ((selectedMethodBox == null || selectedMethodBox.getX() < methodBox.getX()))
-                    selectedMethodBox = methodBox;
+        synchronized (_methods) {
+            for (DisplayMethod methodBox : _methods) {
+                if (methodBox.isInRange(x, y))
+                    if ((selectedMethodBox == null || selectedMethodBox.getX() < methodBox.getX()))
+                        selectedMethodBox = methodBox;
+            }
         }
         return selectedMethodBox;
     }
@@ -206,25 +211,32 @@ public class DisplayObject extends ScreenObject {
             g2.drawLine(getCenterX(), 0, getCenterX(), _fullHeight);
             g2.setStroke(oldStroke);
 
-            for (DisplayMethod methodBox : _methods) {
-                methodBox.paint(g2);
+            synchronized (_methods) {
+                for (DisplayMethod methodBox : _methods) {
+                    methodBox.paint(g2);
+                }
             }
         }
 
-        for (DisplayLink displayLink : _calls) {
+        synchronized (_calls) {
+            for (DisplayLink displayLink : _calls) {
 //            if (displayLink.getLink().isBootstrap())
 //                continue;
-            displayLink.paint(g2);
+                displayLink.paint(g2);
+            }
         }
-        for (DisplayLink displayLink : _returns) {
-            // todo make it configurable
-            if (displayLink instanceof DisplaySelfCallReturn /*|| displayLink.getLink().isBootstrap()*/)
-                continue;
-            if (!SequenceSettingsState.getInstance().SHOW_RETURN_ARROWS && displayLink instanceof DisplayCallReturn)
-                continue;
-            if (displayLink.getTo().getObjectInfo().getName().equals(ObjectInfo.ACTOR_NAME))
-                continue;
-            displayLink.paint(g2);
+
+        synchronized (_returns) {
+            for (DisplayLink displayLink : _returns) {
+                // todo make it configurable
+                if (displayLink instanceof DisplaySelfCallReturn /*|| displayLink.getLink().isBootstrap()*/)
+                    continue;
+                if (!SequenceSettingsState.getInstance().SHOW_RETURN_ARROWS && displayLink instanceof DisplayCallReturn)
+                    continue;
+                if (displayLink.getTo().getObjectInfo().getName().equals(ObjectInfo.ACTOR_NAME))
+                    continue;
+                displayLink.paint(g2);
+            }
         }
     }
 

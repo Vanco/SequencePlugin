@@ -12,8 +12,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 public class PreviewPanel extends JPanel {
-    private JScrollPane _scrollPane;
-    private Display _display;
+    private final JScrollPane _scrollPane;
+    private final Display _display;
     private BufferedImage _image;
     private double _xScale;
     private double _yScale;

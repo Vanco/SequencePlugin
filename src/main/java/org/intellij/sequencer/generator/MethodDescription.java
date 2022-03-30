@@ -15,7 +15,7 @@ public class MethodDescription {
     private final List<String> _argNames;
     private final List<String> _argTypes;
     private final String _returnType;
-    private int offset;
+    private final int offset;
 
     protected MethodDescription(ClassDescription classDescription, List<String> attributes,
                                 String methodName, String returnType, List<String> argNames, List<String> argTypes, int offset) {

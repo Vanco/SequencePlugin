@@ -8,14 +8,14 @@ import java.util.List;
 
 public class MethodInfo extends Info {
 
-    private ObjectInfo _objectInfo;
-    private Numbering _numbering;
-    private String _name;
+    private final ObjectInfo _objectInfo;
+    private final Numbering _numbering;
+    private final String _name;
     private String _returnType;
-    private List<String> _argNames;
-    private List<String> _argTypes;
-    private int _startSeq;
-    private int _endSeq;
+    private final List<String> _argNames;
+    private final List<String> _argTypes;
+    private final int _startSeq;
+    private final int _endSeq;
     private String _htmlDescription;
 
     public MethodInfo(ObjectInfo obj, Numbering numbering, List<String> attributes,

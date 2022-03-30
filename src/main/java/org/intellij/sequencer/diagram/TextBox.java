@@ -5,7 +5,7 @@ import java.awt.geom.Rectangle2D;
 
 class TextBox {
 
-    private int _pad = 5;
+    private final int _pad = 5;
 
     private String _text = null;
     private int _boxWidth = -1;
