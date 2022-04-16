@@ -1,9 +1,11 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.1.7]
 ### Fixed
 - Support for Mermaid when export diagram.
 - Support export PlantUML and Mermaid when unchecked `Show simple call name`.
+- Fix some java.util.ConcurrentModificationException bugs.
 
 ## [2.1.6]
 ### Changed
