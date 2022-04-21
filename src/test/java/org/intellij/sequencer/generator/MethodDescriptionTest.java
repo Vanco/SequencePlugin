@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
@@ -47,5 +48,11 @@ public class MethodDescriptionTest {
         MethodDescription method = gson.fromJson(json, MethodDescription.class);
 
         assertEquals(m, method);
+    }
+
+    @Test(expected = NegativeArraySizeException.class)
+    public void maxSize() {
+        int size = -1233295232;
+        DataBufferInt bufferInt = new DataBufferInt(size);
     }
 }

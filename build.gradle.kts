@@ -73,3 +73,8 @@ tasks {
         channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
     }
 }
+
+dependencies {
+//    implementation("ar.com.hjg:pngj:2.1.0")
+    implementation("org.apache.xmlgraphics:batik-svggen:1.14")
+}

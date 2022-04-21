@@ -2,8 +2,13 @@ package org.intellij.sequencer.diagram;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.ImageUtil;
+import kotlin.text.Charsets;
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.intellij.sequencer.config.ConfigListener;
 import org.intellij.sequencer.config.SequenceSettingsState;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -12,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -184,6 +190,14 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         return new Dimension(width, height);
     }
 
+    /**
+     * Save image as png file.
+     * Known issue: when image width * height greater than Int.MAX_VALUE, will throw <code> java.lang.NegativeArraySizeException</code>.
+     * which is the limits of <code>Raster</code>
+     * @param file file to be saved
+     * @throws IOException
+     */
+    @Deprecated
     public void saveImageToFile(File file) throws IOException {
         Dimension size = getFullSize();
         BufferedImage image = ImageUtil.createImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
@@ -205,8 +219,24 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         ImageIO.write(image, "png", file);
     }
 
+    public void saveImageToSvgFile(File file) throws IOException {
+        DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+        String svgNS = "http://www.w3.org/2000/svg";
+        Document document = domImpl.createDocument(svgNS, "svg", null);
+
+        SVGGraphics2D svgGraphics2D = new SVGGraphics2D(document);
+
+        paintComponentWithHeader(svgGraphics2D);
+
+        FileWriter fileWriter = new FileWriter(file);
+
+        svgGraphics2D.stream(fileWriter, false);
+
+    }
+
     public void paintComponentWithHeader(Graphics2D graphics) {
         Dimension size = getFullSize();
+        graphics.setColor(JBColor.background());
         graphics.fillRect(0, 0, size.width, size.height);
         _displayHeader.paintComponent(graphics);
         graphics.translate(0, _displayHeader.getHeight());

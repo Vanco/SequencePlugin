@@ -319,23 +319,24 @@ public class SequencePanel extends JPanel implements ConfigListener {
 
         public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_") + ".png"));
+            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_") + ".svg"));
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
             fileChooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().endsWith("png");
+                    return f.isDirectory() || f.getName().endsWith("svg");
                 }
 
                 public String getDescription() {
-                    return "PNG Images";
+                    return "SVG Images";
                 }
             });
             try {
                 if (fileChooser.showSaveDialog(SequencePanel.this) == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    if (!selectedFile.getName().endsWith("png"))
-                        selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".png");
-                    _display.saveImageToFile(selectedFile);
+                    if (!selectedFile.getName().endsWith("svg"))
+                        selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".svg");
+//                    _display.saveImageToFile(selectedFile);
+                    _display.saveImageToSvgFile(selectedFile);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

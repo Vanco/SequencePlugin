@@ -1,6 +1,9 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+### Fixed
+- Unable to export large images #122, #119
+
 ## [2.1.7]
 ### Fixed
 - Support for Mermaid when export diagram.
