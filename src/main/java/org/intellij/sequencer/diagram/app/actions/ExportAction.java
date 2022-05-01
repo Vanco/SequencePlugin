@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class ExportAction extends SequenceAction {
 
-    private Display _display = null;
+    private final Display _display;
 
     public ExportAction(Display display) {
         super("ExportAction", true);
@@ -30,7 +30,7 @@ public class ExportAction extends SequenceAction {
 
     private void export(File file) {
         try {
-            _display.saveImageToFile(file);
+            _display.saveImageToSvgFile(file);
         } catch(IOException e) {
             e.printStackTrace();
         }

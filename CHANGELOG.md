@@ -1,6 +1,7 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.1.8]
 ### Fixed
 - Unable to export large images #122, #119
 
