@@ -43,7 +43,12 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
     }
 
     @Override
-    public CallStack generate(PsiElement psiElement) {
+    public CallStack generate(PsiElement psiElement, CallStack parent) {
+        if (parent != null) {
+            topStack = parent;
+            currentStack = topStack;
+        }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("[generate]" + psiElement.getText());
         }
@@ -78,21 +83,19 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         makeMethodCallExceptCurrentStackIsRecursive(method);
     }
 
-    public CallStack generate(KtFunction ktFunction) {
+    private CallStack generate(KtFunction ktFunction) {
         ktFunction.accept(this);
         return topStack;
     }
 
-    public CallStack generate(PsiMethod psiMethod) {
+    private CallStack generate(PsiMethod psiMethod) {
         final SequenceGenerator sequenceGenerator =
                 offsetStack.isEmpty() ? new SequenceGenerator(params) : new SequenceGenerator(params, offsetStack.pop(), depth);
-        CallStack javaCall = sequenceGenerator.generate(psiMethod);
+        CallStack javaCall = sequenceGenerator.generate(psiMethod, currentStack);
         LOGGER.debug("[JAVACall]:" + javaCall.generateText());
         if (topStack == null) {
             topStack = javaCall;
             currentStack = topStack;
-        } else {
-            currentStack.merge(javaCall);
         }
         return topStack;
     }
@@ -153,8 +156,8 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
 
     @Override
     public void visitObjectLiteralExpression(@NotNull KtObjectLiteralExpression expression) {
-        CallStack objLiteralExpr = new KtSequenceGenerator(params).generate(expression.getObjectDeclaration());
-        currentStack = currentStack.merge(objLiteralExpr);
+        CallStack objLiteralExpr = new KtSequenceGenerator(params).generate(expression.getObjectDeclaration(), currentStack);
+        //currentStack = currentStack.methodCall(objLiteralExpr);
         //super.visitObjectLiteralExpression(expression);
     }
 
@@ -182,7 +185,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
             depth++;
             LOGGER.debug("+ depth = " + depth + " method = " + psiElement.getText());
             offsetStack.push(offset);
-            generate(psiElement);
+            generate(psiElement,null); // here, No NEW Generator created, call with null
             depth--;
             LOGGER.debug("- depth = " + depth + " method = " + psiElement.getText());
             currentStack = oldStack;

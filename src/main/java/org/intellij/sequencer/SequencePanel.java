@@ -146,7 +146,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
                         true);
         ReadAction
                 .nonBlocking(() -> {
-                    final CallStack callStack = generator.generate(psiElement);
+                    final CallStack callStack = generator.generate(psiElement, null);
                     buildNaviIndex(callStack, "1");
                     _titleName = callStack.getMethod().getTitleName();
                     generate(callStack.generateSequence());
@@ -177,7 +177,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
 
         IGenerator generator = GeneratorFactory.createGenerator(psiElement.getLanguage(), _sequenceParams);
 
-        final CallStack callStack = generator.generate(psiElement);
+        final CallStack callStack = generator.generate(psiElement, null);
 
         if ("mmd".equalsIgnoreCase(ext))
             return callStack.generateMmd();

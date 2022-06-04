@@ -1,6 +1,11 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.1.9]
+### Changed
+- Build for 222.x
+- Add parent CallStack parameter to IGenerator
+
 ## [2.1.8]
 ### Fixed
 - Unable to export large images #122, #119

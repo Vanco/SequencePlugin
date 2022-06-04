@@ -37,7 +37,12 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     }
 
     @Override
-    public CallStack generate(PsiElement psiElement) {
+    public CallStack generate(PsiElement psiElement, CallStack parent) {
+        if (parent != null) {
+            topStack = parent;
+            currentStack = topStack;
+        }
+
         if (psiElement instanceof PsiMethod)
             return generate((PsiMethod) psiElement);
         else if (psiElement instanceof PsiLambdaExpression) {
@@ -55,14 +60,14 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
      * @param expression lambda expression
      * @return CallStack
      */
-    public CallStack generate(PsiLambdaExpression expression) {
+    private CallStack generate(PsiLambdaExpression expression) {
         MethodDescription method = createMethod(expression);
         makeMethodCallExceptCurrentStackIsRecursive(method);
         super.visitLambdaExpression(expression);
         return topStack;
     }
 
-    public CallStack generate(PsiMethod psiMethod) {
+    private CallStack generate(PsiMethod psiMethod) {
         if (psiMethod.getLanguage().equals(JavaLanguage.INSTANCE)) {
             return generateJava(psiMethod);
         } else if (psiMethod.getLanguage().equals(KotlinLanguage.INSTANCE)) {
@@ -82,12 +87,10 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
 
         final KtSequenceGenerator ktSequenceGenerator =
                 offsetStack.isEmpty() ? new KtSequenceGenerator(params) : new KtSequenceGenerator(params, offsetStack.pop(), depth);
-        CallStack kotlinCall = ktSequenceGenerator.generate(psiMethod.getNavigationElement());
+        CallStack kotlinCall = ktSequenceGenerator.generate(psiMethod.getNavigationElement(), currentStack);
         if (topStack == null) {
             topStack = kotlinCall;
             currentStack = topStack;
-        } else {
-            currentStack.merge(kotlinCall);
         }
         return topStack;
     }
@@ -334,8 +337,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
 
     @Override
     public void visitLambdaExpression(PsiLambdaExpression expression) {
-        CallStack lambdaExpr = new SequenceGenerator(params).generate(expression);
-        currentStack = currentStack.merge(lambdaExpr);
+        new SequenceGenerator(params).generate(expression, currentStack);
     }
 
     private boolean makeMethodCallExceptCurrentStackIsRecursive(MethodDescription method) {
