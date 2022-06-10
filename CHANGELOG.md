@@ -1,6 +1,11 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+### Added
+- `Show lambda call` option
+- Support generate function expression body in kotlin
+- Support generate lambda_argument
+
 ## [2.1.9]
 ### Changed
 - Build for 222.x

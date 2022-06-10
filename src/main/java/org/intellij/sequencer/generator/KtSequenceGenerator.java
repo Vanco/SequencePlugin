@@ -11,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.descriptors.CallableDescriptor;
 import org.jetbrains.kotlin.idea.caches.resolve.ResolutionUtils;
+import org.jetbrains.kotlin.idea.codeInsight.DescriptorToSourceUtilsIde;
 import org.jetbrains.kotlin.psi.*;
-import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils;
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode;
 
@@ -169,10 +169,10 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
 
     @Nullable
     private PsiElement resolveFunction(@NotNull KtExpression expression) {
-        ResolvedCall<? extends CallableDescriptor> resolvedCall = ResolutionUtils.resolveToCall(expression, BodyResolveMode.PARTIAL);
+        ResolvedCall<? extends CallableDescriptor> resolvedCall = ResolutionUtils.resolveToCall(expression, BodyResolveMode.FULL);
         if (resolvedCall == null) return null;
         CallableDescriptor candidateDescriptor = resolvedCall.getCandidateDescriptor();
-        return DescriptorToSourceUtils.descriptorToDeclaration(candidateDescriptor);
+        return DescriptorToSourceUtilsIde.INSTANCE.getAnyDeclaration(expression.getProject(), candidateDescriptor);
     }
 
     private void methodCall(PsiElement psiElement, int offset) {

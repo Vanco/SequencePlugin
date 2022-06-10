@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
+import org.intellij.sequencer.config.SequenceSettingsState;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
@@ -26,8 +27,11 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     private int depth;
     private final SequenceParams params;
 
+    private boolean SHOW_LAMBDA_CALL;
+
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
+        SHOW_LAMBDA_CALL = SequenceSettingsState.getInstance().SHOW_LAMBDA_CALL;
     }
 
     public SequenceGenerator(SequenceParams params, int offset, int depth) {
@@ -337,7 +341,11 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
 
     @Override
     public void visitLambdaExpression(PsiLambdaExpression expression) {
-        new SequenceGenerator(params).generate(expression, currentStack);
+        if (SHOW_LAMBDA_CALL) {
+             new SequenceGenerator(params).generate(expression, currentStack);
+        } else {
+            super.visitLambdaExpression(expression);
+        }
     }
 
     private boolean makeMethodCallExceptCurrentStackIsRecursive(MethodDescription method) {

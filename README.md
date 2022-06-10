@@ -80,11 +80,13 @@ I draw a dummy `λ→` self call in diagram.
 
 ### Kotlin support
 The Kotlin language support are in very early stage. 
-  - Support generate topLevel function
-  - Support generate PrimaryConstructor and SecondaryConstructor
-  - Support generate No Constructor Class
-  - Support generate JavaCall deeply
-  - Code navigation is Not Implement Yet
+  - [x] Support generate topLevel function
+  - [x] Support generate PrimaryConstructor and SecondaryConstructor
+  - [x] Support generate No Constructor Class
+  - [x] Support generate JavaCall deeply
+  - [ ] Support generate lambda argument
+  - [ ] Support generate function with expression body
+  - [ ] Code navigation
 
 ## How to use
 SequenceDiagram can generate sequence diagram from JAVA and Kotlin File. 
@@ -101,7 +103,7 @@ Please try to experience it and find what happen.
 Have fun!
 
 ## Version History
-**Current Version 2.1.8**
+**Current Version 2.1.9**
 
 versions:
 [Changelog](CHANGELOG.md)

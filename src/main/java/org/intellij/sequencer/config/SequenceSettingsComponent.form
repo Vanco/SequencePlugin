@@ -127,7 +127,7 @@
             <children>
               <component id="ec297" class="javax.swing.JCheckBox" binding="_antialiasing">
                 <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="1" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <actionCommand value="Use antialiasing"/>
@@ -168,6 +168,14 @@
                 </constraints>
                 <properties>
                   <text value="Show simple call name"/>
+                </properties>
+              </component>
+              <component id="ac2f9" class="javax.swing.JCheckBox" binding="_showLambdaCall">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Show lambda call"/>
                 </properties>
               </component>
             </children>

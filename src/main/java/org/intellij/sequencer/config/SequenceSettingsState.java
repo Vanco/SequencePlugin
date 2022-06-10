@@ -33,6 +33,8 @@ public class SequenceSettingsState implements PersistentStateComponent<SequenceS
     public boolean SHOW_RETURN_ARROWS = true;
     public boolean SHOW_CALL_NUMBERS = true;
     public boolean SHOW_SIMPLIFY_CALL_NAME = true;
+
+    public boolean SHOW_LAMBDA_CALL = true;
     public String FONT_NAME = "Dialog";
     public int FONT_SIZE = 11;
 
