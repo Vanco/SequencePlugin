@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 - `Show lambda call` option
+- Add Color Icon in setting Colors.
 - Support generate function expression body in kotlin
 - Support generate lambda_argument
 
