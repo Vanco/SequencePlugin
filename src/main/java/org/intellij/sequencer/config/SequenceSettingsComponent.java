@@ -13,6 +13,27 @@ public class SequenceSettingsComponent implements ActionListener {
           {"8", "9", "10", "11", "12", "13", "14",
            "16", "18", "20", "24", "28", "32", "48", "64"};
 
+    /**
+     * Default Icon(13x13) show color of background.
+     */
+    public static final Icon DEFAULT_ICON = new Icon() {
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            g.setColor(c.getBackground());
+            g.fillRect(x, y, 13, 13);
+        }
+
+        @Override
+        public int getIconWidth() {
+            return 13;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return 13;
+        }
+    };
+
     private JPanel _mainPanel;
     private JButton _classColor;
     private JButton _externalClassColor;
@@ -47,10 +68,15 @@ public class SequenceSettingsComponent implements ActionListener {
             _fondSize.addItem(fontSize);
         }
         _classColor.addActionListener(this);
+        _classColor.setIcon(DEFAULT_ICON);
         _externalClassColor.addActionListener(this);
+        _externalClassColor.setIcon(DEFAULT_ICON);
         _methodBarColor.addActionListener(this);
+        _methodBarColor.setIcon(DEFAULT_ICON);
         _selectedMethodBarColor.addActionListener(this);
+        _selectedMethodBarColor.setIcon(DEFAULT_ICON);
         _interfaceColor.addActionListener(this);
+        _interfaceColor.setIcon(DEFAULT_ICON);
         _addExcludeEntry.addActionListener(this);
         _removeExcludeEntry.addActionListener(this);
         _addColorMapEntry.addActionListener(this);

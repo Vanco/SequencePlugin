@@ -20,7 +20,7 @@ public class Editor extends JPanel implements DocumentListener, ModelTextListene
     private static final Logger LOGGER = Logger.getLogger(Editor.class);
 
     private Model _model = null;
-    private JEditorPane _editPane = new JEditorPane();
+    private final JEditorPane _editPane = new JEditorPane();
 
     private Action _cutAction = null;
     private Action _copyAction = null;
