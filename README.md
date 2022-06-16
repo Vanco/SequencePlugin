@@ -96,7 +96,7 @@ Since v2.1.0, the UI has improved a lot. now you can easily find it everywhere :
 2. In Tools menu. `Tools` > `Sequence Diagram ...`
 3. In Project view popup up menu. `Sequence Diagram ...`
 4. In Editor popup up menu. `Sequence Diagram ...`
-5. In IntentionAction tips.`Generate sequence diagram`
+5. ~~In IntentionAction tips.`Generate sequence diagram`~~(removed, not stable)
 
 Please try to experience it and find what happen. 
 

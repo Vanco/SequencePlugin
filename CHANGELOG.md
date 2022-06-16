@@ -1,11 +1,19 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.1.10]
 ### Added
 - `Show lambda call` option
 - Add Color Icon in setting Colors.
 - Support generate function expression body in kotlin
 - Support generate lambda_argument
+
+### Removed
+- Remove `Generate Sequence Diagram` intention
+
+### Fixed
+- Issue#127 
+- Issue#100 Method Declaration Becomes Grey
 
 ## [2.1.9]
 ### Changed

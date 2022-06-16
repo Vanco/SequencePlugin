@@ -1,6 +1,7 @@
 package org.intellij.sequencer.diagram;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.MalformedJsonException;
 import org.apache.log4j.Logger;
 import org.intellij.sequencer.Constants;
 import org.intellij.sequencer.generator.ClassDescription;
@@ -40,7 +41,12 @@ public class Parser {
                 break;
             } else if (c == '(') {
                 String methodName = readIdent(reader);
-                addCall(methodName);
+                try { addCall(methodName); } catch (Throwable e) {
+                    if (e instanceof MalformedJsonException) {
+                        LOGGER.error("org.intellij.sequencer.diagram.Parser: "+methodName);
+                    }
+                    throw e;
+                }
             } else if (c == ')') {
                 addReturn();
             } else {
@@ -235,6 +241,7 @@ public class Parser {
 
     /**
      * Peek a sdt tile read top method of Sequence Diagram.
+     *
      * @param f a .sdt file
      * @return MethodDescription
      */
