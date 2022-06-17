@@ -1,6 +1,13 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+### Changed
+- Change sdt to line break schema 
+
+### Fixed
+- Issue #126 
+- Issue #95
+
 ## [2.1.10]
 ### Added
 - `Show lambda call` option

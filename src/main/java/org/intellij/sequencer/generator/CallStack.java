@@ -58,15 +58,12 @@ public class CallStack {
     }
 
     private void generate(StringBuffer buffer) {
-        buffer.append('(').append(_method.toJson()).append(' ');
+        buffer.append('(').append('\n').append(_method.toJson()).append('\n');
         for(Iterator<CallStack> iterator = _calls.iterator(); iterator.hasNext();) {
             CallStack callStack = iterator.next();
             callStack.generate(buffer);
-            if(iterator.hasNext()) {
-                buffer.append(' ');
-            }
         }
-        buffer.append(')');
+        buffer.append(')').append('\n');
     }
 
     public String generateText() {
@@ -96,7 +93,7 @@ public class CallStack {
         if (Constants.CONSTRUCTOR_METHOD_NAME.equals(_method.getMethodName())) {
             buffer.append("create ").append(classA).append('\n');
         }
-        buffer.append("Actor").append(" -> ").append(classA).append(" : ").append(method).append("\n");
+        buffer.append("Actor").append(" -> ").append(classA).append(" : ").append(method).append('\n');
         buffer.append("activate ").append(classA).append('\n');
         generatePumlStr(buffer);
         buffer.append("return").append('\n');
@@ -113,7 +110,7 @@ public class CallStack {
             if (Constants.CONSTRUCTOR_METHOD_NAME.equals(callStack.getMethod().getMethodName())) {
                 buffer.append("create ").append(classB).append('\n');
             }
-            buffer.append(classA).append(" -> ").append(classB).append(" : ").append(method).append("\n");
+            buffer.append(classA).append(" -> ").append(classB).append(" : ").append(method).append('\n');
             buffer.append("activate ").append(classB).append('\n');
             callStack.generatePumlStr(buffer);
             buffer.append(classB).append(" --> ").append(classA).append('\n');

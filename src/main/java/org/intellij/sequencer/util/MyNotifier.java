@@ -16,7 +16,10 @@ public class MyNotifier {
      * @param content the content max in three line, may have html tag as will
      */
     public static void notifyError(@Nullable Project project, String content) {
-        NotificationGroup.findRegisteredGroup(SequenceService.PLUGIN_NAME)
+        NotificationGroup registeredGroup = NotificationGroup.findRegisteredGroup(SequenceService.PLUGIN_NAME);
+        if (registeredGroup == null) return;
+
+        registeredGroup
                 .createNotification(content, NotificationType.INFORMATION)
                 .setTitle(SequenceService.PLUGIN_NAME)
                 .setIcon(SequencePluginIcons.SEQUENCE_ICON_13)
@@ -30,7 +33,10 @@ public class MyNotifier {
      * @param action the action to be show in link.
      */
     public static void notifyWithAction(@Nullable Project project, String content, AnAction action) {
-        NotificationGroup.findRegisteredGroup(SequenceService.PLUGIN_NAME)
+        NotificationGroup registeredGroup = NotificationGroup.findRegisteredGroup(SequenceService.PLUGIN_NAME);
+        if (registeredGroup == null) return;
+
+        registeredGroup
                 .createNotification(content, NotificationType.INFORMATION)
                 .setTitle(SequenceService.PLUGIN_NAME)
                 .setIcon(SequencePluginIcons.SEQUENCE_ICON_13)

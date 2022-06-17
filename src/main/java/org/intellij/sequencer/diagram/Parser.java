@@ -9,10 +9,7 @@ import org.intellij.sequencer.generator.LambdaExprDescription;
 import org.intellij.sequencer.generator.MethodDescription;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PushbackReader;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -30,10 +27,38 @@ public class Parser {
     }
 
     public void parse(String sequenceStr) throws IOException {
-        parse(new PushbackReader(new StringReader(sequenceStr)));
+        parse(new BufferedReader(new StringReader(sequenceStr)));
     }
 
-    public void parse(PushbackReader reader) throws IOException {
+    public void parse(BufferedReader reader) throws IOException {
+        paseCalls(reader);
+        resolveBackCalls();
+    }
+
+    private void paseCalls(BufferedReader reader) throws IOException {
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            switch (line) {
+                case "(":
+                    break;
+                case ")":
+                    addReturn();
+                    break;
+                default:
+                    try {
+                        addCall(line);
+                    } catch (Throwable e) {
+                        if (e instanceof MalformedJsonException) {
+                            LOGGER.error("org.intellij.sequencer.diagram.Parser: " + line);
+                        }
+                        throw e;
+                    }
+                    break;
+            }
+        }
+    }
+
+    /*private void paseCalls(PushbackReader reader) throws IOException {
         while (true) {
             skipWhitespace(reader);
             int c = reader.read();
@@ -53,8 +78,7 @@ public class Parser {
                 LOGGER.error("Error '" + (char) c + "'");
             }
         }
-        resolveBackCalls();
-    }
+    }*/
 
     private void resolveBackCalls() {
         HashMap<Numbering, MethodInfo> callsMap = new HashMap<>();
@@ -165,79 +189,79 @@ public class Parser {
         }
     }
 
-    private String readIdent(PushbackReader reader) throws IOException {
+//    private String readIdent(PushbackReader reader) throws IOException {
+//
+//        skipWhitespace(reader);
+//        String result = readNonWhitespace(reader);
+//        skipWhitespace(reader);
+//
+//        if (LOGGER.isDebugEnabled())
+//            LOGGER.debug("readIdent(...) returning " + result);
+//
+//        return result;
+//    }
 
-        skipWhitespace(reader);
-        String result = readNonWhitespace(reader);
-        skipWhitespace(reader);
+//    private void skipWhitespace(PushbackReader reader) throws IOException {
+//
+//        int c;
+//        while (Character.isWhitespace((char) (c = reader.read()))) {
+//        }
+//        if (c != -1)
+//            reader.unread(c);
+//    }
 
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("readIdent(...) returning " + result);
-
-        return result;
-    }
-
-    private void skipWhitespace(PushbackReader reader) throws IOException {
-
-        int c;
-        while (Character.isWhitespace((char) (c = reader.read()))) {
-        }
-        if (c != -1)
-            reader.unread(c);
-    }
-
-    private String readNonWhitespace(PushbackReader r) throws IOException {
-        int c;
-        StringBuilder sb = new StringBuilder();
-        int deep = 0;
-        boolean isGeneric = false;
-        while ((c = r.read()) != -1) {
-            if (c == ')')
-                break;
-            else if (c == '\\') {
-                int u = r.read();
-                if (u == 'u') {
-                    StringBuilder tmp = new StringBuilder();
-                    tmp.append((char) c).append((char) u);
-                    for (int j = 0; j < 4; j++) {
-                        u = r.read();
-                        tmp.append((char) u);
-                    }
-                    if (tmp.toString().equals("\\u003c")) {
-                        deep++;
-                        isGeneric = true;
-                        sb.append(tmp);
-                    } else if (tmp.toString().equals("\\u003e")) {
-                        deep--;
-                        if (deep == 0)
-                            isGeneric = false;
-                        sb.append(tmp);
-                    } else {
-                        sb.append(tmp);
-                    }
-                }
-            } else if (c == '<') {
-                deep++;
-                isGeneric = true;
-                sb.append((char) c);
-            } else if (c == '>') {
-                deep--;
-                if (deep == 0)
-                    isGeneric = false;
-                sb.append((char) c);
-            } else if (Character.isWhitespace((char) c)) {
-                if (isGeneric) {
-                    sb.append((char) c);
-                } else {
-                    break;
-                }
-            } else
-                sb.append((char) c);
-        }
-        if (c != -1)
-            r.unread(c);
-        return sb.toString();
-    }
+//    private String readNonWhitespace(PushbackReader r) throws IOException {
+//        int c;
+//        StringBuilder sb = new StringBuilder();
+//        int deep = 0;
+//        boolean isGeneric = false;
+//        while ((c = r.read()) != -1) {
+//            if (c == ')')
+//                break;
+//            else if (c == '\\') {
+//                int u = r.read();
+//                if (u == 'u') {
+//                    StringBuilder tmp = new StringBuilder();
+//                    tmp.append((char) c).append((char) u);
+//                    for (int j = 0; j < 4; j++) {
+//                        u = r.read();
+//                        tmp.append((char) u);
+//                    }
+//                    if (tmp.toString().equals("\\u003c")) {
+//                        deep++;
+//                        isGeneric = true;
+//                        sb.append(tmp);
+//                    } else if (tmp.toString().equals("\\u003e")) {
+//                        deep--;
+//                        if (deep == 0)
+//                            isGeneric = false;
+//                        sb.append(tmp);
+//                    } else {
+//                        sb.append(tmp);
+//                    }
+//                }
+//            } else if (c == '<') {
+//                deep++;
+//                isGeneric = true;
+//                sb.append((char) c);
+//            } else if (c == '>') {
+//                deep--;
+//                if (deep == 0)
+//                    isGeneric = false;
+//                sb.append((char) c);
+//            } else if (Character.isWhitespace((char) c)) {
+//                if (isGeneric) {
+//                    sb.append((char) c);
+//                } else {
+//                    break;
+//                }
+//            } else
+//                sb.append((char) c);
+//        }
+//        if (c != -1)
+//            r.unread(c);
+//        return sb.toString();
+//    }
 
     /**
      * Peek a sdt tile read top method of Sequence Diagram.
@@ -249,21 +273,13 @@ public class Parser {
         try {
             List<String> query = Files.readAllLines(f.toPath());
             for (String s : query) {
-                PushbackReader reader = new PushbackReader(new StringReader(s));
-
-                Parser parser = new Parser();
-                parser.skipWhitespace(reader);
-                int c = reader.read();
-                switch (c) {
-                    case -1:
-                        break;
-                    case '(':
-                        String firstMethod = parser.readIdent(reader);
-
-                        Gson gson = new Gson();
-                        return gson.fromJson(firstMethod, MethodDescription.class);
+                switch (s) {
+                    case "(":
+                    case ")":
+                        continue;
                     default:
-                        return null;
+                        Gson gson = new Gson();
+                        return gson.fromJson(s, MethodDescription.class);
                 }
             }
 
@@ -322,7 +338,7 @@ public class Parser {
 
         private Numbering _numbering;
         private Call _call;
-        private int _startingSeq;
+        private final int _startingSeq;
 
         CallInfo(ObjectInfo obj, String method, int startingSeq) {
             _obj = obj;

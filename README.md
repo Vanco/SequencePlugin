@@ -103,9 +103,11 @@ Please try to experience it and find what happen.
 Have fun!
 
 ## Version History
-**Current Version 2.1.9**
+Current Version
 
-versions:
+![GitHub release](https://img.shields.io/github/v/release/Vanco/SequencePlugin)
+
+versions history:
 [Changelog](CHANGELOG.md)
 
 ## Acknowledgement

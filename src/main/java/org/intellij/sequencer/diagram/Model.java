@@ -11,7 +11,7 @@ public class Model {
 
     private static final Logger LOGGER = Logger.getLogger(Model.class);
 
-    private String _queryString = " ";
+    private String _queryString = "";
 
     private SwingPropertyChangeSupport _changeSupport;
 
