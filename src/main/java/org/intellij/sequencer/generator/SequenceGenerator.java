@@ -8,6 +8,10 @@ import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.config.SequenceSettingsState;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
+import org.intellij.sequencer.model.CallStack;
+import org.intellij.sequencer.model.ClassDescription;
+import org.intellij.sequencer.model.LambdaExprDescription;
+import org.intellij.sequencer.model.MethodDescription;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.kotlin.idea.KotlinLanguage;
 

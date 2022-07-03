@@ -19,11 +19,15 @@ import icons.SequencePluginIcons;
 import org.intellij.sequencer.config.ConfigListener;
 import org.intellij.sequencer.config.SequenceParamsState;
 import org.intellij.sequencer.diagram.*;
+import org.intellij.sequencer.formatter.MermaidFormatter;
+import org.intellij.sequencer.formatter.PlantUMLFormatter;
+import org.intellij.sequencer.formatter.SdtFormatter;
 import org.intellij.sequencer.generator.*;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.generator.filters.SingleClassFilter;
 import org.intellij.sequencer.generator.filters.SingleMethodFilter;
 import org.intellij.sequencer.impl.EmptySequenceNavigable;
+import org.intellij.sequencer.model.CallStack;
 import org.intellij.sequencer.ui.MyButtonlessScrollBarUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.psi.KtFunction;
@@ -149,7 +153,8 @@ public class SequencePanel extends JPanel implements ConfigListener {
                     final CallStack callStack = generator.generate(psiElement, null);
                     buildNaviIndex(callStack, "1");
                     _titleName = callStack.getMethod().getTitleName();
-                    generate(callStack.generateSequence());
+                    String format = new SdtFormatter().format(callStack);
+                    generate(format);
                     progressIndicator.processFinish();
                     return _titleName;
                 })
@@ -180,9 +185,9 @@ public class SequencePanel extends JPanel implements ConfigListener {
         final CallStack callStack = generator.generate(psiElement, null);
 
         if ("mmd".equalsIgnoreCase(ext))
-            return callStack.generateMmd();
+            return new MermaidFormatter().format(callStack);
 
-        return callStack.generatePuml();
+        return new PlantUMLFormatter().format(callStack);
     }
 
     private void showBirdView() {

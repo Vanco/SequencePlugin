@@ -1,8 +1,7 @@
-package org.intellij.sequencer.generator;
+package org.intellij.sequencer.model;
 
 import com.google.gson.GsonBuilder;
 import org.intellij.sequencer.Constants;
-import org.intellij.sequencer.model.GenericType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -115,14 +114,14 @@ public class MethodDescription {
     }
 
 
-    static MethodDescription createMethodDescription(ClassDescription classDescription,
+    public static MethodDescription createMethodDescription(ClassDescription classDescription,
                                                      List<String> attributes, String methodName,
                                                      String returnType,
                                                      List<String> argNames, List<String> argTypes, int offset) {
         return new MethodDescription(classDescription, attributes, methodName, returnType, argNames, argTypes, offset);
     }
 
-    static MethodDescription createConstructorDescription(ClassDescription classDescription,
+    public static MethodDescription createConstructorDescription(ClassDescription classDescription,
                                                           List<String> attributes, List<String> argNames,
                                                           List<String> argTypes, int offset) {
         return new MethodDescription(classDescription, attributes, Constants.CONSTRUCTOR_METHOD_NAME,

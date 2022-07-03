@@ -15,7 +15,7 @@ import org.intellij.sequencer.SequencePanel;
 import org.intellij.sequencer.SequenceParamsEditor;
 import org.intellij.sequencer.SequenceService;
 import org.intellij.sequencer.diagram.Parser;
-import org.intellij.sequencer.generator.MethodDescription;
+import org.intellij.sequencer.model.MethodDescription;
 import org.intellij.sequencer.impl.EmptySequenceNavigable;
 import org.intellij.sequencer.impl.JavaSequenceNavigable;
 import org.intellij.sequencer.impl.KtSequenceNavigable;

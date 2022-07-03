@@ -6,6 +6,9 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.Constants;
+import org.intellij.sequencer.model.CallStack;
+import org.intellij.sequencer.model.ClassDescription;
+import org.intellij.sequencer.model.MethodDescription;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -92,7 +95,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         final SequenceGenerator sequenceGenerator =
                 offsetStack.isEmpty() ? new SequenceGenerator(params) : new SequenceGenerator(params, offsetStack.pop(), depth);
         CallStack javaCall = sequenceGenerator.generate(psiMethod, currentStack);
-        LOGGER.debug("[JAVACall]:" + javaCall.generateText());
+        LOGGER.debug("[JAVACall]:" + javaCall.toString());
         if (topStack == null) {
             topStack = javaCall;
             currentStack = topStack;

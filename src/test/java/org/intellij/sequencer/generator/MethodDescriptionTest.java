@@ -1,7 +1,8 @@
 package org.intellij.sequencer.generator;
 
 import com.google.gson.Gson;
-import org.junit.Before;
+import org.intellij.sequencer.model.ClassDescription;
+import org.intellij.sequencer.model.MethodDescription;
 import org.junit.Test;
 
 import java.awt.image.DataBufferInt;
@@ -26,7 +27,7 @@ public class MethodDescriptionTest {
         argName.add("offset");
 
         ArrayList<String> argType = new ArrayList<>();
-        argType.add("org.intellij.sequencer.generator.ClassDescription");
+        argType.add("org.intellij.sequencer.model.ClassDescription");
         argType.add("java.util.List<java.lang.String>");
         argType.add("java.lang.String");
         argType.add("java.lang.String");
@@ -37,7 +38,7 @@ public class MethodDescriptionTest {
         MethodDescription m = MethodDescription.createMethodDescription(ClassDescription.ANONYMOUS_CLASS,
                 attr,
                 "createMethodDescription",
-                "org.intellij.sequencer.generator.MethodDescription",
+                "org.intellij.sequencer.model.MethodDescription",
                 argName,
                 argType,
                 0

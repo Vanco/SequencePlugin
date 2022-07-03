@@ -1,4 +1,4 @@
-package org.intellij.sequencer.generator;
+package org.intellij.sequencer.model;
 
 import org.intellij.sequencer.Constants;
 
