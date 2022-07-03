@@ -255,8 +255,10 @@ public class JavaSequenceNavigable implements SequenceNavigable {
         if (virtualFile == null)
             return;
 
+        // temporary check offset MUST less than File length
+        long length = virtualFile.getLength();
         getFileEditorManager().openTextEditor(new OpenFileDescriptor(project,
-                virtualFile, offset), true);
+                virtualFile, offset > length ? (int) length : offset), true);
     }
 
 

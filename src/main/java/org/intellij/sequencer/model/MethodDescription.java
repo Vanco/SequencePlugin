@@ -104,8 +104,7 @@ public class MethodDescription {
         MethodDescription that = (MethodDescription) o;
         return Objects.equals(_classDescription, that._classDescription)
                 && Objects.equals(_methodName, that._methodName)
-                && Objects.equals(_argTypes, that._argTypes)
-                && offset == that.getOffset();
+                && Objects.equals(_argTypes, that._argTypes);
     }
 
     @Override

@@ -119,7 +119,8 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("[visitPrimaryConstructor]" + constructor.getText());
         }
-        MethodDescription method = createMethod(constructor);
+        final int naviOffset = offsetStack.isEmpty() ? constructor.getTextOffset() : offsetStack.pop();
+        MethodDescription method = createMethod(constructor, naviOffset);
         if (makeMethodCallExceptCurrentStackIsRecursive(method)) return;
         super.visitPrimaryConstructor(constructor);
     }
@@ -129,7 +130,8 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("[visitSecondaryConstructor]" + constructor.getText());
         }
-        MethodDescription method = createMethod(constructor);
+        final int naviOffset = offsetStack.isEmpty() ? constructor.getTextOffset() : offsetStack.pop();
+        MethodDescription method = createMethod(constructor, naviOffset);
         if (makeMethodCallExceptCurrentStackIsRecursive(method)) return;
         super.visitSecondaryConstructor(constructor);
     }
@@ -245,7 +247,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         );
     }
 
-    private MethodDescription createMethod(KtSecondaryConstructor constructor) {
+    private MethodDescription createMethod(KtSecondaryConstructor constructor, int offset) {
         ParamPair paramPair = extractParameters(constructor.getValueParameters());
         ClassDescription classDescription = new ClassDescription(constructor.getName(), new ArrayList<>());
 
@@ -256,11 +258,11 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
                 classDescription,
                 attributes, Constants.CONSTRUCTOR_METHOD_NAME, returnType,
                 paramPair.argNames, paramPair.argTypes,
-                constructor.getTextOffset()
+                offset
         );
     }
 
-    private MethodDescription createMethod(KtPrimaryConstructor constructor) {
+    private MethodDescription createMethod(KtPrimaryConstructor constructor, int offset) {
         ParamPair paramPair = extractParameters(constructor.getValueParameters());
         ClassDescription classDescription = new ClassDescription(constructor.getName(), new ArrayList<>());
 
@@ -271,7 +273,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
                 classDescription,
                 attributes, Constants.CONSTRUCTOR_METHOD_NAME, returnType,
                 paramPair.argNames, paramPair.argTypes,
-                constructor.getTextOffset()
+                offset
         );
     }
 

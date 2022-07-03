@@ -43,7 +43,7 @@ public class KtSequenceNavigable extends JavaSequenceNavigable implements Sequen
                         final String objLiteralType = odx == -1 ? "": className.substring(odx + 1);
                         final String className1 = odx == -1 ? className : className.substring(0, odx);
 
-                        final String pathSegment = className1.replace(".", "/").replace("_", ".");
+                        final String pathSegment = className1.replace(".", "/").replace("_kt", ".kt");
                         final String filename = className1.substring(idx + 1).replace("_", ".");
 
                         final PsiFile[] psiFiles = FilenameIndex.getFilesByName(project, filename, GlobalSearchScope.allScope(project));
@@ -110,7 +110,7 @@ public class KtSequenceNavigable extends JavaSequenceNavigable implements Sequen
                         final String objLiteralType = odx == -1 ? "": fromClass.substring(odx + 1);
                         final String fromClass1 = odx == -1 ? fromClass : fromClass.substring(0, odx);
 
-                        final String pathSegment = fromClass1.replace(".", "/").replace("_", ".");
+                        final String pathSegment = fromClass1.replace(".", "/").replace("_kt", ".kt");
 
                         final String filename = fromClass1.substring(idx + 1).replace("_", ".");
 
