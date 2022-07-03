@@ -3,10 +3,12 @@
 ## [Unreleased]
 ### Changed
 - Change sdt to line break schema 
+- Refactoring add formatter package for PlantUML, Mermaid format.
 
 ### Fixed
 - Issue #126 
 - Issue #95
+- fix isRecursive always false issue.
 
 ## [2.1.10]
 ### Added
