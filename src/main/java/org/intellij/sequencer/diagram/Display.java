@@ -222,7 +222,15 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
         String svgNS = "http://www.w3.org/2000/svg";
         Document document = domImpl.createDocument(svgNS, "svg", null);
-
+        // backup look and feel
+        LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
+        // set look and feel to system default
+        try {
+            String systemLookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
+            UIManager.setLookAndFeel(systemLookAndFeelClassName);
+        } catch (Exception e) {
+            //ignore
+        }
         SVGGraphics2D svgGraphics2D = new SVGGraphics2D(document);
 
         Dimension size = getFullSize();
@@ -230,6 +238,12 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
         paintComponentWithHeader(svgGraphics2D);
 
+        // reset look and fell
+        try {
+            UIManager.setLookAndFeel(lookAndFeel);
+        } catch (UnsupportedLookAndFeelException e) {
+            //ignore
+        }
         FileWriter fileWriter = new FileWriter(file);
 
         svgGraphics2D.stream(fileWriter, false);
