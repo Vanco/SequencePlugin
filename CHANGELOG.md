@@ -9,6 +9,7 @@
 - Issue #126 
 - Issue #95
 - fix isRecursive always false issue.
+- SVG canvas size issue.
 
 ## [2.1.10]
 ### Added
