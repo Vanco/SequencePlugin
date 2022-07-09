@@ -2,7 +2,6 @@ package org.intellij.sequencer.diagram;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.ImageUtil;
-import kotlin.text.Charsets;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.intellij.sequencer.config.ConfigListener;
@@ -226,6 +225,9 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
 
         SVGGraphics2D svgGraphics2D = new SVGGraphics2D(document);
 
+        Dimension size = getFullSize();
+        svgGraphics2D.setSVGCanvasSize(size);
+
         paintComponentWithHeader(svgGraphics2D);
 
         FileWriter fileWriter = new FileWriter(file);
@@ -235,9 +237,6 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
     }
 
     public void paintComponentWithHeader(Graphics2D graphics) {
-        Dimension size = getFullSize();
-        graphics.setColor(JBColor.background());
-        graphics.fillRect(0, 0, size.width, size.height);
         _displayHeader.paintComponent(graphics);
         graphics.translate(0, _displayHeader.getHeight());
         paintComponent(graphics);
