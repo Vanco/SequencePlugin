@@ -1,8 +1,10 @@
 package org.intellij.sequencer;
 
+import java.nio.charset.StandardCharsets;
+
 public interface Constants {
     String ANONYMOUS_CLASS_NAME = "Anonymous";
     String CONSTRUCTOR_METHOD_NAME = "new";
-    String Lambda_Invoke = "λ→";
+    String Lambda_Invoke = "() ->";
     String TOP_LEVEL_FUN = "Global";
 }
