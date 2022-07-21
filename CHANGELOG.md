@@ -1,6 +1,7 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+## [2.2.0]
 ### Changed
 - Change sdt to line break schema 
 - Refactoring add formatter package for PlantUML, Mermaid format.
@@ -10,6 +11,9 @@
 - Issue #95
 - fix isRecursive always false issue.
 - SVG canvas size issue.
+- SVG `λ→` show incorrectly. 
+- Issue #129
+- Issue #130
 
 ## [2.1.10]
 ### Added
