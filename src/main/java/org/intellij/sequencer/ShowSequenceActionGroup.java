@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
