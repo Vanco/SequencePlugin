@@ -1,15 +1,11 @@
 package org.intellij.sequencer;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.lang.java.JavaLanguage;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.ui.popup.PopupStep;
-import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -22,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.idea.KotlinLanguage;
 import org.jetbrains.kotlin.psi.KtFunction;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -77,15 +74,15 @@ public class ShowSequenceAction extends AnAction {
 
             // try to get top PsiClass (java)
             if (psiElement == null && psiFile != null && psiFile.getLanguage() == JavaLanguage.INSTANCE) {
-                final Collection<PsiClass> psiClassCollection = PsiTreeUtil.findChildrenOfType(psiFile, PsiClass.class);
-                for (PsiClass psiClass : psiClassCollection) {
-                    chooseMethodToGenerate(event, plugin, params, psiClass);
-                }
+                final Collection<PsiClass> psiClassCollection = MyPsiUtil.findChildrenOfType(psiFile, PsiClass.class);
+                chooseMethodToGenerate(event, plugin, params, psiClassCollection);
             }
         }
 
         if (psiElement instanceof PsiClass) {
-            chooseMethodToGenerate(event, plugin, params, (PsiClass) psiElement);
+            ArrayList<PsiClass> list = new ArrayList<>();
+            list.add((PsiClass) psiElement);
+            chooseMethodToGenerate(event, plugin, params, list);
         } else if (psiElement instanceof PsiMethod) {
             PsiMethod method = (PsiMethod) psiElement;
             plugin.showSequence(params, method);
@@ -96,21 +93,56 @@ public class ShowSequenceAction extends AnAction {
 
     }
 
-    private void chooseMethodToGenerate(@NotNull AnActionEvent event, SequenceService plugin, SequenceParams params, PsiClass psiElement) {
-        PsiMethod[] methods = psiElement.getMethods();
-        // for PsiClass, show popup menu list method to choose
-        JBPopupFactory.getInstance().createListPopup(new BaseListPopupStep<PsiMethod>("Choose Method ...", Arrays.asList(methods)) {
-            @Override
-            public @NotNull
-            String getTextFor(PsiMethod value) {
-                return value.getName();
-            }
+    private void chooseMethodToGenerate(@NotNull AnActionEvent event, SequenceService plugin, SequenceParams params, Collection<PsiClass> psiClassCollection) {
 
-            @Override
-            public @Nullable
-            PopupStep<?> onChosen(PsiMethod selectedValue, boolean finalChoice) {
-                return doFinalStep(() -> plugin.showSequence(params, selectedValue));
+        // for PsiClass, show popup menu list method to choose
+        ArrayList<AnAction> list = new ArrayList<>();
+
+        if (psiClassCollection.size() > 1) {
+            for (PsiClass psiClass : psiClassCollection) {
+                ActionGroup group = new ActionGroup(psiClass.getName(), psiClass.getQualifiedName(), AllIcons.Nodes.Class) {
+                    @NotNull
+                    @Override
+                    public AnAction[] getChildren(@Nullable AnActionEvent e) {
+                        return getActions(plugin, params, psiClass);
+                    }
+                };
+                group.setPopup(true);
+                list.add(group);
+
             }
-        }).showInBestPositionFor(event.getDataContext());
+        } else {
+            for (PsiClass psiClass : psiClassCollection) {
+                list.addAll(Arrays.asList(getActions(plugin, params, psiClass)));
+            }
+        }
+
+        ActionGroup actionGroup = new ActionGroup() {
+            @NotNull
+            @Override
+            public AnAction[] getChildren(@Nullable AnActionEvent e) {
+                return list.toArray(new AnAction[0]);
+            }
+        };
+
+        JBPopupFactory.getInstance().createActionGroupPopup("Choose Method ...", actionGroup, event.getDataContext(),
+                null, false ).showInBestPositionFor(event.getDataContext());
+    }
+
+    private AnAction[] getActions( SequenceService plugin, SequenceParams params, PsiClass psiClass) {
+        PsiMethod[] methods = psiClass.getMethods();
+        ArrayList<AnAction> subList = new ArrayList<>();
+
+        for (PsiMethod method : methods) {
+            subList.add(new AnAction(method.getName(), "Generate sequence", AllIcons.Nodes.Method) {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent e) {
+                    Project project = e.getProject();
+                    if (project == null) return;
+                    plugin.showSequence(params, method);
+                }
+            });
+        }
+        return subList.toArray(new AnAction[0]);
     }
 }

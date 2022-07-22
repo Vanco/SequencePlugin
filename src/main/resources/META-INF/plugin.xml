@@ -36,11 +36,16 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
         <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction"
                 icon="SequencePluginIcons.SEQUENCE_ICON"
                 text="Sequence Diagram..." description="Generate sequence diagram of the current method">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="AddFrameworkSupport"/>
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="ShowIntentionsGroup"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <add-to-group group-id="NavBarToolBar" anchor="before" relative-to-action="NavBarToolBarOthers"/>
+<!--            <add-to-group group-id="NavBarToolBar" anchor="before" relative-to-action="NavBarToolBarOthers"/>-->
         </action>
+        <group id="SequencePlugin.SequenceDiagramGroup"
+               class="org.intellij.sequencer.ShowSequenceActionGroup"
+               icon="SequencePluginIcons.SEQUENCE_ICON" text="Sequence Diagram..." popup="true">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="AddFrameworkSupport"/>
+            <add-to-group group-id="NavBarToolBar" anchor="first"/>
+        </group>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

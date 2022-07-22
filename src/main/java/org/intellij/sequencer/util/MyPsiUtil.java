@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.psi.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -303,5 +304,17 @@ public class MyPsiUtil {
         }
 
         return "Unit";
+    }
+
+    /**
+     * Find PisClass in the PsiFile exclude PsiTypeParameter.
+     * @param psiFile
+     * @param psiClassClass
+     * @return
+     */
+    public static Collection<PsiClass> findChildrenOfType(PsiFile psiFile, Class<PsiClass> psiClassClass) {
+        Collection<PsiClass> children = PsiTreeUtil.findChildrenOfType(psiFile, psiClassClass);
+        children.removeIf(it -> it instanceof PsiTypeParameter);
+        return children;
     }
 }
