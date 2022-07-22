@@ -74,7 +74,7 @@ public class Lambda {
     }
 }
 ```
-I draw a dummy `λ→` self call in diagram.
+I draw a dummy `() ->` self call in diagram.
 
 ![Lambda Expression](imges/lambda_expr.png)
 
