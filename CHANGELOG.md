@@ -1,6 +1,9 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+### Added
+- Add ShowSequenceActionGroup
+
 ## [2.2.0]
 ### Changed
 - Change sdt to line break schema 
