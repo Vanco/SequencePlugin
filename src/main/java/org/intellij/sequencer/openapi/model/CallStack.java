@@ -1,4 +1,4 @@
-package org.intellij.sequencer.model;
+package org.intellij.sequencer.openapi.model;
 
 import org.jetbrains.annotations.NotNull;
 

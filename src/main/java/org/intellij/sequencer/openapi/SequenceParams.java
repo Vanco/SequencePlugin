@@ -1,10 +1,10 @@
-package org.intellij.sequencer.generator;
+package org.intellij.sequencer.openapi;
 
 import org.intellij.sequencer.config.SequenceSettingsState;
 import org.intellij.sequencer.config.ExcludeEntry;
-import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
-import org.intellij.sequencer.generator.filters.InterfaceImplFilter;
-import org.intellij.sequencer.generator.filters.PackageFilter;
+import org.intellij.sequencer.openapi.filters.CompositeElementFilter;
+import org.intellij.sequencer.openapi.filters.ImplementationWhiteList;
+import org.intellij.sequencer.openapi.filters.PackageFilter;
 import org.intellij.sequencer.generator.filters.SingleClassFilter;
 
 import java.util.List;
@@ -15,9 +15,10 @@ public class SequenceParams {
 
     private int _maxDepth = 3;
     private boolean _allowRecursion = false;
-    private boolean smartInterface = true;
-    private final CompositeMethodFilter _methodFilter = new CompositeMethodFilter();
-    private final InterfaceImplFilter _implFilter = new InterfaceImplFilter();
+    @Deprecated(since = "2.2.0", forRemoval = true)
+    private boolean smartInterface = false;
+    private final CompositeElementFilter _methodFilter = new CompositeElementFilter();
+    private final ImplementationWhiteList _implFilter = new ImplementationWhiteList();
 
     public SequenceParams() {
         List<ExcludeEntry> excludeList = SequenceSettingsState.getInstance().getExcludeList();
@@ -52,19 +53,21 @@ public class SequenceParams {
         this._allowRecursion = allowRecursion;
     }
 
+    @Deprecated(since = "2.2.0", forRemoval = true)
     public boolean isSmartInterface() {
         return smartInterface;
     }
 
+    @Deprecated(since = "2.2.0", forRemoval = true)
     public void setSmartInterface(boolean smartInterface) {
         this.smartInterface = smartInterface;
     }
 
-    public CompositeMethodFilter getMethodFilter() {
+    public CompositeElementFilter getMethodFilter() {
         return _methodFilter;
     }
 
-    public InterfaceImplFilter getInterfaceImplFilter() {
+    public ImplementationWhiteList getImplementationWhiteList() {
         return _implFilter;
     }
 }

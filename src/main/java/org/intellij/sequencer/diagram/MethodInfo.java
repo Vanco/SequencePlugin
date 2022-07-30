@@ -1,7 +1,7 @@
 package org.intellij.sequencer.diagram;
 
-import org.intellij.sequencer.Constants;
-import org.intellij.sequencer.model.GenericType;
+import org.intellij.sequencer.openapi.Constants;
+import org.intellij.sequencer.openapi.model.GenericType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

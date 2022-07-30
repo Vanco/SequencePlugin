@@ -1,6 +1,5 @@
 package org.intellij.sequencer.ui;
 
-import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -10,28 +9,28 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import icons.SequencePluginIcons;
-import org.intellij.sequencer.SequenceNavigable;
+import org.intellij.sequencer.openapi.SequenceNavigable;
 import org.intellij.sequencer.SequencePanel;
 import org.intellij.sequencer.SequenceParamsEditor;
 import org.intellij.sequencer.SequenceService;
 import org.intellij.sequencer.diagram.Parser;
-import org.intellij.sequencer.model.MethodDescription;
-import org.intellij.sequencer.impl.EmptySequenceNavigable;
-import org.intellij.sequencer.impl.JavaSequenceNavigable;
-import org.intellij.sequencer.impl.KtSequenceNavigable;
+import org.intellij.sequencer.generator.EmptySequenceNavigable;
+import org.intellij.sequencer.openapi.SequenceNavigableFactory;
+import org.intellij.sequencer.openapi.model.MethodDescription;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.idea.KotlinLanguage;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-import static org.intellij.sequencer.util.ConfigUtil.loadSequenceParams;
-import static org.intellij.sequencer.util.MyPsiUtil.getFileChooser;
 import static org.intellij.sequencer.util.MyNotifier.notifyError;
+import static org.intellij.sequencer.util.MyPsiUtil.getFileChooser;
 
 public class Welcome {
     private final JPanel myHtmlPanelWrapper;
@@ -100,7 +99,6 @@ public class Welcome {
 
                 if (project == null) return;
 
-                SequenceNavigable navigable = new EmptySequenceNavigable();
                 PsiMethod psiMethod = null;
 
                 if (method != null) {
@@ -115,11 +113,6 @@ public class Welcome {
                         String content = "Open success! Method source not found, the navigation is disabled.";
                         notifyError(project, content);
                     } else {
-                        if (psiMethod.getLanguage().is(JavaLanguage.INSTANCE)) {
-                            navigable = new JavaSequenceNavigable(project);
-                        } else if (psiMethod.getLanguage().is(KotlinLanguage.INSTANCE)) {
-                            navigable = new KtSequenceNavigable(project);
-                        }
 
                         titleName = method.getTitleName();
 
@@ -129,8 +122,9 @@ public class Welcome {
                     }
                 }
 
+                final PsiMethod theMethod = psiMethod;
                 SequencePanel sequencePanel = new SequencePanel(
-                        project, navigable, psiMethod, loadSequenceParams()
+                        project, theMethod
                 );
 
                 sequencePanel.setTitleName(titleName);

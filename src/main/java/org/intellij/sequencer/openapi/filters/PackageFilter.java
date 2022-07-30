@@ -1,11 +1,16 @@
-package org.intellij.sequencer.generator.filters;
+package org.intellij.sequencer.openapi.filters;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
 
-public class PackageFilter implements MethodFilter {
-    private String _packageName;
-    private boolean _recursive;
+/**
+ * The package should be excluded.
+ */
+public class PackageFilter implements PsiElementFilter {
+    private final String _packageName;
+    private final boolean _recursive;
 
     public PackageFilter(String packageName) {
         this(packageName, false);
@@ -16,8 +21,8 @@ public class PackageFilter implements MethodFilter {
         _recursive = recursive;
     }
 
-    public boolean allow(PsiMethod psiMethod) {
-        String packageName = MyPsiUtil.getPackageName(psiMethod);
+    public boolean allow(PsiElement psiElement) {
+        String packageName = MyPsiUtil.getPackageName(psiElement);
         if(packageName == null)
             return true;
         if (_recursive) {

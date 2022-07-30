@@ -1,6 +1,6 @@
 package org.intellij.sequencer.formatter;
 
-import org.intellij.sequencer.model.CallStack;
+import org.intellij.sequencer.openapi.model.CallStack;
 
 public class SdtFormatter implements IFormatter{
     @Override

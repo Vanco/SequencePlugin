@@ -3,6 +3,8 @@
 ## [Unreleased]
 ### Added
 - Add ShowSequenceActionGroup
+- Extract openapi
+- Add Shortcut `Alt S` (Windows OS), `option S` (MacOS)
 
 ## [2.2.0]
 ### Changed
@@ -15,7 +17,7 @@
 - fix isRecursive always false issue.
 - SVG canvas size issue.
 - SVG `λ→` show incorrectly. 
-- Issue #129
+- Issue #129 
 - Issue #130
 
 ## [2.1.10]

@@ -1,5 +1,6 @@
 package org.intellij.sequencer.config;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -19,6 +20,7 @@ public class SequenceParamsState implements PersistentStateComponent<SequencePar
     public boolean noGetterSetters = true;
     public boolean noPrivateMethods = false;
     public boolean noConstructors = false;
+    @Deprecated(since = "2.2.0", forRemoval = true)
     public boolean smartInterface = false;
 
     @Transient
@@ -28,7 +30,7 @@ public class SequenceParamsState implements PersistentStateComponent<SequencePar
     }
 
     public static @NotNull SequenceParamsState getInstance() {
-        return ServiceManager.getService(SequenceParamsState.class);
+        return ApplicationManager.getApplication().getService(SequenceParamsState.class);
     }
 
     public void addConfigListener(ConfigListener listener) {

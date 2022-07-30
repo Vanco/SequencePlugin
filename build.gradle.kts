@@ -4,7 +4,7 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.4.0"
+    id("org.jetbrains.intellij") version "1.6.0"
     id("org.jetbrains.changelog") version "1.2.1"
 }
 
@@ -38,8 +38,8 @@ changelog {
 tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "1.9"
+        targetCompatibility = "1.9"
     }
 
     patchPluginXml {

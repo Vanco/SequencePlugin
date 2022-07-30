@@ -8,10 +8,13 @@ import com.intellij.util.containers.Stack;
 import org.intellij.sequencer.config.SequenceSettingsState;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
-import org.intellij.sequencer.model.CallStack;
-import org.intellij.sequencer.model.ClassDescription;
-import org.intellij.sequencer.model.LambdaExprDescription;
-import org.intellij.sequencer.model.MethodDescription;
+import org.intellij.sequencer.openapi.GeneratorFactory;
+import org.intellij.sequencer.openapi.IGenerator;
+import org.intellij.sequencer.openapi.SequenceParams;
+import org.intellij.sequencer.openapi.model.CallStack;
+import org.intellij.sequencer.openapi.model.ClassDescription;
+import org.intellij.sequencer.openapi.model.LambdaExprDescription;
+import org.intellij.sequencer.openapi.model.MethodDescription;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.kotlin.idea.KotlinLanguage;
 
@@ -31,7 +34,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     private int depth;
     private final SequenceParams params;
 
-    private boolean SHOW_LAMBDA_CALL;
+    private final boolean SHOW_LAMBDA_CALL;
 
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
@@ -93,8 +96,10 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
      */
     private CallStack generateKotlin(PsiMethod psiMethod) {
 
-        final KtSequenceGenerator ktSequenceGenerator =
-                offsetStack.isEmpty() ? new KtSequenceGenerator(params) : new KtSequenceGenerator(params, offsetStack.pop(), depth);
+        final IGenerator ktSequenceGenerator =
+                offsetStack.isEmpty()
+                        ? GeneratorFactory.createGenerator(psiMethod.getLanguage(), params)
+                        : GeneratorFactory.createGenerator(psiMethod.getLanguage(), params, offsetStack.pop(), depth);
         CallStack kotlinCall = ktSequenceGenerator.generate(psiMethod.getNavigationElement(), currentStack);
         if (topStack == null) {
             topStack = kotlinCall;
@@ -129,14 +134,14 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
                     if (psiElement instanceof PsiMethod) {
                         if (alreadyInStack((PsiMethod) psiElement)) continue;
 
-                        if (/*!params.isSmartInterface() && */params.getInterfaceImplFilter().allow((PsiMethod) psiElement))
+                        if (/*!params.isSmartInterface() && */params.getImplementationWhiteList().allow((PsiMethod) psiElement))
                             methodAccept(psiElement);
                     }
                 }
             }
         } else {
             // resolve variable initializer
-            if (params.isSmartInterface() && !MyPsiUtil.isExternal(containingClass)) {
+            if (/*params.isSmartInterface() && */!MyPsiUtil.isExternal(containingClass)) {
                 containingClass.accept(implementationFinder);
             }
 
@@ -158,7 +163,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
             PsiMethod method = (PsiMethod) psiElement;
             if (params.getMethodFilter().allow(method)) {
                 PsiClass containingClass = (method).getContainingClass();
-                if (params.isSmartInterface() && containingClass != null && !MyPsiUtil.isExternal(containingClass))
+                if (/*params.isSmartInterface() && */containingClass != null && !MyPsiUtil.isExternal(containingClass))
                     containingClass.accept(implementationFinder);
                 method.accept(this);
             }
@@ -216,7 +221,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
                 String impl = psiType.getCanonicalText();
 
                 if (!impl.startsWith(type))
-                    params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                    params.getImplementationWhiteList().put(type, new ImplementClassFilter(impl));
             }
         } catch (Exception e) {
             //ignore
@@ -309,6 +314,37 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         super.visitLocalVariable(variable);
     }
 
+    /**
+     * Find interface's implementation of which user had used in assignment. e.g.
+     * <pre>
+     * public interface Fruit {
+     *     int eat();
+     * }
+     *
+     * public class Apple implements Fruit {
+     *     @Override
+     *     public int eat() {
+     *         return 5;
+     *     }
+     * }
+     *
+     * public class Banana implements Fruit {
+     *      @Override
+     *      public int eat() {
+     *          return 1;
+     *      }
+     * }
+     * </pre>
+     *
+     * When user use Apple assignment, the <code>Apple</code> implement should be preferred.
+     * <pre>
+     *     Fruit fruit = new Apple()
+     * </pre>
+     *
+     * @param referenceElement
+     * @param psiType
+     * @param initializer
+     */
     private void variableImplementationFinder(PsiJavaCodeReferenceElement referenceElement, PsiType psiType, PsiExpression initializer) {
         if (referenceElement != null) {
             PsiClass psiClass = (PsiClass) referenceElement.resolve();
@@ -320,7 +356,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
                     if (initializerType != null) {
                         String impl = initializerType.getCanonicalText();
                         if (!type.equals(impl)) {
-                            params.getInterfaceImplFilter().put(type, new ImplementClassFilter(impl));
+                            params.getImplementationWhiteList().put(type, new ImplementClassFilter(impl));
                         }
                     }
 
@@ -331,22 +367,33 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
 
     @Override
     public void visitAssignmentExpression(PsiAssignmentExpression expression) {
-        PsiExpression re = expression.getRExpression();
-        if (params.isSmartInterface() && re instanceof PsiNewExpression) {
-            String face = Objects.requireNonNull(expression.getType()).getCanonicalText();
-            PsiType psiType = Objects.requireNonNull(expression.getRExpression()).getType();
-            String impl = Objects.requireNonNull(psiType).getCanonicalText();
+        findImplementationInAssignmentExpression(expression);
+        super.visitAssignmentExpression(expression);
+    }
 
-            params.getInterfaceImplFilter().put(face, new ImplementClassFilter(impl));
+    private void findImplementationInAssignmentExpression(PsiAssignmentExpression expression) {
+        PsiExpression re = expression.getRExpression();
+        if (re instanceof PsiNewExpression) {
+            PsiType type = expression.getType();
+            if (type == null) return;
+
+            String face = type.getCanonicalText();
+            PsiType psiType = re.getType();
+            if (psiType == null) return;
+
+            String impl = psiType.getCanonicalText();
+
+            params.getImplementationWhiteList().put(face, new ImplementClassFilter(impl));
 
         }
-        super.visitAssignmentExpression(expression);
     }
 
     @Override
     public void visitLambdaExpression(PsiLambdaExpression expression) {
         if (SHOW_LAMBDA_CALL) {
-             new SequenceGenerator(params).generate(expression, currentStack);
+            GeneratorFactory
+                    .createGenerator(expression.getLanguage(), params)
+                    .generate(expression, currentStack);
         } else {
             super.visitLambdaExpression(expression);
         }
@@ -424,14 +471,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
 
         @Override
         public void visitAssignmentExpression(PsiAssignmentExpression expression) {
-            PsiExpression re = expression.getRExpression();
-            if (re instanceof PsiNewExpression) {
-                String face = Objects.requireNonNull(expression.getType()).getCanonicalText();
-                String impl = Objects.requireNonNull(expression.getRExpression().getType()).getCanonicalText();
-
-                params.getInterfaceImplFilter().put(face, new ImplementClassFilter(impl));
-
-            }
+            findImplementationInAssignmentExpression(expression);
             super.visitAssignmentExpression(expression);
         }
 

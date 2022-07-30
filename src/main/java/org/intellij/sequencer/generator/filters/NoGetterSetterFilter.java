@@ -1,9 +1,14 @@
 package org.intellij.sequencer.generator.filters;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.PropertyUtil;
+import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 
-public class NoGetterSetterFilter implements MethodFilter {
+/**
+ * Exclude getter/setter method.
+ */
+public class NoGetterSetterFilter implements PsiElementFilter {
     private boolean _noGetterSetters = true;
 
     public NoGetterSetterFilter(boolean noGetterSetters) {
@@ -18,8 +23,10 @@ public class NoGetterSetterFilter implements MethodFilter {
         _noGetterSetters = noGetterSetters;
     }
 
-    public boolean allow(PsiMethod psiMethod) {
-        if(_noGetterSetters && isGetterSetter(psiMethod))
+    public boolean allow(PsiElement psiElement) {
+        if(_noGetterSetters
+                && (psiElement instanceof PsiMethod)
+                && isGetterSetter((PsiMethod) psiElement))
             return false;
         return true;
     }

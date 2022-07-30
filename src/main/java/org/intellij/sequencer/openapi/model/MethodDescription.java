@@ -1,7 +1,7 @@
-package org.intellij.sequencer.model;
+package org.intellij.sequencer.openapi.model;
 
 import com.google.gson.GsonBuilder;
-import org.intellij.sequencer.Constants;
+import org.intellij.sequencer.openapi.Constants;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

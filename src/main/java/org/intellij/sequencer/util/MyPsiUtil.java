@@ -95,8 +95,8 @@ public class MyPsiUtil {
         return MyPsiUtil.findPsiMethod(psiMethods, methodName, argTypes);
     }
 
-    public static String getPackageName(PsiMethod psiMethod) {
-        PsiElement psiElement = psiMethod.getParent();
+    public static String getPackageName(PsiElement param) {
+        PsiElement psiElement = param;
         while (psiElement != null) {
             if (psiElement instanceof PsiJavaFile) {
                 PsiJavaFile psiJavaFile = (PsiJavaFile) psiElement;
@@ -312,8 +312,8 @@ public class MyPsiUtil {
      * @param psiClassClass
      * @return
      */
-    public static Collection<PsiClass> findChildrenOfType(PsiFile psiFile, Class<PsiClass> psiClassClass) {
-        Collection<PsiClass> children = PsiTreeUtil.findChildrenOfType(psiFile, psiClassClass);
+    public static <T extends PsiElement> Collection<T> findChildrenOfType(PsiFile psiFile, Class<? extends T> psiClassClass) {
+        @NotNull Collection<T> children = PsiTreeUtil.findChildrenOfType(psiFile, psiClassClass);
         children.removeIf(it -> it instanceof PsiTypeParameter);
         return children;
     }

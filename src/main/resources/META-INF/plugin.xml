@@ -28,25 +28,39 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     <depends>com.intellij.modules.java</depends>
 
-    <depends>org.jetbrains.kotlin</depends>
+    <depends optional="true" config-file="SequenceDiagram-kotlin.xml">org.jetbrains.kotlin</depends>
 
     <change-notes/>
 
     <actions>
         <action id="SequencePlugin.ShowSequenceDiagram" class="org.intellij.sequencer.ShowSequenceAction"
                 icon="SequencePluginIcons.SEQUENCE_ICON"
-                text="Sequence Diagram..." description="Generate sequence diagram of the current method">
+                text="Sequence Diagram"
+                description="Generate sequence diagram of the current method">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="ShowIntentionsGroup"/>
+            <add-to-group group-id="StructureViewPopupMenu" anchor="after" relative-to-action="RefactoringMenu"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-<!--            <add-to-group group-id="NavBarToolBar" anchor="before" relative-to-action="NavBarToolBarOthers"/>-->
+            <keyboard-shortcut first-keystroke="alt S" keymap="$default"/>
         </action>
         <group id="SequencePlugin.SequenceDiagramGroup"
                class="org.intellij.sequencer.ShowSequenceActionGroup"
                icon="SequencePluginIcons.SEQUENCE_ICON" text="Sequence Diagram..." popup="true">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="AddFrameworkSupport"/>
-            <add-to-group group-id="NavBarToolBar" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="before" relative-to-action="AssociateWithFileType"/>
+            <add-to-group group-id="NavBarToolBarOthers" anchor="first"/>
         </group>
     </actions>
+
+    <extensionPoints>
+        <extensionPoint name="sequenceNavigable" beanClass="com.intellij.lang.LanguageExtensionPoint" area="IDEA_PROJECT" dynamic="true">
+            <with attribute="implementationClass" implements="org.intellij.sequencer.openapi.SequenceNavigable"/>
+        </extensionPoint>
+        <extensionPoint name="generator" beanClass="com.intellij.lang.LanguageExtensionPoint" dynamic="true">
+            <with attribute="implementationClass" implements="org.intellij.sequencer.openapi.GeneratorFactory"/>
+        </extensionPoint>
+        <extensionPoint name="actionMenuFinder" beanClass="com.intellij.lang.LanguageExtensionPoint" dynamic="true">
+            <with attribute="implementationClass" implements="org.intellij.sequencer.openapi.ActionMenuFinder"/>
+        </extensionPoint>
+    </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
@@ -64,5 +78,10 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
                         serviceImplementation="org.intellij.sequencer.impl.SequenceServiceImpl"/>
 
 
+    </extensions>
+    <extensions defaultExtensionNs="SequenceDiagram">
+        <sequenceNavigable language="JAVA" implementationClass="org.intellij.sequencer.generator.JavaSequenceNavigable"/>
+        <generator language="JAVA" implementationClass="org.intellij.sequencer.generator.JavaGeneratorFactory"/>
+        <actionMenuFinder language="JAVA" implementationClass="org.intellij.sequencer.generator.JavaActionMenuFinder"/>
     </extensions>
 </idea-plugin>

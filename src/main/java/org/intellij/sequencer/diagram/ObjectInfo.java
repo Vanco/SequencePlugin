@@ -9,10 +9,10 @@ public class ObjectInfo extends Info {
     private static final Logger LOGGER = Logger.getLogger(ObjectInfo.class);
     public static final String ACTOR_NAME = "Actor";
 
-    private String _name;
-    private String _fullName;
-    private int _seq;
-    private List<MethodInfo> _methods = new ArrayList<>();
+    private final String _name;
+    private final String _fullName;
+    private final int _seq;
+    private final List<MethodInfo> _methods = new ArrayList<>();
 
     public ObjectInfo(String name, List<String> attributes, int seq) {
         super(attributes);

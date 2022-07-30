@@ -2,8 +2,8 @@ package org.intellij.sequencer.formatter;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.intellij.sequencer.config.SequenceSettingsState;
-import org.intellij.sequencer.model.CallStack;
-import org.intellij.sequencer.model.MethodDescription;
+import org.intellij.sequencer.openapi.model.CallStack;
+import org.intellij.sequencer.openapi.model.MethodDescription;
 
 /**
  * Generate Mermaid Sequence Diagram format.

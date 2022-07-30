@@ -22,12 +22,11 @@ import org.intellij.sequencer.diagram.*;
 import org.intellij.sequencer.formatter.MermaidFormatter;
 import org.intellij.sequencer.formatter.PlantUMLFormatter;
 import org.intellij.sequencer.formatter.SdtFormatter;
-import org.intellij.sequencer.generator.*;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
 import org.intellij.sequencer.generator.filters.SingleClassFilter;
 import org.intellij.sequencer.generator.filters.SingleMethodFilter;
-import org.intellij.sequencer.impl.EmptySequenceNavigable;
-import org.intellij.sequencer.model.CallStack;
+import org.intellij.sequencer.openapi.*;
+import org.intellij.sequencer.openapi.model.CallStack;
 import org.intellij.sequencer.ui.MyButtonlessScrollBarUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.psi.KtFunction;
@@ -58,18 +57,14 @@ public class SequencePanel extends JPanel implements ConfigListener {
     private final HashMap<String, Integer> navIndexMap = new HashMap<>();
     private GenerateFinishedListener finished = name -> {};
 
-    public SequencePanel(Project project, SequenceNavigable navigable, PsiElement psiMethod, SequenceParams sequenceParams) {
+    public SequencePanel(Project project, PsiElement psiMethod) {
         super(new BorderLayout());
         this.project = project;
 
-        if (navigable == null) {
-            this.navigable = new EmptySequenceNavigable();
-        } else {
-            this.navigable = navigable;
-        }
+        navigable = SequenceNavigableFactory.INSTANCE.forLanguage(project, psiMethod.getLanguage());
 
         psiElement = psiMethod;
-        _sequenceParams = sequenceParams;
+        _sequenceParams = loadSequenceParams();
 
 
         _model = new Model();
@@ -265,7 +260,6 @@ public class SequencePanel extends JPanel implements ConfigListener {
         } else if (isLambdaCall(fromMethodInfo)) {
             LambdaExprInfo lambdaExprInfo = (LambdaExprInfo) fromMethodInfo;
             navigable.openMethodCallInsideLambdaExprInEditor(
-                    _sequenceParams.getMethodFilter(),
                     lambdaExprInfo.getObjectInfo().getFullName(),
                     lambdaExprInfo.getEnclosedMethodName(),
                     lambdaExprInfo.getEnclosedMethodArgTypes(),
@@ -280,7 +274,6 @@ public class SequencePanel extends JPanel implements ConfigListener {
             gotoMethod(toMethodInfo);
         } else {
             navigable.openMethodCallInEditor(
-                    _sequenceParams.getMethodFilter(),
                     fromMethodInfo.getObjectInfo().getFullName(),
                     fromMethodInfo.getRealName(),
                     fromMethodInfo.getArgTypes(),
@@ -529,7 +522,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-            _sequenceParams.getInterfaceImplFilter().put(
+            _sequenceParams.getImplementationWhiteList().put(
                     face,
                     new ImplementClassFilter(impl)
             );
@@ -556,7 +549,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
                 actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
                 if (displayObject.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE)
                         && !displayObject.getObjectInfo().hasAttribute(Info.EXTERNAL_ATTRIBUTE)
-                        && !_sequenceParams.isSmartInterface()) {
+                        /*&& !_sequenceParams.isSmartInterface()*/) {
                     String className = displayObject.getObjectInfo().getFullName();
                     List<String> impls = navigable.findImplementations(className);
                     actionGroup.addSeparator();
@@ -570,7 +563,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
                 actionGroup.add(new RemoveMethodAction(displayMethod.getMethodInfo()));
                 if (displayMethod.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE)
                         && !displayMethod.getObjectInfo().hasAttribute(Info.EXTERNAL_ATTRIBUTE)
-                        && !_sequenceParams.isSmartInterface()) {
+                        /*&& !_sequenceParams.isSmartInterface()*/) {
 
                     String className = displayMethod.getObjectInfo().getFullName();
                     String methodName = displayMethod.getMethodInfo().getRealName();

@@ -1,4 +1,4 @@
-package org.intellij.sequencer.impl;
+package org.intellij.sequencer.ext.kotlin;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.ReadAction;
@@ -9,18 +9,15 @@ import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.concurrency.NonUrgentExecutor;
-import org.intellij.sequencer.SequenceNavigable;
-import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
-import org.intellij.sequencer.generator.filters.MethodFilter;
+import org.intellij.sequencer.openapi.SequenceNavigable;
+import org.intellij.sequencer.generator.JavaSequenceNavigable;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.psi.*;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class KtSequenceNavigable extends JavaSequenceNavigable implements SequenceNavigable {
 
@@ -85,7 +82,7 @@ public class KtSequenceNavigable extends JavaSequenceNavigable implements Sequen
                     })
                     .finishOnUiThread(ModalityState.defaultModalityState(), p -> {
                         if (p != null)
-                            openInEditor(p.first, p.second);
+                            openInEditor(p.first, p.second, project);
                     })
                     .inSmartMode(project)
                     .submit(NonUrgentExecutor.getInstance());
@@ -101,7 +98,7 @@ public class KtSequenceNavigable extends JavaSequenceNavigable implements Sequen
     }
 
     @Override
-    public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes, String toClass, String toMethod, List<String> toArgType, int offset) {
+    public void openMethodCallInEditor(String fromClass, String fromMethod, List<String> fromArgTypes, String toClass, String toMethod, List<String> toArgType, int offset) {
         if (MyPsiUtil.isKtFileName(fromClass) || MyPsiUtil.isKtObjectLiteral(fromClass)) {
             ReadAction
                     .nonBlocking(() -> {
@@ -146,24 +143,24 @@ public class KtSequenceNavigable extends JavaSequenceNavigable implements Sequen
 
                         return null;
                     })
-                    .finishOnUiThread(ModalityState.defaultModalityState(), containingClass -> openInEditor(containingClass, offset))
+                    .finishOnUiThread(ModalityState.defaultModalityState(), containingClass -> openInEditor(containingClass, offset, project))
                     .inSmartMode(project)
                     .submit(NonUrgentExecutor.getInstance());
 
         } else {
-            super.openMethodCallInEditor(filter, fromClass, fromMethod, fromArgTypes, toClass, toMethod, toArgType, offset);
+            super.openMethodCallInEditor(fromClass, fromMethod, fromArgTypes, toClass, toMethod, toArgType, offset);
         }
 
     }
 
     @Override
     public List<String> findImplementations(String className) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public List<String> findImplementations(String className, String methodName, List<String> argTypes) {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -172,8 +169,8 @@ public class KtSequenceNavigable extends JavaSequenceNavigable implements Sequen
     }
 
     @Override
-    public void openMethodCallInsideLambdaExprInEditor(CompositeMethodFilter methodFilter, String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes, List<String> argTypes, String returnType, String toClass, String toMethod, List<String> toArgTypes, int offset) {
-        super.openMethodCallInsideLambdaExprInEditor(methodFilter, fromClass, enclosedMethodName, enclosedMethodArgTypes, argTypes, returnType, toClass, toMethod, toArgTypes, offset);
+    public void openMethodCallInsideLambdaExprInEditor(String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes, List<String> argTypes, String returnType, String toClass, String toMethod, List<String> toArgTypes, int offset) {
+        super.openMethodCallInsideLambdaExprInEditor(fromClass, enclosedMethodName, enclosedMethodArgTypes, argTypes, returnType, toClass, toMethod, toArgTypes, offset);
     }
 
 }

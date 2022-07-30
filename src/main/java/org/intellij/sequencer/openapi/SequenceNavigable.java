@@ -1,7 +1,4 @@
-package org.intellij.sequencer;
-
-import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
-import org.intellij.sequencer.generator.filters.MethodFilter;
+package org.intellij.sequencer.openapi;
 
 import java.util.List;
 
@@ -10,13 +7,14 @@ import java.util.List;
  * Created by van on 2020/4/12.
  */
 public interface SequenceNavigable {
+
     void openClassInEditor(String className);
 
     void openMethodInEditor(String className, String methodName, List<String> argTypes);
 
     boolean isInsideAMethod();
 
-    void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes,
+    void openMethodCallInEditor(String fromClass, String fromMethod, List<String> fromArgTypes,
                                 String toClass, String toMethod, List<String> toArgType, int offset);
 
     List<String> findImplementations(String className);
@@ -25,7 +23,7 @@ public interface SequenceNavigable {
 
     void openLambdaExprInEditor(String fromClass, String fromMethod, List<String> fromArgTypes, List<String> argTypes, String returnType, int integer);
 
-    void openMethodCallInsideLambdaExprInEditor(CompositeMethodFilter methodFilter, String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes,
+    void openMethodCallInsideLambdaExprInEditor(String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes,
                                                 List<String> argTypes, String returnType,
                                                 String toClass, String toMethod, List<String> toArgTypes, int offset);
 }

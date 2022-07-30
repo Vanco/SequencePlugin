@@ -1,4 +1,4 @@
-package org.intellij.sequencer.model;
+package org.intellij.sequencer.openapi.model;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

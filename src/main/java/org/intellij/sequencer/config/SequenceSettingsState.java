@@ -1,5 +1,6 @@
 package org.intellij.sequencer.config;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -46,7 +47,7 @@ public class SequenceSettingsState implements PersistentStateComponent<SequenceS
     public SequenceSettingsState() {}
 
     public static SequenceSettingsState getInstance() {
-        return ServiceManager.getService(SequenceSettingsState.class);
+        return ApplicationManager.getApplication().getService(SequenceSettingsState.class);
     }
 
     public void addConfigListener(ConfigListener listener) {

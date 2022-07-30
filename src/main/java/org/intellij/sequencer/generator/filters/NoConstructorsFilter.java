@@ -1,8 +1,13 @@
 package org.intellij.sequencer.generator.filters;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 
-public class NoConstructorsFilter implements MethodFilter {
+/**
+ * Exclude constructors.
+ */
+public class NoConstructorsFilter implements PsiElementFilter {
     private boolean _noConstructors = false;
 
     public NoConstructorsFilter(boolean noConstructors) {
@@ -17,8 +22,10 @@ public class NoConstructorsFilter implements MethodFilter {
         _noConstructors = noConstructors;
     }
 
-    public boolean allow(PsiMethod psiMethod) {
-        if(_noConstructors && psiMethod.isConstructor())
+    public boolean allow(PsiElement psiElement) {
+        if(_noConstructors
+                && (psiElement instanceof PsiMethod)
+                && ((PsiMethod) psiElement).isConstructor())
             return false;
         return true;
     }

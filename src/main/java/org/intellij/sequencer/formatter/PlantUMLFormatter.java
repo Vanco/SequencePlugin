@@ -1,9 +1,9 @@
 package org.intellij.sequencer.formatter;
 
-import org.intellij.sequencer.Constants;
+import org.intellij.sequencer.openapi.Constants;
 import org.intellij.sequencer.config.SequenceSettingsState;
-import org.intellij.sequencer.model.CallStack;
-import org.intellij.sequencer.model.MethodDescription;
+import org.intellij.sequencer.openapi.model.CallStack;
+import org.intellij.sequencer.openapi.model.MethodDescription;
 
 /**
  * Generate <a href="https://plantuml.com/sequence-diagram">PlantUml sequence diagram</a> format.

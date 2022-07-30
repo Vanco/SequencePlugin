@@ -1,8 +1,6 @@
-package org.intellij.sequencer.impl;
+package org.intellij.sequencer.generator;
 
-import org.intellij.sequencer.SequenceNavigable;
-import org.intellij.sequencer.generator.filters.CompositeMethodFilter;
-import org.intellij.sequencer.generator.filters.MethodFilter;
+import org.intellij.sequencer.openapi.SequenceNavigable;
 
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class EmptySequenceNavigable implements SequenceNavigable {
     }
 
     @Override
-    public void openMethodCallInEditor(MethodFilter filter, String fromClass, String fromMethod, List<String> fromArgTypes, String toClass, String toMethod, List<String> toArgType, int offset) {
+    public void openMethodCallInEditor(String fromClass, String fromMethod, List<String> fromArgTypes, String toClass, String toMethod, List<String> toArgType, int offset) {
 
     }
 
@@ -43,7 +41,7 @@ public class EmptySequenceNavigable implements SequenceNavigable {
     }
 
     @Override
-    public void openMethodCallInsideLambdaExprInEditor(CompositeMethodFilter methodFilter, String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes, List<String> argTypes, String returnType, String toClass, String toMethod, List<String> toArgTypes, int offset) {
+    public void openMethodCallInsideLambdaExprInEditor(String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes, List<String> argTypes, String returnType, String toClass, String toMethod, List<String> toArgTypes, int offset) {
 
     }
 }

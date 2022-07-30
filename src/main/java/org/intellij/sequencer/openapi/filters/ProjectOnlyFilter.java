@@ -1,9 +1,14 @@
-package org.intellij.sequencer.generator.filters;
+package org.intellij.sequencer.openapi.filters;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
 
-public class ProjectOnlyFilter implements MethodFilter {
+/**
+ * Only project class/interface should be included.
+ */
+public class ProjectOnlyFilter implements PsiElementFilter {
     private boolean _projectClasssesOnly = true;
 
     public ProjectOnlyFilter(boolean projectClasssesOnly) {
@@ -18,14 +23,14 @@ public class ProjectOnlyFilter implements MethodFilter {
         _projectClasssesOnly = projectClasssesOnly;
     }
 
-    public boolean allow(PsiMethod psiMethod) {
-        if(_projectClasssesOnly && isInProject(psiMethod))
+    public boolean allow(PsiElement psiElement) {
+        if(_projectClasssesOnly && isInProject(psiElement))
             return false;
         return true;
     }
 
-    private boolean isInProject(PsiMethod psiMethod) {
-        return MyPsiUtil.isInJarFileSystem(psiMethod) || MyPsiUtil.isInClassFile(psiMethod);
+    private boolean isInProject(PsiElement psiElement) {
+        return MyPsiUtil.isInJarFileSystem(psiElement) || MyPsiUtil.isInClassFile(psiElement);
     }
 
 }

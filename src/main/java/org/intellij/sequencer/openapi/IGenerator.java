@@ -1,7 +1,7 @@
-package org.intellij.sequencer.generator;
+package org.intellij.sequencer.openapi;
 
 import com.intellij.psi.PsiElement;
-import org.intellij.sequencer.model.CallStack;
+import org.intellij.sequencer.openapi.model.CallStack;
 import org.jetbrains.annotations.Nullable;
 
 public interface IGenerator {

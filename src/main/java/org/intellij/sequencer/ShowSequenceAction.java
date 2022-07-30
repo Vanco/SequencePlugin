@@ -10,7 +10,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
-import org.intellij.sequencer.generator.SequenceParams;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,8 +19,6 @@ import org.jetbrains.kotlin.psi.KtFunction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
-import static org.intellij.sequencer.util.ConfigUtil.loadSequenceParams;
 
 /**
  * Show Sequence generate options dialog.
@@ -60,8 +57,6 @@ public class ShowSequenceAction extends AnAction {
 
         SequenceService plugin = project.getService(SequenceService.class);
 
-        SequenceParams params = loadSequenceParams();
-
         PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
         if (psiElement == null) {
             // try to find the enclosedMethod of caret (java)
@@ -74,25 +69,25 @@ public class ShowSequenceAction extends AnAction {
             // try to get top PsiClass (java)
             if (psiElement == null && psiFile != null && psiFile.getLanguage() == JavaLanguage.INSTANCE) {
                 final Collection<PsiClass> psiClassCollection = MyPsiUtil.findChildrenOfType(psiFile, PsiClass.class);
-                chooseMethodToGenerate(event, plugin, params, psiClassCollection);
+                chooseMethodToGenerate(event, plugin, psiClassCollection);
             }
         }
 
         if (psiElement instanceof PsiClass) {
             ArrayList<PsiClass> list = new ArrayList<>();
             list.add((PsiClass) psiElement);
-            chooseMethodToGenerate(event, plugin, params, list);
+            chooseMethodToGenerate(event, plugin, list);
         } else if (psiElement instanceof PsiMethod) {
             PsiMethod method = (PsiMethod) psiElement;
-            plugin.showSequence(params, method);
+            plugin.showSequence(method);
         } else if (psiElement instanceof KtFunction) {
             // generate kotlin function
-            plugin.showSequence(params, psiElement);
+            plugin.showSequence(psiElement);
         }
 
     }
 
-    private void chooseMethodToGenerate(@NotNull AnActionEvent event, SequenceService plugin, SequenceParams params, Collection<PsiClass> psiClassCollection) {
+    private void chooseMethodToGenerate(@NotNull AnActionEvent event, SequenceService plugin, Collection<PsiClass> psiClassCollection) {
 
         // for PsiClass, show popup menu list method to choose
         ArrayList<AnAction> list = new ArrayList<>();
@@ -103,7 +98,7 @@ public class ShowSequenceAction extends AnAction {
                     @NotNull
                     @Override
                     public AnAction[] getChildren(@Nullable AnActionEvent e) {
-                        return getActions(plugin, params, psiClass);
+                        return getActions(plugin, psiClass);
                     }
                 };
                 group.setPopup(true);
@@ -112,7 +107,7 @@ public class ShowSequenceAction extends AnAction {
             }
         } else {
             for (PsiClass psiClass : psiClassCollection) {
-                list.addAll(Arrays.asList(getActions(plugin, params, psiClass)));
+                list.addAll(Arrays.asList(getActions(plugin, psiClass)));
             }
         }
 
@@ -128,7 +123,7 @@ public class ShowSequenceAction extends AnAction {
                 null, false ).showInBestPositionFor(event.getDataContext());
     }
 
-    private AnAction[] getActions( SequenceService plugin, SequenceParams params, PsiClass psiClass) {
+    private AnAction[] getActions(SequenceService plugin, PsiClass psiClass) {
         PsiMethod[] methods = psiClass.getMethods();
         ArrayList<AnAction> subList = new ArrayList<>();
 
@@ -138,7 +133,7 @@ public class ShowSequenceAction extends AnAction {
                 public void actionPerformed(@NotNull AnActionEvent e) {
                     Project project = e.getProject();
                     if (project == null) return;
-                    plugin.showSequence(params, method);
+                    plugin.showSequence(method);
                 }
             });
         }

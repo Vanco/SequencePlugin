@@ -1,6 +1,4 @@
-package org.intellij.sequencer;
-
-import java.nio.charset.StandardCharsets;
+package org.intellij.sequencer.openapi;
 
 public interface Constants {
     String ANONYMOUS_CLASS_NAME = "Anonymous";

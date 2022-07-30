@@ -1,8 +1,8 @@
 package org.intellij.sequencer.generator;
 
 import com.google.gson.Gson;
-import org.intellij.sequencer.model.ClassDescription;
-import org.intellij.sequencer.model.MethodDescription;
+import org.intellij.sequencer.openapi.model.ClassDescription;
+import org.intellij.sequencer.openapi.model.MethodDescription;
 import org.junit.Test;
 
 import java.awt.image.DataBufferInt;

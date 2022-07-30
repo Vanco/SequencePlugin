@@ -3,10 +3,10 @@ package org.intellij.sequencer.diagram;
 import com.google.gson.Gson;
 import com.google.gson.stream.MalformedJsonException;
 import org.apache.log4j.Logger;
-import org.intellij.sequencer.Constants;
-import org.intellij.sequencer.model.ClassDescription;
-import org.intellij.sequencer.model.LambdaExprDescription;
-import org.intellij.sequencer.model.MethodDescription;
+import org.intellij.sequencer.openapi.Constants;
+import org.intellij.sequencer.openapi.model.ClassDescription;
+import org.intellij.sequencer.openapi.model.LambdaExprDescription;
+import org.intellij.sequencer.openapi.model.MethodDescription;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
