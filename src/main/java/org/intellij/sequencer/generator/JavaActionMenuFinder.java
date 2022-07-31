@@ -23,6 +23,10 @@ public class JavaActionMenuFinder implements ActionMenuFinder {
     @Override
     public AnAction[] find(@NotNull PsiElement element, ActionMenuProcessor processor) {
 
+        if (element instanceof PsiClass) {
+            return getActions((PsiClass) element, processor);
+        }
+
         final Collection<PsiClass> psiClassCollection = PsiTreeUtil.findChildrenOfType(element, PsiClass.class);
         psiClassCollection.removeIf(psiClass -> psiClass instanceof PsiTypeParameter);
 

@@ -3,5 +3,6 @@
         <sequenceNavigable language="kotlin" implementationClass="org.intellij.sequencer.ext.kotlin.KtSequenceNavigable"/>
         <generator language="kotlin" implementationClass="org.intellij.sequencer.ext.kotlin.KtGeneratorFactory"/>
         <actionMenuFinder language="kotlin" implementationClass="org.intellij.sequencer.ext.kotlin.KtActionMenuFinder"/>
+        <typeFinder language="kotlin" implementationClass="org.intellij.sequencer.ext.kotlin.KtElementTypeFinder"/>
     </extensions>
 </idea-plugin>
