@@ -21,8 +21,18 @@ public class ImplementationWhiteList implements PsiElementFilter {
         filters.put(key, filter);
     }
 
+    public void putIfAbsent(String key, PsiElementFilter filter) {
+        if (!contain(key)) {
+            filters.put(key, filter);
+        }
+    }
+
     public PsiElementFilter get(String key) {
         return filters.get(key);
+    }
+
+    public boolean contain(String key) {
+        return filters.containsKey(key);
     }
 
     @Override
