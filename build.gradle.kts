@@ -4,8 +4,8 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.6.0"
-    id("org.jetbrains.changelog") version "1.2.1"
+    id("org.jetbrains.intellij") version "1.7.0"
+    id("org.jetbrains.changelog") version "1.3.1"
 }
 
 group = properties("pluginGroup")
