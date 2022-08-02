@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
+import org.apache.log4j.Level;
 import org.intellij.sequencer.config.SequenceSettingsState;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
@@ -39,6 +40,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
         SHOW_LAMBDA_CALL = SequenceSettingsState.getInstance().SHOW_LAMBDA_CALL;
+        LOGGER.setLevel(Level.DEBUG);
     }
 
     public SequenceGenerator(SequenceParams params, int offset, int depth) {
@@ -134,7 +136,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
                     if (psiElement instanceof PsiMethod) {
                         if (alreadyInStack((PsiMethod) psiElement)) continue;
 
-                        if (/*!params.isSmartInterface() && */params.getImplementationWhiteList().allow((PsiMethod) psiElement))
+                        if (/*!params.isSmartInterface() && */params.getImplementationWhiteList().allow(psiElement))
                             methodAccept(psiElement);
                     }
                 }
@@ -220,8 +222,8 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
 
                 String impl = psiType.getCanonicalText();
 
-                if (!impl.startsWith(type))
-                    params.getImplementationWhiteList().put(type, new ImplementClassFilter(impl));
+                if (!impl.equals(type))
+                    params.getImplementationWhiteList().putIfAbsent(type, new ImplementClassFilter(impl));
             }
         } catch (Exception e) {
             //ignore
@@ -232,14 +234,14 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         if (psiMethod == null) return;
         if (!params.getMethodFilter().allow(psiMethod)) return;
 
-        if (depth < params.getMaxDepth() - 1) {
+        if (currentStack.level() < params.getMaxDepth() - 1) {
             CallStack oldStack = currentStack;
             depth++;
-            LOGGER.debug("+ depth = " + depth + " method = " + psiMethod.getName());
+            LOGGER.debug("+ depth = " + currentStack.level() + " method = " + psiMethod.getName());
             offsetStack.push(offset);
             generate(psiMethod);
             depth--;
-            LOGGER.debug("- depth = " + depth + " method = " + psiMethod.getName());
+            LOGGER.debug("- depth = " + currentStack.level() + " method = " + psiMethod.getName());
             currentStack = oldStack;
         } else
             currentStack.methodCall(createMethod(psiMethod, offset));
@@ -355,8 +357,9 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
                     PsiType initializerType = initializer.getType();
                     if (initializerType != null) {
                         String impl = initializerType.getCanonicalText();
+                        // initializer type is not same as variable type
                         if (!type.equals(impl)) {
-                            params.getImplementationWhiteList().put(type, new ImplementClassFilter(impl));
+                            params.getImplementationWhiteList().putIfAbsent(type, new ImplementClassFilter(impl));
                         }
                     }
 
@@ -383,7 +386,9 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
 
             String impl = psiType.getCanonicalText();
 
-            params.getImplementationWhiteList().put(face, new ImplementClassFilter(impl));
+            if (!face.equals(impl)) {
+                params.getImplementationWhiteList().putIfAbsent(face, new ImplementClassFilter(impl));
+            }
 
         }
     }

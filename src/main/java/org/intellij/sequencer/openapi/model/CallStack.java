@@ -43,6 +43,10 @@ public class CallStack {
         return _calls;
     }
 
+    public int level() {
+        return _parent == null ? 1 : _parent.level() + 1;
+    }
+
     private void generateFormatStr(StringBuffer buffer, int deep) {
         for (int i = 0; i< deep; i ++) {
             buffer.append("    ");
