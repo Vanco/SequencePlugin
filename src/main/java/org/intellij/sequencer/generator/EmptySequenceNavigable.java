@@ -44,4 +44,9 @@ public class EmptySequenceNavigable implements SequenceNavigable {
     public void openMethodCallInsideLambdaExprInEditor(String fromClass, String enclosedMethodName, List<String> enclosedMethodArgTypes, List<String> argTypes, String returnType, String toClass, String toMethod, List<String> toArgTypes, int offset) {
 
     }
+
+    @Override
+    public String[] findSuperClass(String className) {
+        return new String[0];
+    }
 }

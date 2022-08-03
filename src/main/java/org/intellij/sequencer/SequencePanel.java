@@ -522,9 +522,11 @@ public class SequencePanel extends JPanel implements ConfigListener {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+            String[] superClass = navigable.findSuperClass(impl);
+
             _sequenceParams.getImplementationWhiteList().put(
                     face,
-                    new ImplementClassFilter(impl)
+                    new ImplementClassFilter(superClass)
             );
             generate();
         }
@@ -547,7 +549,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
             if (screenObject instanceof DisplayObject) {
                 DisplayObject displayObject = (DisplayObject) screenObject;
                 actionGroup.add(new RemoveClassAction(displayObject.getObjectInfo()));
-                if (displayObject.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE)
+                if ((displayObject.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) || displayObject.getObjectInfo().hasAttribute(Info.ABSTRACT_ATTRIBUTE))
                         && !displayObject.getObjectInfo().hasAttribute(Info.EXTERNAL_ATTRIBUTE)
                         /*&& !_sequenceParams.isSmartInterface()*/) {
                     String className = displayObject.getObjectInfo().getFullName();
@@ -561,7 +563,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
             } else if (screenObject instanceof DisplayMethod) {
                 DisplayMethod displayMethod = (DisplayMethod) screenObject;
                 actionGroup.add(new RemoveMethodAction(displayMethod.getMethodInfo()));
-                if (displayMethod.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE)
+                if ((displayMethod.getObjectInfo().hasAttribute(Info.INTERFACE_ATTRIBUTE) || displayMethod.getObjectInfo().hasAttribute(Info.ABSTRACT_ATTRIBUTE))
                         && !displayMethod.getObjectInfo().hasAttribute(Info.EXTERNAL_ATTRIBUTE)
                         /*&& !_sequenceParams.isSmartInterface()*/) {
 

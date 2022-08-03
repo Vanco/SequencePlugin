@@ -222,6 +222,37 @@ public class JavaSequenceNavigable implements SequenceNavigable {
 
     }
 
+    @Override
+    public String[] findSuperClass(String className) {
+
+        final @NotNull CancellablePromise<String[]> readAction =
+                ReadAction
+                        .nonBlocking(() -> {
+                            ArrayList<String> result = new ArrayList<>();
+                            result.add(className);
+
+                            PsiClass psiClass = MyPsiUtil.findPsiClass(getPsiManager(project), className);
+
+                            PsiClass[] supers = psiClass.getSupers();
+
+                            for (PsiClass aSuper : supers) {
+                                result.add(aSuper.getQualifiedName());
+                            }
+
+                            return result.toArray(new String[0]);
+                        })
+                        .inSmartMode(project)
+                        .submit(NonUrgentExecutor.getInstance());
+
+        try {
+            return readAction.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return new String[0];
+    }
+
     private PsiMethod getCurrentPsiMethod(Project project) {
         Editor editor = getSelectedEditor(project);
         if (editor == null)

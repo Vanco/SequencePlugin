@@ -352,14 +352,27 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
             PsiClass psiClass = (PsiClass) referenceElement.resolve();
 
             if (MyPsiUtil.isAbstract(psiClass)) {
-                String type = psiType.getCanonicalText();
+                String face = psiType.getCanonicalText();
                 if (initializer instanceof PsiNewExpression) {
                     PsiType initializerType = initializer.getType();
                     if (initializerType != null) {
+                        ArrayList<String> list = new ArrayList<>();
                         String impl = initializerType.getCanonicalText();
                         // initializer type is not same as variable type
-                        if (!type.equals(impl)) {
-                            params.getImplementationWhiteList().putIfAbsent(type, new ImplementClassFilter(impl));
+                        if (!face.equals(impl)) {
+                            list.add(impl);
+                        }
+
+                        PsiType[] superTypes = initializerType.getSuperTypes();
+                        for (PsiType superType : superTypes) {
+                            String superImpl = superType.getCanonicalText();
+                            if (!face.equals(superImpl)) {
+                                list.add(superImpl);
+                            }
+                        }
+
+                        if (!list.isEmpty()) {
+                            params.getImplementationWhiteList().putIfAbsent(face, new ImplementClassFilter(list.toArray(new String[0])));
                         }
                     }
 
@@ -381,15 +394,28 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
             if (type == null) return;
 
             String face = type.getCanonicalText();
+            ArrayList<String> list = new ArrayList<>();
+
             PsiType psiType = re.getType();
             if (psiType == null) return;
 
             String impl = psiType.getCanonicalText();
 
             if (!face.equals(impl)) {
-                params.getImplementationWhiteList().putIfAbsent(face, new ImplementClassFilter(impl));
+                list.add(impl);
             }
 
+            PsiType[] superTypes = psiType.getSuperTypes();
+            for (PsiType superType : superTypes) {
+                String superImpl = superType.getCanonicalText();
+                if (!face.equals(superImpl)) {
+                    list.add(superImpl);
+                }
+            }
+
+            if (!list.isEmpty()) {
+                params.getImplementationWhiteList().putIfAbsent(face, new ImplementClassFilter(list.toArray(new String[0])));
+            }
         }
     }
 
@@ -468,8 +494,11 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         @Override
         public void visitMethod(PsiMethod method) {
             // only constructor
-            PsiClass containingClass = method.getContainingClass();
-            if (containingClass != null && method.getName().equals(containingClass.getName())) {
+//            PsiClass containingClass = method.getContainingClass();
+//            if (containingClass != null && method.getName().equals(containingClass.getName())) {
+//                super.visitMethod(method);
+//            }
+            if (method.isConstructor()) {
                 super.visitMethod(method);
             }
         }
