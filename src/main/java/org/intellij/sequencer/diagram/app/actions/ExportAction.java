@@ -30,7 +30,7 @@ public class ExportAction extends SequenceAction {
 
     private void export(File file) {
         try {
-            _display.saveImageToSvgFile(file);
+            _display.saveImageToSvgFile(file, "svg");
         } catch(IOException e) {
             e.printStackTrace();
         }

@@ -4,6 +4,13 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.ui.ImageUtil;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.transcoder.Transcoder;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.JPEGTranscoder;
+import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.apache.batik.transcoder.image.TIFFTranscoder;
 import org.intellij.sequencer.config.ConfigListener;
 import org.intellij.sequencer.config.SequenceSettingsState;
 import org.w3c.dom.DOMImplementation;
@@ -15,9 +22,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 public class Display extends JComponent implements ModelTextListener, Scrollable, ConfigListener {
@@ -218,7 +225,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         ImageIO.write(image, "png", file);
     }
 
-    public void saveImageToSvgFile(File file) throws IOException {
+    public void saveImageToSvgFile(File file, String extension) throws IOException {
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
         String svgNS = "http://www.w3.org/2000/svg";
         Document document = domImpl.createDocument(svgNS, "svg", null);
@@ -244,10 +251,63 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         } catch (UnsupportedLookAndFeelException e) {
             //ignore
         }
-        FileWriter fileWriter = new FileWriter(file);
 
-        svgGraphics2D.stream(fileWriter, false);
+        exportImage(file, extension,  svgGraphics2D);
 
+    }
+
+    private static void exportImage(File exportFile, String extension, SVGGraphics2D svgGraphics2D) throws IOException {
+        // write the svg file
+        File svgFile = exportFile;
+
+        if (!"svg".equals(extension)) {
+            svgFile = new File(exportFile.getAbsolutePath() + ".temp");
+        }
+
+        try(OutputStream outputStream = Files.newOutputStream(svgFile.toPath())) {
+            Writer out = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+            svgGraphics2D.stream(out, true /* use css */);
+            outputStream.flush();
+        }
+
+        if (!"svg".equals(extension)) {
+
+            try (OutputStream outputStream = Files.newOutputStream(exportFile.toPath())) {
+                TranscoderOutput output = new TranscoderOutput(outputStream);
+
+                TranscoderInput svgInputFile = new TranscoderInput(svgFile.toURI().toString());
+
+                switch (extension) {
+                    case "jpg":
+                        Transcoder transcoder = new JPEGTranscoder();
+                        transcoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, 1.0F);
+                        transcoder.transcode(svgInputFile, output);
+                        break;
+                    case "png":
+                        Transcoder pngTranscoder = new PNGTranscoder();
+                        pngTranscoder.addTranscodingHint(PNGTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 0.084666f);
+                        pngTranscoder.transcode(svgInputFile, output);
+                        break;
+                    case "tif":
+                        TIFFTranscoder tiffTranscoder = new TIFFTranscoder();
+                        tiffTranscoder.addTranscodingHint(TIFFTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER, 0.084666f);
+                        tiffTranscoder.addTranscodingHint(TIFFTranscoder.KEY_FORCE_TRANSPARENT_WHITE, true);
+                        tiffTranscoder.transcode(svgInputFile, output);
+                        break;
+                    default:
+                        break;
+                }
+
+                outputStream.flush();
+            } catch (TranscoderException e) {
+                throw new IOException(e);
+            }
+
+            // delete the temp svg file.
+            if (svgFile.exists()) {
+                svgFile.delete();
+            }
+        }
     }
 
     public void paintComponentWithHeader(Graphics2D graphics) {

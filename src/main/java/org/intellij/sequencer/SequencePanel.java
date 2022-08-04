@@ -317,24 +317,23 @@ public class SequencePanel extends JPanel implements ConfigListener {
 
         public void actionPerformed(@NotNull AnActionEvent event) {
             JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_") + ".svg"));
+            fileChooser.setSelectedFile(new File(getTitleName().replaceAll("\\.", "_")));
             fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-            fileChooser.setFileFilter(new FileFilter() {
-                public boolean accept(File f) {
-                    return f.isDirectory() || f.getName().endsWith("svg");
-                }
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("SVG (.svg) File", "svg"));
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG (.jpg) File", "jpg"));
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("PNG (.png) File", "png"));
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("TIF/TIFF (.tif) File", "tif"));
+            fileChooser.setAcceptAllFileFilterUsed(false);
 
-                public String getDescription() {
-                    return "SVG Images";
-                }
-            });
             try {
                 if (fileChooser.showSaveDialog(SequencePanel.this) == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    if (!selectedFile.getName().endsWith("svg"))
-                        selectedFile = new File(selectedFile.getParentFile(), selectedFile.getName() + ".svg");
-//                    _display.saveImageToFile(selectedFile);
-                    _display.saveImageToSvgFile(selectedFile);
+                    FileFilter fileFilter = fileChooser.getFileFilter();
+                    String extension = ((FileNameExtensionFilter) fileFilter).getExtensions()[0];
+
+                    File fileToSave = new File(selectedFile.getParentFile(), selectedFile.getName() + '.' + extension);
+
+                    _display.saveImageToSvgFile(fileToSave, extension);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
