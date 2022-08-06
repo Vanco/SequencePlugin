@@ -4,7 +4,8 @@
 ### Added
 - Add ShowSequenceActionGroup
 - Extract openapi
-- Add Shortcut `Alt S` (Windows OS), `option S` (MacOS)
+- Add Shortcut `Alt S` (Windows OS), `option S` (macOS)
+- Export SVG, PNG, JPEG, TIFF image
 
 ## [2.2.0]
 ### Changed
@@ -122,7 +123,7 @@
 - Build for 2021.2 
 - Change to gradle kotlin script.
 - Place inside method will generate sequence diagram for enclosed method.
-- Place at class name or anywhere other than method will popup method list to choose.
+- Place at class name or anywhere other than method will pop up method list to choose.
 
 ### Fixed 
 - Issue #81 IndexOutOfBoundsException
@@ -155,7 +156,7 @@
 - Load `.sdt` file to view the graph.
 
 ### Changed
-- Merged pull request #58 and now you can add object color overlay.
+- Merged pull request #58, and now you can add object color overlay.
 
 ## [2.0.1]
 ### Changed
@@ -209,11 +210,11 @@
   
 ## [1.1.0]
 ### Fixed
-- fix issue #3 support parameter is anther method call, fix issue #4 support pipeline call.
+- fix issue #3 support parameter is another method call, fix issue #4 support pipeline call.
 
 ## [1.0.9]
 ### Fixed
-- fix issue #1 recognise more generic method definition, fix issue #2 show popup menu on mac and linux.
+- fix issue #1 recognise more generic method definition, fix issue #2 show popup menu on Mac and linux.
 
 ## [1.0.8]
 ### Changed
