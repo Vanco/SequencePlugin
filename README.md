@@ -10,7 +10,7 @@ with this plugin, you can
 + generate Simple Sequence Diagram.
 + Navigate the code by click the diagram shape.
 + Delete Class from diagram.
-+ Export the diagram as image.
++ Export the diagram as image(SVG, JPEG, PNG, TIFF).
 + Export the diagram as PlantUML, Mermaid format file.
 + Exclude classes from diagram by Settings > Tools > Sequence Diagram
 + Smart Interface(experimental)
