@@ -1,7 +1,6 @@
 package org.intellij.sequencer.openapi.filters;
 
 import com.intellij.psi.PsiElement;
-import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +9,8 @@ public class CompositeElementFilter implements PsiElementFilter {
     private final List<PsiElementFilter> _filters = new ArrayList<>();
 
     public void addFilter(PsiElementFilter filter) {
+        //remove old if exist
+        _filters.remove(filter);
         _filters.add(filter);
     }
 

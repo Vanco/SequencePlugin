@@ -5,6 +5,8 @@ import com.intellij.psi.PsiMethod;
 import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
 
+import java.util.Objects;
+
 /**
  * Only project class/interface should be included.
  */
@@ -33,4 +35,16 @@ public class ProjectOnlyFilter implements PsiElementFilter {
         return MyPsiUtil.isInJarFileSystem(psiElement) || MyPsiUtil.isInClassFile(psiElement);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProjectOnlyFilter that = (ProjectOnlyFilter) o;
+        return _projectClasssesOnly == that._projectClasssesOnly;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_projectClasssesOnly);
+    }
 }

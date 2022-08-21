@@ -4,6 +4,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 
+import java.util.Objects;
+
 /**
  * Exclude private method.
  */
@@ -33,5 +35,19 @@ public class NoPrivateMethodsFilter implements PsiElementFilter {
     private boolean isPrivateMethod(PsiMethod psiMethod) {
         return psiMethod.getModifierList().hasModifierProperty("private");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NoPrivateMethodsFilter that = (NoPrivateMethodsFilter) o;
+        return _noPrivateMethods == that._noPrivateMethods;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_noPrivateMethods);
+    }
+
 
 }

@@ -5,6 +5,8 @@ import com.intellij.psi.PsiMethod;
 import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
 
+import java.util.Objects;
+
 /**
  * The package should be excluded.
  */
@@ -31,5 +33,18 @@ public class PackageFilter implements PsiElementFilter {
         else {
             return !packageName.equals(_packageName);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PackageFilter that = (PackageFilter) o;
+        return _recursive == that._recursive && _packageName.equals(that._packageName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_packageName, _recursive);
     }
 }

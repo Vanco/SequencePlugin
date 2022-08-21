@@ -7,13 +7,12 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.Stack;
+import org.intellij.sequencer.config.SequenceSettingsState;
 import org.intellij.sequencer.diagram.Info;
-import org.intellij.sequencer.openapi.SequenceParams;
-import org.intellij.sequencer.openapi.Constants;
-import org.intellij.sequencer.openapi.GeneratorFactory;
-import org.intellij.sequencer.openapi.IGenerator;
+import org.intellij.sequencer.openapi.*;
 import org.intellij.sequencer.openapi.model.CallStack;
 import org.intellij.sequencer.openapi.model.ClassDescription;
+import org.intellij.sequencer.openapi.model.LambdaExprDescription;
 import org.intellij.sequencer.openapi.model.MethodDescription;
 import org.intellij.sequencer.util.MyPsiUtil;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +24,10 @@ import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator {
     private static final Logger LOGGER = Logger.getInstance(KtSequenceGenerator.class.getName());
@@ -35,18 +37,19 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
 
     private CallStack topStack;
     private CallStack currentStack;
-    private int depth;
     private final SequenceParams params;
 
+    private final boolean SHOW_LAMBDA_CALL;
+
+
     public KtSequenceGenerator(SequenceParams params) {
-        this(params, 0, 0);
+        this(params, 0);
     }
 
-    public KtSequenceGenerator(SequenceParams params, int offset, int depth) {
+    public KtSequenceGenerator(SequenceParams params, int offset) {
         this.params = params;
         if (offset > 0) offsetStack.push(offset);
-        this.depth = depth;
-
+        SHOW_LAMBDA_CALL = SequenceSettingsState.getInstance().SHOW_LAMBDA_CALL;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
             LOGGER.debug("[generate]" + psiElement.getText());
         }
         if (psiElement instanceof KtFunction) {
-            return generate((KtFunction) psiElement);
+            generate((KtFunction) psiElement);
         } else if (psiElement instanceof PsiMethod) {
             return generate((PsiMethod) psiElement);
         } else if (psiElement instanceof KtClass) {
@@ -71,6 +74,8 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         } else if (psiElement instanceof PsiClass) {
             final int naviOffset = offsetStack.isEmpty() ? MyPsiUtil.findNaviOffset(psiElement) : offsetStack.pop();
             generateClass((PsiClass) psiElement, naviOffset);
+        } else if (psiElement instanceof KtLambdaExpression) {
+            generateLambda((KtLambdaExpression) psiElement);
         } else {
             psiElement.accept(this);
             LOGGER.warn("unsupported " + psiElement.getText());
@@ -78,6 +83,14 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
 
         return topStack;
     }
+
+    private void generateLambda(KtLambdaExpression lambdaExpression) {
+        MethodDescription method = createMethod(lambdaExpression);
+        makeMethodCallExceptCurrentStackIsRecursive(method);
+        super.visitLambdaExpression(lambdaExpression);
+    }
+
+
 
 
     private CallStack generateObject(KtObjectDeclaration psiElement) {
@@ -106,11 +119,10 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
     }
 
     private CallStack generate(PsiMethod psiMethod) {
-        GeneratorFactory.createGenerator(psiMethod.getLanguage(), params);
         final IGenerator sequenceGenerator =
                 offsetStack.isEmpty()
                         ? GeneratorFactory.createGenerator(psiMethod.getLanguage(), params)
-                        : GeneratorFactory.createGenerator(psiMethod.getLanguage(), params, offsetStack.pop(), depth);
+                        : GeneratorFactory.createGenerator(psiMethod.getLanguage(), params, offsetStack.pop());
         CallStack javaCall = sequenceGenerator.generate(psiMethod, currentStack);
         LOGGER.debug("[JAVACall]:" + javaCall.toString());
         if (topStack == null) {
@@ -183,6 +195,22 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
                 .generate(expression.getObjectDeclaration(), currentStack);
     }
 
+    @Override
+    public void visitLambdaExpression(@NotNull KtLambdaExpression lambdaExpression) {
+        if (SHOW_LAMBDA_CALL) {
+            GeneratorFactory
+                    .createGenerator(lambdaExpression.getLanguage(), params)
+                    .generate(lambdaExpression, currentStack);
+        } else {
+            super.visitLambdaExpression(lambdaExpression);
+        }
+    }
+
+    @Override
+    public void visitArgument(@NotNull KtValueArgument argument) {
+        super.visitArgument(argument);
+    }
+
     private void resolveAndCall(@NotNull KtCallExpression expression) {
         PsiElement psiElement = resolveFunction(expression);
         methodCall(psiElement, MyPsiUtil.findNaviOffset(expression));
@@ -191,7 +219,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
 
     @Nullable
     private PsiElement resolveFunction(@NotNull KtExpression expression) {
-        ResolvedCall<? extends CallableDescriptor> resolvedCall = ResolutionUtils.resolveToCall(expression, BodyResolveMode.FULL);
+        ResolvedCall<? extends CallableDescriptor> resolvedCall = ResolutionUtils.resolveToCall(expression, BodyResolveMode.PARTIAL);
         if (resolvedCall == null) return null;
         CallableDescriptor candidateDescriptor = resolvedCall.getCandidateDescriptor();
         return DescriptorToSourceUtilsIde.INSTANCE.getAnyDeclaration(expression.getProject(), candidateDescriptor);
@@ -200,22 +228,34 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
     private void methodCall(PsiElement psiElement, int offset) {
         if (psiElement == null) return;
         //fixme: should support kotlin filter
-        if (psiElement instanceof PsiMethod && !params.getMethodFilter().allow((PsiMethod) psiElement)) return;
+        if (!params.getMethodFilter().allow(psiElement)) return;
 
-        if (depth < params.getMaxDepth() - 1) {
+        if (currentStack.level() < params.getMaxDepth()) {
             CallStack oldStack = currentStack;
-            depth++;
-            LOGGER.debug("+ depth = " + depth + " method = " + psiElement.getText());
+            LOGGER.debug("+ depth = " + currentStack.level() + " method = " + psiElement.getText());
             offsetStack.push(offset);
             generate(psiElement, null); // here, No NEW Generator created, call with null
-            depth--;
-            LOGGER.debug("- depth = " + depth + " method = " + psiElement.getText());
+            LOGGER.debug("- depth = " + currentStack.level() + " method = " + psiElement.getText());
             currentStack = oldStack;
         } else {
             final MethodDescription method = createMethod(psiElement, offset);
             if (method != null) //fixme
                 currentStack.methodCall(method);
         }
+    }
+
+    private MethodDescription createMethod(KtLambdaExpression expression) {
+        ParamPair paramPair = extractParameters(expression.getValueParameters());
+
+        String returnType = "Unit";
+
+        Class<? extends PsiElement> method = ElementTypeFinder.EP_NAME.forLanguage(expression.getLanguage()).findMethod();
+        PsiElement psiElement = PsiTreeUtil.getParentOfType(expression, method, false);
+
+        final int offset = expression.getTextOffset();
+        MethodDescription enclosedMethod = createMethod(psiElement, offset);
+
+        return new LambdaExprDescription(enclosedMethod, returnType, paramPair.argNames, paramPair.argTypes, offset);
     }
 
     private MethodDescription createMethod(PsiElement psiElement, int offset) {
@@ -393,13 +433,4 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         return false;
     }
 
-    private static class ParamPair {
-        final List<String> argNames;
-        final List<String> argTypes;
-
-        public ParamPair(List<String> argNames, List<String> argTypes) {
-            this.argNames = argNames;
-            this.argTypes = argTypes;
-        }
-    }
 }

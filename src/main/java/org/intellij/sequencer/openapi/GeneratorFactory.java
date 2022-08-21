@@ -14,19 +14,25 @@ public abstract class GeneratorFactory {
     @NotNull
     public static IGenerator createGenerator(Language language, SequenceParams params) {
         GeneratorFactory factory = EP_NAME.forLanguage(language);
-        return  factory != null ? factory.getGenerator(params) : new DefaultGenerator();
+        factory.loadParams(params);
+        return factory.getGenerator(params);
     }
 
     @NotNull
-    public static IGenerator createGenerator(Language language, SequenceParams params, int offset, int depth) {
+    public static IGenerator createGenerator(Language language, SequenceParams params, int offset) {
         GeneratorFactory factory = EP_NAME.forLanguage(language);
-        return  factory != null ? factory.getGenerator(params, offset, depth) : new DefaultGenerator();
+        factory.loadParams(params);
+        return factory.getGenerator(params, offset);
     }
 
     @NotNull
     public abstract IGenerator getGenerator(@NotNull SequenceParams params);
 
-    public abstract IGenerator getGenerator(@NotNull SequenceParams params, int offset, int depth);
+    @NotNull
+    public abstract IGenerator getGenerator(@NotNull SequenceParams params, int offset);
+
+    @NotNull
+    public abstract SequenceParams loadParams(@NotNull SequenceParams params);
 
     private static class DefaultGenerator implements IGenerator {
         @Override

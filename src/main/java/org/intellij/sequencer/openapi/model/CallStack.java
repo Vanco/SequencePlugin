@@ -65,4 +65,9 @@ public class CallStack {
         return buffer.toString();
     }
 
+    public static final CallStack EMPTY = new CallStack(MethodDescription.DUMMY_METHOD);
+
+    public boolean isEmpty() {
+        return EMPTY.equals(this);
+    }
 }

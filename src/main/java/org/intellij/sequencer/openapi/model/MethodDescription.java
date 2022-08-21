@@ -136,4 +136,6 @@ public class MethodDescription {
 //        return new MethodDescription(classDescription,
 //                new ArrayList<>(), Constants.Lambda_Invoke, returnType, argNames, argTypes);
 //    }
+
+    public static final MethodDescription DUMMY_METHOD = new MethodDescription(ClassDescription.ANONYMOUS_CLASS, new ArrayList<>(), "dummy", "",new ArrayList<>(), new ArrayList<>(), 0);
 }

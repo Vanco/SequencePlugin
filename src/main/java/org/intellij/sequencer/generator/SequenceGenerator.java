@@ -32,7 +32,6 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
     private CallStack topStack;
     private CallStack currentStack;
-    private int depth;
     private final SequenceParams params;
 
     private final boolean SHOW_LAMBDA_CALL;
@@ -43,10 +42,9 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         LOGGER.setLevel(Level.DEBUG);
     }
 
-    public SequenceGenerator(SequenceParams params, int offset, int depth) {
+    public SequenceGenerator(SequenceParams params, int offset) {
         this(params);
         offsetStack.push(offset);
-        this.depth = depth;
     }
 
     @Override
@@ -101,7 +99,7 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         final IGenerator ktSequenceGenerator =
                 offsetStack.isEmpty()
                         ? GeneratorFactory.createGenerator(psiMethod.getLanguage(), params)
-                        : GeneratorFactory.createGenerator(psiMethod.getLanguage(), params, offsetStack.pop(), depth);
+                        : GeneratorFactory.createGenerator(psiMethod.getLanguage(), params, offsetStack.pop());
         CallStack kotlinCall = ktSequenceGenerator.generate(psiMethod.getNavigationElement(), currentStack);
         if (topStack == null) {
             topStack = kotlinCall;
@@ -234,13 +232,11 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         if (psiMethod == null) return;
         if (!params.getMethodFilter().allow(psiMethod)) return;
 
-        if (currentStack.level() < params.getMaxDepth() - 1) {
+        if (currentStack.level() < params.getMaxDepth()) {
             CallStack oldStack = currentStack;
-            depth++;
             LOGGER.debug("+ depth = " + currentStack.level() + " method = " + psiMethod.getName());
             offsetStack.push(offset);
             generate(psiMethod);
-            depth--;
             LOGGER.debug("- depth = " + currentStack.level() + " method = " + psiMethod.getName());
             currentStack = oldStack;
         } else
@@ -514,14 +510,14 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         }
 
     }
-
-    private static class ParamPair {
-        final List<String> argNames;
-        final List<String> argTypes;
-
-        public ParamPair(List<String> argNames, List<String> argTypes) {
-            this.argNames = argNames;
-            this.argTypes = argTypes;
-        }
-    }
+//
+//    private static class ParamPair {
+//        final List<String> argNames;
+//        final List<String> argTypes;
+//
+//        public ParamPair(List<String> argNames, List<String> argTypes) {
+//            this.argNames = argNames;
+//            this.argTypes = argTypes;
+//        }
+//    }
 }

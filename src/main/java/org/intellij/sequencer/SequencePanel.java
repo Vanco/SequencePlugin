@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import static org.intellij.sequencer.util.ConfigUtil.loadSequenceParams;
 import static org.intellij.sequencer.util.MyPsiUtil.getFileChooser;
 
 public class SequencePanel extends JPanel implements ConfigListener {
@@ -64,7 +63,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
         navigable = SequenceNavigableFactory.INSTANCE.forLanguage(project, psiMethod.getLanguage());
 
         psiElement = psiMethod;
-        _sequenceParams = loadSequenceParams();
+        _sequenceParams = new SequenceParams();
 
 
         _model = new Model();
@@ -133,6 +132,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
             psiElement = null;
             return;
         }
+
         IGenerator generator = GeneratorFactory.createGenerator(psiElement.getLanguage(), _sequenceParams);
 
         final BackgroundableProcessIndicator progressIndicator =
@@ -291,7 +291,8 @@ public class SequencePanel extends JPanel implements ConfigListener {
 
     @Override
     public void configChanged() {
-        _sequenceParams = loadSequenceParams();
+        // do nothing
+        //_sequenceParams = loadSequenceParams();
     }
 
     private class ReGenerateAction extends AnAction {

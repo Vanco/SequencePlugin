@@ -4,6 +4,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 
+import java.util.Objects;
+
 /**
  * Exclude constructors.
  */
@@ -28,5 +30,18 @@ public class NoConstructorsFilter implements PsiElementFilter {
                 && ((PsiMethod) psiElement).isConstructor())
             return false;
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NoConstructorsFilter that = (NoConstructorsFilter) o;
+        return _noConstructors == that._noConstructors;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_noConstructors);
     }
 }

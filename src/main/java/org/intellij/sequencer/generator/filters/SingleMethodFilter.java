@@ -8,6 +8,7 @@ import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The method should be excluded.
@@ -38,5 +39,18 @@ public class SingleMethodFilter implements PsiElementFilter {
         return _className.equals(Constants.ANONYMOUS_CLASS_NAME) &&
               containingClass.getQualifiedName() == null ||
               _className.equals(containingClass.getQualifiedName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SingleMethodFilter that = (SingleMethodFilter) o;
+        return _className.equals(that._className) && _methodName.equals(that._methodName) && _argTypes.equals(that._argTypes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_className, _methodName, _argTypes);
     }
 }

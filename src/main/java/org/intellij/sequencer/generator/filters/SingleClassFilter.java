@@ -5,6 +5,8 @@ import com.intellij.psi.PsiMethod;
 import org.intellij.sequencer.openapi.Constants;
 import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 
+import java.util.Objects;
+
 /**
  * The class should be excluded.
  */
@@ -29,5 +31,18 @@ public class SingleClassFilter implements PsiElementFilter {
             return false;
         else
             return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SingleClassFilter that = (SingleClassFilter) o;
+        return _className.equals(that._className);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_className);
     }
 }
