@@ -1,8 +1,6 @@
 package org.intellij.sequencer.openapi.filters;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
-import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
 
 import java.util.Objects;
@@ -10,7 +8,7 @@ import java.util.Objects;
 /**
  * The package should be excluded.
  */
-public class PackageFilter implements PsiElementFilter {
+public class PackageFilter implements MethodFilter {
     private final String _packageName;
     private final boolean _recursive;
 

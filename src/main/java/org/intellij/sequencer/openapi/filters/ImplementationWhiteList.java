@@ -10,24 +10,24 @@ import java.util.HashMap;
  * &copy; fanhuagang@gmail.com
  * Created by van on 17/10/2016.
  */
-public class ImplementationWhiteList implements PsiElementFilter {
-    private final HashMap<String, PsiElementFilter> filters = new HashMap<>();
+public class ImplementationWhiteList implements MethodFilter {
+    private final HashMap<String, MethodFilter> filters = new HashMap<>();
 
     public void clear() {
         filters.clear();
     }
 
-    public void put(String key, PsiElementFilter filter) {
+    public void put(String key, MethodFilter filter) {
         filters.put(key, filter);
     }
 
-    public void putIfAbsent(String key, PsiElementFilter filter) {
+    public void putIfAbsent(String key, MethodFilter filter) {
         if (!contain(key)) {
             filters.put(key, filter);
         }
     }
 
-    public PsiElementFilter get(String key) {
+    public MethodFilter get(String key) {
         return filters.get(key);
     }
 
@@ -37,7 +37,7 @@ public class ImplementationWhiteList implements PsiElementFilter {
 
     @Override
     public boolean allow(PsiElement psiMethod) {
-        for (PsiElementFilter filter : filters.values()) {
+        for (MethodFilter filter : filters.values()) {
             if(filter.allow(psiMethod)) {
                 return true;
             }

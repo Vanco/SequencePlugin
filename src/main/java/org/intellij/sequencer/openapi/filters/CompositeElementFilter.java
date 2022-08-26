@@ -5,16 +5,16 @@ import com.intellij.psi.PsiElement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompositeElementFilter implements PsiElementFilter {
-    private final List<PsiElementFilter> _filters = new ArrayList<>();
+public class CompositeElementFilter implements MethodFilter {
+    private final List<MethodFilter> _filters = new ArrayList<>();
 
-    public void addFilter(PsiElementFilter filter) {
+    public void addFilter(MethodFilter filter) {
         //remove old if exist
         _filters.remove(filter);
         _filters.add(filter);
     }
 
-    public void removeFilter(PsiElementFilter filter) {
+    public void removeFilter(MethodFilter filter) {
         _filters.remove(filter);
     }
 
@@ -25,7 +25,7 @@ public class CompositeElementFilter implements PsiElementFilter {
      */
     @Override
     public boolean allow(PsiElement psiElement) {
-        for (PsiElementFilter psiElementFilter : _filters) {
+        for (MethodFilter psiElementFilter : _filters) {
             if (!psiElementFilter.allow(psiElement)) {
                 return false;
             }

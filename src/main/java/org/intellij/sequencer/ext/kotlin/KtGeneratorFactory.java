@@ -3,10 +3,10 @@ package org.intellij.sequencer.ext.kotlin;
 import org.intellij.sequencer.config.ExcludeEntry;
 import org.intellij.sequencer.config.SequenceParamsState;
 import org.intellij.sequencer.config.SequenceSettingsState;
+import org.intellij.sequencer.ext.kotlin.filters.KtNoConstructorsFilter;
+import org.intellij.sequencer.ext.kotlin.filters.KtNoGetterSetterFilter;
+import org.intellij.sequencer.ext.kotlin.filters.KtNoPrivateMethodsFilter;
 import org.intellij.sequencer.ext.kotlin.filters.KtSingleClassFilter;
-import org.intellij.sequencer.generator.filters.NoConstructorsFilter;
-import org.intellij.sequencer.generator.filters.NoGetterSetterFilter;
-import org.intellij.sequencer.generator.filters.NoPrivateMethodsFilter;
 import org.intellij.sequencer.openapi.GeneratorFactory;
 import org.intellij.sequencer.openapi.IGenerator;
 import org.intellij.sequencer.openapi.SequenceParams;
@@ -37,9 +37,9 @@ public class KtGeneratorFactory extends GeneratorFactory {
         params.setMaxDepth(state.callDepth);
 //        params.setSmartInterface(state.smartInterface);
         params.getMethodFilter().addFilter(new ProjectOnlyFilter(state.projectClassesOnly));
-        params.getMethodFilter().addFilter(new NoGetterSetterFilter(state.noGetterSetters));
-        params.getMethodFilter().addFilter(new NoPrivateMethodsFilter(state.noPrivateMethods));
-        params.getMethodFilter().addFilter(new NoConstructorsFilter(state.noConstructors));
+        params.getMethodFilter().addFilter(new KtNoGetterSetterFilter(state.noGetterSetters));
+        params.getMethodFilter().addFilter(new KtNoPrivateMethodsFilter(state.noPrivateMethods));
+        params.getMethodFilter().addFilter(new KtNoConstructorsFilter(state.noConstructors));
 
         List<ExcludeEntry> excludeList = SequenceSettingsState.getInstance().getExcludeList();
         for (ExcludeEntry excludeEntry : excludeList) {

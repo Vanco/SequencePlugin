@@ -2,7 +2,7 @@ package org.intellij.sequencer.generator.filters;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import org.intellij.sequencer.openapi.filters.PsiElementFilter;
+import org.intellij.sequencer.openapi.filters.MethodFilter;
 
 import java.util.Arrays;
 
@@ -12,7 +12,7 @@ import java.util.Arrays;
  * &copy; fanhuagang@gmail.com
  * Created by van on 18/10/2016.
  */
-public class ImplementClassFilter implements PsiElementFilter {
+public class ImplementClassFilter implements MethodFilter {
 
     private final String[] classNames;
 

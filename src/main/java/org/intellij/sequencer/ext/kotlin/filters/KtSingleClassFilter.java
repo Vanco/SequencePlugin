@@ -1,15 +1,13 @@
 package org.intellij.sequencer.ext.kotlin.filters;
 
-import com.intellij.model.psi.PsiSymbolReference;
 import com.intellij.psi.PsiElement;
-import org.intellij.sequencer.openapi.Constants;
-import org.intellij.sequencer.openapi.filters.PsiElementFilter;
+import org.intellij.sequencer.openapi.filters.MethodFilter;
 import org.jetbrains.kotlin.psi.KtClass;
 import org.jetbrains.kotlin.psi.KtFunction;
 
 import java.util.Objects;
 
-public class KtSingleClassFilter implements PsiElementFilter {
+public class KtSingleClassFilter implements MethodFilter {
 
     private final String _className;
 
@@ -20,19 +18,15 @@ public class KtSingleClassFilter implements PsiElementFilter {
 
     @Override
     public boolean allow(PsiElement psiElement) {
-        if (!(psiElement instanceof KtFunction)) return true;
+        if (psiElement instanceof KtFunction) {
+            KtFunction function = (KtFunction) psiElement;
 
-        KtFunction function = (KtFunction) psiElement;
+            return function.getFqName() == null || !_className.equals(function.getFqName().parent().asString());
 
-        if(_className.equals(Constants.ANONYMOUS_CLASS_NAME)) {
-            for (PsiSymbolReference ownReference : function.getOwnReferences()) {
-                if (ownReference.getElement() instanceof KtClass) {
-                   if  (((KtClass) ownReference.getElement()).getName().equals(_className))
-                       return false;
-                }
-            }
+        } else if (psiElement instanceof KtClass) {
+            KtClass ktClass = (KtClass) psiElement;
 
-            if (function.getParent() == null) return false;
+            return ktClass.getFqName() == null || !_className.equals(ktClass.getFqName().asString());
         }
 
         return true;

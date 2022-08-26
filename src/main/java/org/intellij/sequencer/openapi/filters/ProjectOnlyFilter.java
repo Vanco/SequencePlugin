@@ -1,8 +1,6 @@
 package org.intellij.sequencer.openapi.filters;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
-import org.intellij.sequencer.openapi.filters.PsiElementFilter;
 import org.intellij.sequencer.util.MyPsiUtil;
 
 import java.util.Objects;
@@ -10,23 +8,15 @@ import java.util.Objects;
 /**
  * Only project class/interface should be included.
  */
-public class ProjectOnlyFilter implements PsiElementFilter {
-    private boolean _projectClasssesOnly = true;
+public class ProjectOnlyFilter implements MethodFilter {
+    private final boolean _projectClassOnly;
 
-    public ProjectOnlyFilter(boolean projectClasssesOnly) {
-        _projectClasssesOnly = projectClasssesOnly;
-    }
-
-    public boolean isProjectClasssesOnly() {
-        return _projectClasssesOnly;
-    }
-
-    public void setProjectClasssesOnly(boolean projectClasssesOnly) {
-        _projectClasssesOnly = projectClasssesOnly;
+    public ProjectOnlyFilter(boolean projectClassOnly) {
+        _projectClassOnly = projectClassOnly;
     }
 
     public boolean allow(PsiElement psiElement) {
-        if(_projectClasssesOnly && isInProject(psiElement))
+        if(_projectClassOnly && isInProject(psiElement))
             return false;
         return true;
     }
@@ -40,11 +30,11 @@ public class ProjectOnlyFilter implements PsiElementFilter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProjectOnlyFilter that = (ProjectOnlyFilter) o;
-        return _projectClasssesOnly == that._projectClasssesOnly;
+        return _projectClassOnly == that._projectClassOnly;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_projectClasssesOnly);
+        return Objects.hash(_projectClassOnly);
     }
 }

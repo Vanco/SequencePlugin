@@ -3,25 +3,15 @@ package org.intellij.sequencer.generator.filters;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.PropertyUtil;
-import org.intellij.sequencer.openapi.filters.PsiElementFilter;
-
-import java.util.Objects;
+import org.intellij.sequencer.openapi.filters.MethodFilter;
 
 /**
  * Exclude getter/setter method.
  */
-public class NoGetterSetterFilter implements PsiElementFilter {
-    private boolean _noGetterSetters = true;
+public class NoGetterSetterFilter implements MethodFilter {
+    private final boolean _noGetterSetters;
 
     public NoGetterSetterFilter(boolean noGetterSetters) {
-        _noGetterSetters = noGetterSetters;
-    }
-
-    public boolean isNoGetterSetters() {
-        return _noGetterSetters;
-    }
-
-    public void setNoGetterSetters(boolean noGetterSetters) {
         _noGetterSetters = noGetterSetters;
     }
 
@@ -41,13 +31,7 @@ public class NoGetterSetterFilter implements PsiElementFilter {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        NoGetterSetterFilter that = (NoGetterSetterFilter) o;
-        return _noGetterSetters == that._noGetterSetters;
+        return o != null && getClass() == o.getClass();
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(_noGetterSetters);
-    }
 }

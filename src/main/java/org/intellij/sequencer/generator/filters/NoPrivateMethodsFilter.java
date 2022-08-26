@@ -2,25 +2,15 @@ package org.intellij.sequencer.generator.filters;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import org.intellij.sequencer.openapi.filters.PsiElementFilter;
-
-import java.util.Objects;
+import org.intellij.sequencer.openapi.filters.MethodFilter;
 
 /**
  * Exclude private method.
  */
-public class NoPrivateMethodsFilter implements PsiElementFilter {
-    private boolean _noPrivateMethods = false;
+public class NoPrivateMethodsFilter implements MethodFilter {
+    private final boolean _noPrivateMethods;
 
     public NoPrivateMethodsFilter(boolean noPrivateMethods) {
-        _noPrivateMethods = noPrivateMethods;
-    }
-
-    public boolean isNoPrivateMethods() {
-        return _noPrivateMethods;
-    }
-
-    public void setNoPrivateMethods(boolean noPrivateMethods) {
         _noPrivateMethods = noPrivateMethods;
     }
 
@@ -39,15 +29,7 @@ public class NoPrivateMethodsFilter implements PsiElementFilter {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        NoPrivateMethodsFilter that = (NoPrivateMethodsFilter) o;
-        return _noPrivateMethods == that._noPrivateMethods;
+        return o != null && getClass() == o.getClass();
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(_noPrivateMethods);
-    }
-
 
 }
