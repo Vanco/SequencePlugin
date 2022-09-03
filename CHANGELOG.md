@@ -6,6 +6,7 @@
 - Extract openapi
 - Add Shortcut `Alt S` (Windows OS), `option S` (macOS)
 - Export SVG, PNG, JPEG, TIFF image
+- Generate Kotlin `init`
 
 ## [2.2.0]
 ### Changed
