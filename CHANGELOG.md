@@ -1,6 +1,8 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+
+## [2.2.1]
 ### Added
 - Add ShowSequenceActionGroup
 - Extract openapi
@@ -126,7 +128,7 @@
 - Place inside method will generate sequence diagram for enclosed method.
 - Place at class name or anywhere other than method will pop up method list to choose.
 
-### Fixed 
+### Fixed
 - Issue #81 IndexOutOfBoundsException
 - Issue #82 Null pointer exception after double-click in the diagram
 - Issue #88 Exported PlantUML is zero-length for reopened SDT files
@@ -207,8 +209,8 @@
 ## [1.2.0]
 ### Added
 - new feature: Smart Interface, List implementation of interface in project, user can choose one to 
-  show in sequence diagram. If only one implementation found, it will show automatically. 
-  
+  show in sequence diagram. If only one implementation found, it will show automatically.
+
 ## [1.1.0]
 ### Fixed
 - fix issue #3 support parameter is another method call, fix issue #4 support pipeline call.
@@ -219,11 +221,11 @@
 
 ## [1.0.8]
 ### Changed
-- Refine not to call "@Deprecated" methods. Add Exclude Settings. Change the name to SequenceDiagram. 
+- Refine not to call "@Deprecated" methods. Add Exclude Settings. Change the name to SequenceDiagram.
 
 ## [1.0.7]
 ### Changed
-- Remove "com.intellij.diagram" dependency. 
+- Remove "com.intellij.diagram" dependency.
 
 ## [1.0.6]
 ### Fixed
