@@ -82,10 +82,11 @@ I draw a dummy `() ->` self call in diagram.
 The Kotlin language support are in very early stage. 
   - [x] Support generate topLevel function
   - [x] Support generate PrimaryConstructor and SecondaryConstructor
-  - [x] Support generate No Constructor Class
+  - [x] Support generate Default Constructor Class
   - [x] Support generate JavaCall deeply
   - [ ] Support generate lambda argument
   - [ ] Support generate function with expression body
+  - [ ] Support generate class initializer
   - [ ] Code navigation
 
 ## How to use
