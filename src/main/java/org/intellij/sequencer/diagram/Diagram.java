@@ -89,7 +89,7 @@ public class Diagram {
             x += displayObject.getWidth() + inset;
         }
 
-        int maxX = 200;
+        int maxWidth = 200;
         synchronized (_objectLifeLines) {
             for (int i = 0; i < _objectLifeLines.size(); ++i) {
                 DisplayObject obj = _objectLifeLines.get(i);
@@ -101,7 +101,7 @@ public class Diagram {
                         if (i == _objectLifeLines.size() - 1) {
                             int width = obj.getWidth();
                             if (width < call.getTextWidth())
-                                obj.setWidth(obj.getTextWidth() + call.getTextWidth());
+                                obj.setWidth(width / 2 + call.getTextWidth());
                             continue;
                         } else {
                             availableGap = obj.calcCurrentGap(
@@ -123,7 +123,7 @@ public class Diagram {
                         }
                     }
                 }
-                maxX = obj.getX() + 2 * obj.getWidth() + inset;
+                maxWidth = obj.getX() + obj.getWidth() + inset;
             }
 
             if (_objectLifeLines.isEmpty())
@@ -138,9 +138,10 @@ public class Diagram {
                 y += link.getTextHeight() + link.getLinkHeight();
             }
         }
-        y += 10;
+        int maxHeight = y + inset;
+
         calculateFullSize(y);
-        return new Dimension(maxX, y);
+        return new Dimension(maxWidth, maxHeight);
     }
 
     private void calculateFullSize(int height) {
@@ -148,9 +149,9 @@ public class Diagram {
             for (int i = 0; i < _objectLifeLines.size(); i++) {
                 DisplayObject displayObject = _objectLifeLines.get(i);
                 displayObject.setFullHeight(height);
-                if (i + 1 == _objectLifeLines.size())
+                if (i + 1 == _objectLifeLines.size()) {
                     displayObject.setFullWidth(displayObject.getWidth());
-                else {
+                } else {
                     DisplayObject nextDisplayObject = _objectLifeLines.get(i + 1);
                     displayObject.setFullWidth(nextDisplayObject.getCenterX() - displayObject.getX());
                 }
@@ -165,7 +166,7 @@ public class Diagram {
                 int preferredHeight = displayObjectInfo.getPreferredHeaderHeight();
                 if (maxHeight < preferredHeight)
                     maxHeight = preferredHeight;
-                width += displayObjectInfo.getPreferredHeaderWidth();
+                width = displayObjectInfo.getPreferredHeaderWidth();
             }
         }
         return new Dimension(width, maxHeight);
@@ -214,8 +215,12 @@ public class Diagram {
         }
     }
 
+    /**
+     * `Actor` + One `DisplayObject` lifeline .
+     * @return
+     */
     public boolean isSingleObject() {
-        return _objectLifeLines.size() <= 1;
+        return _objectLifeLines.size() <= 2;
     }
 
     public boolean isEmpty() {
