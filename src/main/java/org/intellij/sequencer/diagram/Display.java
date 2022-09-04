@@ -191,7 +191,7 @@ public class Display extends JComponent implements ModelTextListener, Scrollable
         Dimension size = getPreferredSize();
         Dimension headerSize = _displayHeader.getPreferredSize();
 
-        int width = (_diagram.isSingleObject()) ? size.width : Math.min(headerSize.width, size.width);
+        int width = (_diagram.isSingleObject()) ? size.width : Math.max(headerSize.width, size.width);
         int height = headerSize.height + size.height;
         return new Dimension(width, height);
     }
