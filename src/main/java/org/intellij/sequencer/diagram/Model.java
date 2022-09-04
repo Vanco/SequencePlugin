@@ -1,6 +1,7 @@
 package org.intellij.sequencer.diagram;
 
-import org.apache.log4j.Logger;
+
+import com.intellij.openapi.diagnostic.Logger;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.SwingPropertyChangeSupport;
@@ -9,7 +10,7 @@ import java.io.*;
 
 public class Model {
 
-    private static final Logger LOGGER = Logger.getLogger(Model.class);
+    private static final Logger LOGGER = Logger.getInstance(Model.class);
 
     private String _queryString = "";
 

@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator {
-    private static final Logger LOGGER = Logger.getInstance(KtSequenceGenerator.class.getName());
+    private static final Logger LOGGER = Logger.getInstance(KtSequenceGenerator.class);
     private final Stack<KtCallExpression> exprStack = new Stack<>();
     private final Stack<CallStack> callStack = new Stack<>();
     private final Stack<Integer> offsetStack = new Stack<>();

@@ -1,12 +1,13 @@
 package org.intellij.sequencer.diagram;
 
-import org.apache.log4j.Logger;
+
+import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ObjectInfo extends Info {
-    private static final Logger LOGGER = Logger.getLogger(ObjectInfo.class);
+    private static final Logger LOGGER = Logger.getInstance(ObjectInfo.class);
     public static final String ACTOR_NAME = "Actor";
 
     private final String _name;

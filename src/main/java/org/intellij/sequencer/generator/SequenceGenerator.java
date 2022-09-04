@@ -5,7 +5,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.*;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.containers.Stack;
-import org.apache.log4j.Level;
 import org.intellij.sequencer.config.SequenceSettingsState;
 import org.intellij.sequencer.diagram.Info;
 import org.intellij.sequencer.generator.filters.ImplementClassFilter;
@@ -27,7 +26,7 @@ import java.util.Objects;
 public class SequenceGenerator extends JavaRecursiveElementVisitor implements IGenerator {
     private final Stack<Integer> offsetStack = new Stack<>();
 
-    private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class.getName());
+    private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class);
 
     private final ImplementationFinder implementationFinder = new ImplementationFinder();
     private CallStack topStack;
@@ -39,7 +38,6 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
     public SequenceGenerator(SequenceParams params) {
         this.params = params;
         SHOW_LAMBDA_CALL = SequenceSettingsState.getInstance().SHOW_LAMBDA_CALL;
-        LOGGER.setLevel(Level.DEBUG);
     }
 
     public SequenceGenerator(SequenceParams params, int offset) {
@@ -510,14 +508,4 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         }
 
     }
-//
-//    private static class ParamPair {
-//        final List<String> argNames;
-//        final List<String> argTypes;
-//
-//        public ParamPair(List<String> argNames, List<String> argTypes) {
-//            this.argNames = argNames;
-//            this.argTypes = argTypes;
-//        }
-//    }
 }

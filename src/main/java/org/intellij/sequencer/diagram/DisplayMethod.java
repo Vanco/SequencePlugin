@@ -1,14 +1,14 @@
 package org.intellij.sequencer.diagram;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBColor;
-import org.apache.log4j.Logger;
 import org.intellij.sequencer.config.SequenceSettingsState;
 
 import java.awt.*;
 
 public class DisplayMethod extends ScreenObject {
 
-    private static final Logger LOGGER = Logger.getLogger(DisplayMethod.class);
+    private static final Logger LOGGER = Logger.getInstance(DisplayMethod.class);
 
     private static final Paint LINE_COLOR = JBColor.foreground();
     private static final Paint SHADOW_COLOR = JBColor.LIGHT_GRAY;

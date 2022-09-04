@@ -1,7 +1,7 @@
 package org.intellij.sequencer.diagram;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBColor;
-import org.apache.log4j.Logger;
 import org.intellij.sequencer.config.ColorSupport;
 import org.intellij.sequencer.config.SequenceSettingsState;
 
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class DisplayObject extends ScreenObject {
-    private static final Logger LOGGER = Logger.getLogger(DisplayObject.class);
+    private static final Logger LOGGER = Logger.getInstance(DisplayObject.class);
 
     private static final Paint BORDER_COLOR = JBColor.foreground();
     private static final Paint TEXT_COLOR = Color.DARK_GRAY;

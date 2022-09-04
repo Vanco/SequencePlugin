@@ -1,7 +1,7 @@
 package org.intellij.sequencer.diagram.app;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.components.JBScrollPane;
-import org.apache.log4j.Logger;
 import org.intellij.sequencer.diagram.Display;
 import org.intellij.sequencer.diagram.Model;
 import org.intellij.sequencer.diagram.PreviewFrame;
@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 
 public class Sequence extends JFrame implements PropertyChangeListener {
 
-    private static final Logger LOGGER = Logger.getLogger(Sequence.class);
+    private static final Logger LOGGER = Logger.getInstance(Sequence.class);
 
     private static Sequence sequence = null;
 

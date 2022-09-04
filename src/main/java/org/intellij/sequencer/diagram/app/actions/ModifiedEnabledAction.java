@@ -1,6 +1,6 @@
 package org.intellij.sequencer.diagram.app.actions;
 
-import org.apache.log4j.Logger;
+import com.intellij.openapi.diagnostic.Logger;
 import org.intellij.sequencer.diagram.Model;
 
 import java.beans.PropertyChangeEvent;
@@ -8,7 +8,7 @@ import java.beans.PropertyChangeListener;
 
 public abstract class ModifiedEnabledAction extends ModelAction implements PropertyChangeListener {
 
-    private static final Logger LOGGER = Logger.getLogger(ModifiedEnabledAction.class);
+    private static final Logger LOGGER = Logger.getInstance(ModifiedEnabledAction.class);
 
     ModifiedEnabledAction(String resourcePrefix, Model model) {
         super(resourcePrefix, model);

@@ -1,6 +1,6 @@
 package org.intellij.sequencer.diagram;
 
-import org.apache.log4j.Logger;
+import com.intellij.openapi.diagnostic.Logger;
 
 import java.awt.*;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Diagram {
-    private static final Logger LOGGER = Logger.getLogger(Diagram.class);
+    private static final Logger LOGGER = Logger.getInstance(Diagram.class);
 
     private final List<DisplayObject> _objectLifeLines = Collections.synchronizedList(new ArrayList<>());
     private final List<DisplayLink> _links = Collections.synchronizedList(new ArrayList<>());

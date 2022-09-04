@@ -1,6 +1,6 @@
 package org.intellij.sequencer.diagram.app;
 
-import org.apache.log4j.Logger;
+import com.intellij.openapi.diagnostic.Logger;
 import org.intellij.sequencer.diagram.Model;
 import org.intellij.sequencer.diagram.ModelTextEvent;
 import org.intellij.sequencer.diagram.ModelTextListener;
@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 
 public class Editor extends JPanel implements DocumentListener, ModelTextListener {
 
-    private static final Logger LOGGER = Logger.getLogger(Editor.class);
+    private static final Logger LOGGER = Logger.getInstance(Editor.class);
 
     private Model _model = null;
     private final JEditorPane _editPane = new JEditorPane();

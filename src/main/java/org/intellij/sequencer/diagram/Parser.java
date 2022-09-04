@@ -2,7 +2,7 @@ package org.intellij.sequencer.diagram;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.MalformedJsonException;
-import org.apache.log4j.Logger;
+import com.intellij.openapi.diagnostic.Logger;
 import org.intellij.sequencer.openapi.Constants;
 import org.intellij.sequencer.openapi.model.ClassDescription;
 import org.intellij.sequencer.openapi.model.LambdaExprDescription;
@@ -15,7 +15,7 @@ import java.util.*;
 
 public class Parser {
 
-    private static final Logger LOGGER = Logger.getLogger(Parser.class);
+    private static final Logger LOGGER = Logger.getInstance(Parser.class);
 
     private final CallInfoStack _callInfoStack = new CallInfoStack();
     private final List<Link> _linkList = new ArrayList<>();

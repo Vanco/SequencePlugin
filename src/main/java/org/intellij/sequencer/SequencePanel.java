@@ -44,7 +44,7 @@ import java.util.Objects;
 import static org.intellij.sequencer.util.MyPsiUtil.getFileChooser;
 
 public class SequencePanel extends JPanel implements ConfigListener {
-    private static final Logger LOGGER = Logger.getInstance(SequencePanel.class.getName());
+    private static final Logger LOGGER = Logger.getInstance(SequencePanel.class);
     private final Project project;
     private final Display _display;
     private final Model _model;
