@@ -47,15 +47,20 @@ public class KtActionMenuFinder implements ActionMenuFinder {
         String s = method.getName();
         List<KtParameter> valueParameters = method.getValueParameters();
         if (valueParameters.size() > 0) {
-            s += "(" + valueParameters.stream().map(p -> p.getTypeReference().getText()).collect(Collectors.joining(",")) + ")";
+            s += "(" + valueParameters.stream().map(p -> getType(p.getText())).collect(Collectors.joining(",")) + ")";
         } else {
             s += "()";
         }
         if (method.getTypeReference()!= null) {
             s += ": " + method.getTypeReference().getText();
         } else {
-            s += "Unit";
+            s += ": Unit";
         }
         return s;
+    }
+
+    private String getType(String text) {
+        int idx = text.indexOf(':');
+        return text.substring(idx + 1).trim();
     }
 }

@@ -4,6 +4,7 @@
 ### Fixed
 - Export image width issue.
 - Change `Logger` to `com.intellij.openapi.diagnostic.Logger`
+- NPE when `KtParameter.getTypeReference` is null
 
 ## [2.2.1]
 ### Added
