@@ -1,6 +1,8 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+
+## [2.2.2]
 ### Fixed
 - Export image width issue.
 - Change `Logger` to `com.intellij.openapi.diagnostic.Logger`
