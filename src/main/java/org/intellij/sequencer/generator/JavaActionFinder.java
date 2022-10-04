@@ -1,14 +1,14 @@
 package org.intellij.sequencer.generator;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.intellij.sequencer.SequenceService;
-import org.intellij.sequencer.openapi.ActionMenuFinder;
+import org.intellij.sequencer.openapi.ActionFinder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +18,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JavaActionMenuFinder implements ActionMenuFinder {
+public class JavaActionFinder implements ActionFinder {
+
+    @Override
+    public Boolean isEnabled(PsiElement psiElement) {
+        return psiElement != null
+                && psiElement.getLanguage().is(JavaLanguage.INSTANCE);
+    }
+
     @NotNull
     @Override
     public AnAction[] find(@NotNull PsiElement element, ActionMenuProcessor processor) {

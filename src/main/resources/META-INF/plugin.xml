@@ -58,8 +58,8 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
         <extensionPoint name="generator" beanClass="com.intellij.lang.LanguageExtensionPoint" dynamic="true">
             <with attribute="implementationClass" implements="org.intellij.sequencer.openapi.GeneratorFactory"/>
         </extensionPoint>
-        <extensionPoint name="actionMenuFinder" beanClass="com.intellij.lang.LanguageExtensionPoint" dynamic="true">
-            <with attribute="implementationClass" implements="org.intellij.sequencer.openapi.ActionMenuFinder"/>
+        <extensionPoint name="actionFinder" beanClass="com.intellij.lang.LanguageExtensionPoint" dynamic="true">
+            <with attribute="implementationClass" implements="org.intellij.sequencer.openapi.ActionFinder"/>
         </extensionPoint>
         <extensionPoint name="typeFinder" beanClass="com.intellij.lang.LanguageExtensionPoint" dynamic="true">
             <with attribute="implementationClass" implements="org.intellij.sequencer.openapi.ElementTypeFinder"/>
@@ -88,7 +88,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
         <sequenceNavigable language="JAVA"
                            implementationClass="org.intellij.sequencer.generator.JavaSequenceNavigable"/>
         <generator language="JAVA" implementationClass="org.intellij.sequencer.generator.JavaGeneratorFactory"/>
-        <actionMenuFinder language="JAVA" implementationClass="org.intellij.sequencer.generator.JavaActionMenuFinder"/>
+        <actionFinder language="JAVA" implementationClass="org.intellij.sequencer.generator.JavaActionFinder"/>
         <typeFinder language="JAVA" implementationClass="org.intellij.sequencer.generator.JavaElementTypeFinder"/>
     </extensions>
 </idea-plugin>

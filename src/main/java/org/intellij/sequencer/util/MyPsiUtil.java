@@ -154,6 +154,7 @@ public class MyPsiUtil {
     /**
      * Check KtCallExpression is like:
      * <code> a(b(),c) </code>
+     * <code> a(b(),c -> {...}) </code>
      * The argument is another call.
      *
      * @param ktCallExpression the expression
@@ -164,7 +165,8 @@ public class MyPsiUtil {
         for (KtValueArgument valueArgument : valueArguments) {
             final KtExpression argumentExpression = valueArgument.getArgumentExpression();
             if (argumentExpression instanceof KtDotQualifiedExpression
-                    || argumentExpression instanceof KtCallExpression) {
+                    || argumentExpression instanceof KtCallExpression
+                    || argumentExpression instanceof KtLambdaExpression) {
                 return true;
             }
         }
@@ -220,6 +222,7 @@ public class MyPsiUtil {
 
     /**
      * Find the best offset for navigation
+     *
      * @param psiElement PsiElement like PsiClass, PsiMethod, PsiCallExpression etc.
      * @return the offset.
      */
@@ -236,7 +239,8 @@ public class MyPsiUtil {
     }
 
     /**
-     *  Create .sdt file chooser.
+     * Create .sdt file chooser.
+     *
      * @return JFileChooser
      */
     @NotNull
@@ -300,7 +304,7 @@ public class MyPsiUtil {
         }
 
         if (typeElement instanceof KtFunctionType) {
-            return typeElement.getText().replaceAll("[\\(|\\)]", "_").replaceAll(" ","");//.replaceAll("->", "→");
+            return typeElement.getText().replaceAll("[\\(|\\)]", "_").replaceAll(" ", "");//.replaceAll("->", "→");
         }
 
         return "Unit";
@@ -308,6 +312,7 @@ public class MyPsiUtil {
 
     /**
      * Find PisClass in the PsiFile exclude PsiTypeParameter.
+     *
      * @param psiFile
      * @param psiClassClass
      * @return

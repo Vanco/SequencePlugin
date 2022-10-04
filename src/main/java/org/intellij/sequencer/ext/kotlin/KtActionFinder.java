@@ -6,8 +6,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.intellij.sequencer.openapi.ActionMenuFinder;
+import org.intellij.sequencer.openapi.ActionFinder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.kotlin.idea.KotlinLanguage;
 import org.jetbrains.kotlin.psi.KtFunction;
 import org.jetbrains.kotlin.psi.KtFunctionLiteral;
 import org.jetbrains.kotlin.psi.KtParameter;
@@ -17,7 +18,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class KtActionMenuFinder implements ActionMenuFinder {
+public class KtActionFinder implements ActionFinder {
+
+    @Override
+    public Boolean isEnabled(PsiElement psiElement) {
+        return psiElement != null
+                &&  psiElement.getLanguage().is(KotlinLanguage.INSTANCE);
+    }
+
     @Override
     public AnAction[] find(@NotNull PsiElement element, ActionMenuProcessor processor) {
         return getActions(element, processor);
