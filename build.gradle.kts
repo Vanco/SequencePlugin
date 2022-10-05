@@ -2,6 +2,13 @@ import org.jetbrains.changelog.markdownToHTML
 
 fun properties(key: String) = project.findProperty(key).toString()
 
+buildscript {
+    repositories {
+        maven("https://maven.aliyun.com/repository/public")
+        maven("https://maven.aliyun.com/repository/gradle-plugin")
+    }
+}
+
 plugins {
     id("java")
     id("org.jetbrains.intellij") version "1.8.0"
@@ -15,7 +22,7 @@ repositories {
     mavenLocal()
     google()
     maven { url = uri("https://maven.aliyun.com/repository/public") }
-    maven { url = uri("https://plugins.gradle.org/m2/")}
+    maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin")}
     maven { url = uri("https://www.jetbrains.com/intellij-repository/releases") }
     maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
 }

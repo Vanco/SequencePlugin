@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [2.2.3]
+### Fixed
+- Cannot create `ShowSequenceAction` when the Kotlin plugin is disabled.
+
+### Added
+- Support generate class initializer
+
 ## [2.2.2]
 ### Fixed
 - Export image width issue.

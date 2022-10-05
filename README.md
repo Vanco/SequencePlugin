@@ -86,7 +86,7 @@ The Kotlin language support are in very early stage.
   - [x] Support generate JavaCall deeply
   - [ ] Support generate lambda argument
   - [ ] Support generate function with expression body
-  - [ ] Support generate class initializer
+  - [x] Support generate class initializer
   - [ ] Code navigation
 
 ## How to use
