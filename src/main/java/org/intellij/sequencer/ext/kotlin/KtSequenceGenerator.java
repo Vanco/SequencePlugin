@@ -91,8 +91,6 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
     }
 
 
-
-
     private CallStack generateObject(KtObjectDeclaration psiElement) {
         final Collection<KtNamedFunction> children = PsiTreeUtil.findChildrenOfAnyType(psiElement, KtNamedFunction.class);
         for (KtNamedFunction function : children) {
@@ -115,18 +113,9 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
 
     private CallStack generate(KtFunction ktFunction) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("[generate KtFunction]"+ktFunction.getName());
+            LOGGER.debug("[generate KtFunction]" + ktFunction.getName());
         }
 
-        if (ktFunction instanceof KtConstructor) {
-            /**
-             * Find KtClassInitializer and call it before constructor
-             */
-           @NotNull Collection<KtClassInitializer> initializers = PsiTreeUtil.findChildrenOfType(((KtConstructor<?>) ktFunction).getContainingClassOrObject(),KtClassInitializer.class);
-            for (KtClassInitializer initializer : initializers) {
-                initializer.accept(this);
-            }
-        }
         ktFunction.accept(this);
         return topStack;
     }
@@ -181,6 +170,13 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         final int naviOffset = offsetStack.isEmpty() ? constructor.getTextOffset() : offsetStack.pop();
         MethodDescription method = createMethod(constructor, naviOffset);
         if (makeMethodCallExceptCurrentStackIsRecursive(method)) return;
+
+        // Find KtClassInitializer and call it before constructor
+        @NotNull Collection<KtClassInitializer> initializers = PsiTreeUtil.findChildrenOfType(((KtConstructor<?>) constructor).getContainingClassOrObject(), KtClassInitializer.class);
+        for (KtClassInitializer initializer : initializers) {
+            initializer.accept(this);
+        }
+
         super.visitPrimaryConstructor(constructor);
     }
 
@@ -269,7 +265,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         //fixme: should support kotlin filter
         if (!params.getMethodFilter().allow(psiElement)) return;
 
-        if (currentStack.level() < params.getMaxDepth()) {
+        if (currentStack != null && currentStack.level() < params.getMaxDepth()) {
             CallStack oldStack = currentStack;
             int level = currentStack.level();
             LOGGER.debug("--> depth = " + level + " method = " + psiElement.getText());
@@ -279,8 +275,7 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
             currentStack = oldStack;
         } else {
             final MethodDescription method = createMethod(psiElement, offset);
-            if (method != null) //fixme
-                currentStack.methodCall(method);
+            makeMethodCallExceptCurrentStackIsRecursive(method);
         }
     }
 
@@ -469,6 +464,8 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
     }
 
     private boolean makeMethodCallExceptCurrentStackIsRecursive(MethodDescription method) {
+        if (method == null) return false;
+
         if (topStack == null) {
             topStack = new CallStack(method);
             currentStack = topStack;

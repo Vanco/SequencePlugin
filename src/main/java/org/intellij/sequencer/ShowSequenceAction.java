@@ -51,32 +51,33 @@ public class ShowSequenceAction extends AnAction {
         SequenceService plugin = project.getService(SequenceService.class);
 
         PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
+        // try to find the enclosed PsiMethod / KtFunction of caret
+        final PsiFile psiFile = event.getData(CommonDataKeys.PSI_FILE);
+        final Caret caret = event.getData(CommonDataKeys.CARET);
+
         if (psiElement == null) {
-            // try to find the enclosed PsiMethod / KtFunction of caret
-            final PsiFile psiFile = event.getData(CommonDataKeys.PSI_FILE);
-            final Caret caret = event.getData(CommonDataKeys.CARET);
 
             if (psiFile != null && caret != null) {
                 Class<? extends PsiElement> method = ElementTypeFinder.EP_NAME.forLanguage(psiFile.getLanguage()).findMethod();
                 psiElement = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caret.getOffset(), method, false);
             }
 
-            // try to get top PsiClass / KtClass
-            if (psiElement == null && psiFile != null && caret != null) {
-                Class<? extends PsiElement> aClass = ElementTypeFinder.EP_NAME.forLanguage(psiFile.getLanguage()).findClass();
-                psiElement = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caret.getOffset(), aClass, false);
-                chooseMethodToGenerate(event, plugin, Objects.requireNonNullElse(psiElement, psiFile));
-            }
         }
 
-        if (psiElement instanceof PsiClass) {
-            chooseMethodToGenerate(event, plugin, psiElement);
+        // try to get top PsiClass / KtClass
+        if (psiElement == null && psiFile != null && caret != null) {
+            Class<? extends PsiElement> aClass = ElementTypeFinder.EP_NAME.forLanguage(psiFile.getLanguage()).findClass();
+            psiElement = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caret.getOffset(), aClass, false);
+            chooseMethodToGenerate(event, plugin, Objects.requireNonNullElse(psiElement, psiFile));
         } else {
-            if (isEnabled(psiElement)) {
+            if (psiElement instanceof PsiClass) {
+                chooseMethodToGenerate(event, plugin, psiElement);
+            } else {
+//                if (isEnabled(psiElement)) {
                 plugin.showSequence(psiElement);
+//                }
             }
         }
-
     }
 
     private void chooseMethodToGenerate(@NotNull AnActionEvent event, SequenceService plugin, PsiElement psiElement) {
