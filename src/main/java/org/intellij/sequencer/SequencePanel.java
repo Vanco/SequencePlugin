@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
+import com.intellij.openapi.progress.util.AbstractProgressIndicatorExBase;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.PsiElement;
@@ -29,6 +30,7 @@ import org.intellij.sequencer.openapi.*;
 import org.intellij.sequencer.openapi.model.CallStack;
 import org.intellij.sequencer.ui.MyButtonlessScrollBarUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.concurrency.CancellablePromise;
 import org.jetbrains.kotlin.psi.KtFunction;
 
 import javax.swing.*;
@@ -49,7 +51,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
     private final Display _display;
     private final Model _model;
     private final SequenceNavigable navigable;
-    private SequenceParams _sequenceParams;
+    private final SequenceParams _sequenceParams;
     private PsiElement psiElement;
     private String _titleName;
     private final JScrollPane _jScrollPane;
@@ -139,10 +141,10 @@ public class SequencePanel extends JPanel implements ConfigListener {
                 new BackgroundableProcessIndicator(
                         project,
                         "Generate sequence...",
-                        PerformInBackgroundOption.ALWAYS_BACKGROUND,
+                        PerformInBackgroundOption.ALWAYS_BACKGROUND, // todo: remove this deprecated parameter 
                         "Stop",
                         "Stop",
-                        true);
+                        false);
         ReadAction
                 .nonBlocking(() -> {
                     final CallStack callStack = generator.generate(psiElement, null);
@@ -555,10 +557,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
                     String className = displayObject.getObjectInfo().getFullName();
                     List<String> impls = navigable.findImplementations(className);
                     actionGroup.addSeparator();
-                    for (String impl : impls) {
-                        actionGroup.add(new ExpendInterfaceAction(className, impl));
-                    }
-                    actionGroup.addSeparator();
+                    impls.stream().sorted().forEach(impl -> actionGroup.add(new ExpendInterfaceAction(className, impl)));
                 }
             } else if (screenObject instanceof DisplayMethod) {
                 DisplayMethod displayMethod = (DisplayMethod) screenObject;
@@ -573,11 +572,7 @@ public class SequencePanel extends JPanel implements ConfigListener {
                     List<String> impls = navigable.findImplementations(className, methodName, argTypes);
 
                     actionGroup.addSeparator();
-                    for (String impl : impls) {
-                        actionGroup.add(new ExpendInterfaceAction(className, impl));
-                    }
-                    actionGroup.addSeparator();
-
+                    impls.stream().sorted().forEach(impl -> actionGroup.add(new ExpendInterfaceAction(className, impl)));
                 }
             } else if (screenObject instanceof DisplayLink) {
                 DisplayLink displayLink = (DisplayLink) screenObject;
