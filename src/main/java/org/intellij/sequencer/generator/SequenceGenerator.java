@@ -24,11 +24,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class SequenceGenerator extends JavaRecursiveElementVisitor implements IGenerator {
+    private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class);
     private final Stack<Integer> offsetStack = new Stack<>();
 
-    private static final Logger LOGGER = Logger.getInstance(SequenceGenerator.class);
-
-    private final ImplementationFinder implementationFinder = new ImplementationFinder();
+    private final ArrayList<String> imfCache = new ArrayList<>();
     private CallStack topStack;
     private CallStack currentStack;
     private final SequenceParams params;
@@ -139,8 +138,9 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
             }
         } else {
             // resolve variable initializer
-            if (/*params.isSmartInterface() && */!MyPsiUtil.isExternal(containingClass)) {
-                containingClass.accept(implementationFinder);
+            if (/*params.isSmartInterface() && */!MyPsiUtil.isExternal(containingClass) && !imfCache.contains(containingClass.getQualifiedName())) {
+                containingClass.accept(new ImplementationFinder());
+                imfCache.add(containingClass.getQualifiedName());
             }
 
             psiMethod.accept(this);
@@ -161,8 +161,10 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
             PsiMethod method = (PsiMethod) psiElement;
             if (params.getMethodFilter().allow(method)) {
                 PsiClass containingClass = (method).getContainingClass();
-                if (/*params.isSmartInterface() && */containingClass != null && !MyPsiUtil.isExternal(containingClass))
-                    containingClass.accept(implementationFinder);
+                if (/*params.isSmartInterface() && */containingClass != null && !MyPsiUtil.isExternal(containingClass) && !imfCache.contains(containingClass.getQualifiedName())) {
+                    containingClass.accept(new ImplementationFinder());
+                    imfCache.add(containingClass.getQualifiedName());
+                }
                 method.accept(this);
             }
         }
