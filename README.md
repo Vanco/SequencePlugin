@@ -95,11 +95,11 @@ SequenceDiagram can generate sequence diagram from JAVA and Kotlin File.
 Since v2.1.0, the UI has improved a lot. now you can easily find it everywhere :)
 1. In navigation toolbar, A new ICON ![Sequence Diagram ...](imges/sequence.svg){:height="24px" width="24px"} added.
 2. In Tools menu. `Tools` > `Sequence Diagram`
-3. In Project view popup up menu. `Sequence Diagram ...`
+3. ~~In Project view popup up menu. `Sequence Diagram ...`~~
 4. In Editor popup up menu. `Sequence Diagram`
 5. ~~In IntentionAction tips.`Generate sequence diagram`~~(removed, not stable)
 6. Shortcut `Alt S` for windows, `Option S` for macOS
-7. Structure popup up menu `Sequence Diagram`
+7. ~~Structure popup up menu `Sequence Diagram`~~
 
 Please try to experience it and find what happen. 
 

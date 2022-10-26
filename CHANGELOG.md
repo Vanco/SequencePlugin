@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [2.2.4]
+### Added
+- UAST ActionFinder
+
+### Change
+- move to package `vanstudio`
+
+### Fixed
+- Issue #111 StackOverflowError when I try to use the plugin for non-trivial (bigger) classes
+
 ## [2.2.3]
 ### Fixed
 - Cannot create `ShowSequenceAction` when the Kotlin plugin is disabled.
