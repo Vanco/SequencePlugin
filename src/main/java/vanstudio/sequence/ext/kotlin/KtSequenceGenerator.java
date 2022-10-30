@@ -5,6 +5,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.Stack;
 import org.jetbrains.kotlin.idea.KotlinLanguage;
+import org.jetbrains.uast.UElement;
 import vanstudio.sequence.config.SequenceSettingsState;
 import vanstudio.sequence.diagram.Info;
 import vanstudio.sequence.openapi.*;
@@ -77,6 +78,11 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         }
 
         return topStack;
+    }
+
+    @Override
+    public CallStack generate(UElement node, CallStack parent) {
+        return parent;
     }
 
     private void generateLambda(KtLambdaExpression lambdaExpression) {

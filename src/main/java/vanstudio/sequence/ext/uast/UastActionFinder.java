@@ -1,4 +1,4 @@
-package vanstudio.sequence.generator;
+package vanstudio.sequence.ext.uast;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;

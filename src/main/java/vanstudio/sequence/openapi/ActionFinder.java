@@ -18,7 +18,7 @@ public interface ActionFinder {
         return EP_NAME.forLanguage(language);
     }
 
-    AnAction[] find(@NotNull Project project, @NotNull PsiElement element, Task processor);
+    AnAction[] find(@NotNull Project project, @NotNull PsiElement element, Task task);
 
     /**
      * {@code Task.run} should be called in {@code AnAction.actionPerformed}

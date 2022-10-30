@@ -5,25 +5,22 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.concurrency.NonUrgentExecutor;
-import org.jetbrains.uast.UClass;
-import org.jetbrains.uast.UElement;
-import org.jetbrains.uast.UastContextKt;
-import vanstudio.sequence.openapi.ActionFinder;
-import vanstudio.sequence.openapi.ElementTypeFinder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import vanstudio.sequence.openapi.ActionFinder;
+import vanstudio.sequence.openapi.ElementTypeFinder;
 
 /**
  * Show Sequence generate options dialog.
  */
-public class ShowSequenceAction extends AnAction {
+public class ShowSequenceAction extends AnAction implements DumbAware {
 
     public ShowSequenceAction() {
     }
@@ -38,14 +35,14 @@ public class ShowSequenceAction extends AnAction {
 
         Presentation presentation = event.getPresentation();
 
-        @Nullable Language language = event.getData(CommonDataKeys.LANGUAGE);
-        presentation.setEnabled(isEnabled(language));
+        @Nullable PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
+        presentation.setEnabled(isEnabled(psiElement));
 
     }
 
-    private boolean isEnabled(Language language) {
-        return language != null
-                && ActionFinder.getInstance(language) != null;
+    private boolean isEnabled(PsiElement psiElement) {
+        return psiElement != null
+                && ActionFinder.getInstance(psiElement.getLanguage()) != null;
     }
 
     public void actionPerformed(@NotNull AnActionEvent event) {
@@ -128,8 +125,8 @@ public class ShowSequenceAction extends AnAction {
         }).submit(NonUrgentExecutor.getInstance());
     }
 
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
-    }
+//    @Override
+//    public @NotNull ActionUpdateThread getActionUpdateThread() {
+//        return ActionUpdateThread.BGT;
+//    }
 }

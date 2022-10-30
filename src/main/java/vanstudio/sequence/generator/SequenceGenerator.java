@@ -6,6 +6,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.Query;
 import com.intellij.util.containers.Stack;
+import org.jetbrains.uast.UElement;
 import vanstudio.sequence.config.SequenceSettingsState;
 import vanstudio.sequence.diagram.Info;
 import vanstudio.sequence.generator.filters.ImplementClassFilter;
@@ -61,6 +62,11 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         }
 
         return topStack;
+    }
+
+    @Override
+    public CallStack generate(UElement node, CallStack parent) {
+        return parent;
     }
 
     /**

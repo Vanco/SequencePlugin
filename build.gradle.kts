@@ -12,6 +12,7 @@ buildscript {
 plugins {
     id("java")
     id("org.jetbrains.intellij") version "1.9.0"
+    id("org.jetbrains.kotlin.jvm") version "1.7.10"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -43,12 +44,16 @@ changelog {
     groups.set(emptyList())
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+}
+
 tasks {
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
-        sourceCompatibility = "1.9"
-        targetCompatibility = "1.9"
-    }
+//    withType<JavaCompile> {
+//        options.encoding = "UTF-8"
+//        sourceCompatibility = "1.9"
+//        targetCompatibility = "1.9"
+//    }
 
     patchPluginXml {
         version.set(properties("pluginVersion"))
@@ -79,6 +84,14 @@ tasks {
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
         channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "11"
+    }
+
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "11"
     }
 }
 

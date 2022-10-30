@@ -1,15 +1,18 @@
 package vanstudio.sequence;
 
-import com.intellij.lang.Language;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import vanstudio.sequence.openapi.ActionFinder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import vanstudio.sequence.openapi.ActionFinder;
 
 public class ShowSequenceActionGroup extends ActionGroup implements DumbAware {
 
@@ -17,10 +20,10 @@ public class ShowSequenceActionGroup extends ActionGroup implements DumbAware {
     public void update(@NotNull AnActionEvent e) {
 
 
-        @Nullable Language language = e.getData(CommonDataKeys.LANGUAGE);
+        @Nullable PsiElement psiElement = e.getData(CommonDataKeys.PSI_ELEMENT);
 
-        boolean disabled  = language == null
-                || ActionFinder.getInstance(language) == null;
+        boolean disabled  = psiElement == null
+                || ActionFinder.getInstance(psiElement.getLanguage()) == null;
 
         e.getPresentation().setEnabled(!disabled);
 
@@ -51,8 +54,8 @@ public class ShowSequenceActionGroup extends ActionGroup implements DumbAware {
         });
     }
 
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
-    }
+//    @Override
+//    public @NotNull ActionUpdateThread getActionUpdateThread() {
+//        return ActionUpdateThread.BGT;
+//    }
 }
