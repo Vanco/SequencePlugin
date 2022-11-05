@@ -33,7 +33,7 @@ fun createMethod(node: UMethod, offset: Int): MethodDescription {
     return MethodDescription.createMethodDescription(
         createClassDescription(containingUClass),
         attributes, node.name, returnType?.canonicalText,
-        paramPair.argNames, paramPair.argNames, offset
+        paramPair.argNames, paramPair.argTypes, offset
     )
 }
 
