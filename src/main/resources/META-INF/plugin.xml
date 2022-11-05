@@ -87,7 +87,7 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     </extensions>
     <extensions defaultExtensionNs="SequenceDiagram">
-        <sequenceNavigable language="JAVA"
+        <sequenceNavigable language="UAST"
                            implementationClass="vanstudio.sequence.generator.JavaSequenceNavigable"/>
 <!--        <generator language="JAVA" implementationClass="vanstudio.sequence.generator.JavaGeneratorFactory"/>-->
         <generator language="UAST" implementationClass="vanstudio.sequence.ext.uast.UastGeneratorFactory"/>
