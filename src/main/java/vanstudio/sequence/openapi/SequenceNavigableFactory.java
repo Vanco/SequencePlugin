@@ -4,8 +4,10 @@ import com.intellij.lang.Language;
 import com.intellij.lang.LanguageExtensionPoint;
 import com.intellij.openapi.components.ComponentManager;
 import com.intellij.openapi.extensions.ExtensionPointName;
-import vanstudio.sequence.generator.EmptySequenceNavigable;
+import com.intellij.openapi.project.Project;
+//import vanstudio.sequence.generator.EmptySequenceNavigable;
 import org.jetbrains.annotations.NotNull;
+import vanstudio.sequence.generator.JavaSequenceNavigable;
 
 import java.util.List;
 
@@ -20,11 +22,12 @@ public class SequenceNavigableFactory {
     public SequenceNavigable forLanguage(ComponentManager componentManager, Language language) {
 
         @NotNull List<LanguageExtensionPoint<SequenceNavigable>> extensionList = EP_NAME.getExtensionsIfPointIsRegistered(componentManager);
+
         return extensionList.stream()
-                .filter(it -> it.getKey().equals(language.getID()))
+                .filter(it -> language.isKindOf(it.getKey()))
                 .map(it -> it.createInstance(componentManager))
                 .findFirst()
-                .orElse(new EmptySequenceNavigable());
+                .orElse(new JavaSequenceNavigable((Project) componentManager)); // JAVA and UAST
 
     }
 
