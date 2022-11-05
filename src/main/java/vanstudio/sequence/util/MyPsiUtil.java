@@ -6,7 +6,7 @@ import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.idea.KotlinLanguage;
+//import org.jetbrains.kotlin.idea.KotlinLanguage;
 import org.jetbrains.kotlin.psi.*;
 
 import javax.swing.*;
@@ -207,15 +207,15 @@ public class MyPsiUtil {
             return false;
         for (int i = 0; i < psiParameters.length; i++) {
             PsiParameter psiParameter = psiParameters[i];
-            if (psiParameter.getLanguage().equals(KotlinLanguage.INSTANCE)) {
-                final KtTypeReference typeReference = ((KtParameter) psiParameter.getNavigationElement()).getTypeReference();
-                if (!getKtType(typeReference).equals(argTypes.get(i))) {
-                    return false;
-                }
-            } else {
+//            if (psiParameter.getLanguage().equals(KotlinLanguage.INSTANCE)) {
+//                final KtTypeReference typeReference = ((KtParameter) psiParameter.getNavigationElement()).getTypeReference();
+//                if (!getKtType(typeReference).equals(argTypes.get(i))) {
+//                    return false;
+//                }
+//            } else {
                 if (!psiParameter.getType().getCanonicalText().equals(argTypes.get(i)))
                     return false;
-            }
+//            }
         }
         return true;
     }
