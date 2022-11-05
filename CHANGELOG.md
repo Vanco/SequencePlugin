@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [2.2.5]
+### Added
+- `UastSequenceGenerator` suppose to support JVM Language: Java, Kotlin, Scala, Groovy.
+
+### Fixed
+- Issue #139, #141 `UnsupportedOperatonException`
+
 ## [2.2.4]
 ### Added
 - UAST ActionFinder

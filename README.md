@@ -21,6 +21,19 @@ with this plugin, you can
 ## Experimental features
 **The experimental features created by myself, which is not part of UML standard. Use this feature in your own risk.**
 
+### UAST support
+UAST (Unified Abstract Syntax Tree) is an abstraction layer on the PSI of different programming languages targeting the 
+JVM (Java Virtual Machine). It provides a unified API for working with common language elements like classes and method 
+declarations, literal values, and control flow operators.
+
+Which languages are supported?
+- Java: full support
+- Kotlin: full support
+- Scala: beta, but full support
+- Groovy: declarations only, method bodies not supported
+
+Try to use UAST api to generate SequenceDiagram. 
+
 ### Smart Interface
 Find the implementation of the interface smartly.  e.g.
 ```java
