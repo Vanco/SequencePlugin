@@ -20,7 +20,7 @@ public class ShowSequenceActionGroup extends ActionGroup implements DumbAware {
     public void update(@NotNull AnActionEvent e) {
 
 
-        @Nullable PsiElement psiElement = e.getData(CommonDataKeys.PSI_ELEMENT);
+        @Nullable PsiElement psiElement = e.getData(CommonDataKeys.PSI_FILE);
 
         boolean disabled  = psiElement == null
                 || ActionFinder.getInstance(psiElement.getLanguage()) == null;
