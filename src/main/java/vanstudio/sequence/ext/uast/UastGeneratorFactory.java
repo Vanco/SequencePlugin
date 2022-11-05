@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import vanstudio.sequence.config.ExcludeEntry;
 import vanstudio.sequence.config.SequenceParamsState;
 import vanstudio.sequence.config.SequenceSettingsState;
-import vanstudio.sequence.generator.filters.NoConstructorsFilter;
+import vanstudio.sequence.ext.uast.filters.UastNoConstructorsFilter;
+import vanstudio.sequence.ext.uast.filters.UastNoPrivateMethodsFilter;
+import vanstudio.sequence.ext.uast.filters.UastSingleClassFilter;
 import vanstudio.sequence.generator.filters.NoGetterSetterFilter;
-import vanstudio.sequence.generator.filters.NoPrivateMethodsFilter;
-import vanstudio.sequence.generator.filters.SingleClassFilter;
 import vanstudio.sequence.openapi.GeneratorFactory;
 import vanstudio.sequence.openapi.IGenerator;
 import vanstudio.sequence.openapi.SequenceParams;
@@ -35,8 +35,8 @@ public class UastGeneratorFactory extends GeneratorFactory {
 //        params.setSmartInterface(state.smartInterface);
         params.getMethodFilter().addFilter(new ProjectOnlyFilter(state.projectClassesOnly));
         params.getMethodFilter().addFilter(new NoGetterSetterFilter(state.noGetterSetters));
-        params.getMethodFilter().addFilter(new NoPrivateMethodsFilter(state.noPrivateMethods));
-        params.getMethodFilter().addFilter(new NoConstructorsFilter(state.noConstructors));
+        params.getMethodFilter().addFilter(new UastNoPrivateMethodsFilter(state.noPrivateMethods));
+        params.getMethodFilter().addFilter(new UastNoConstructorsFilter(state.noConstructors));
 
         List<ExcludeEntry> excludeList = SequenceSettingsState.getInstance().getExcludeList();
         for (ExcludeEntry excludeEntry : excludeList) {
@@ -50,7 +50,7 @@ public class UastGeneratorFactory extends GeneratorFactory {
                 int index = excludeName.lastIndexOf(SequenceParams.RECURSIVE_PACKAGE_INDICATOR);
                 params.getMethodFilter().addFilter(new PackageFilter(excludeName.substring(0, index), true));
             } else
-                params.getMethodFilter().addFilter(new SingleClassFilter(excludeName));
+                params.getMethodFilter().addFilter(new UastSingleClassFilter(excludeName));
         }
 
         return params;

@@ -33,6 +33,16 @@ public class UastActionFinder implements ActionFinder {
 
                     return false;
                 }
+
+                /**
+                 * Do nothing to avoid `UnsupportedOperationException`
+                 * @param node
+                 * @return
+                 */
+                @Override
+                public boolean visitAnnotation(@NotNull UAnnotation node) {
+                    return true;
+                }
             });
         }
 

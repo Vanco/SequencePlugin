@@ -122,8 +122,9 @@ public class UastSequenceGenerator extends AbstractUastVisitor implements IGener
         List<UExpression> valueArguments = node.getValueArguments();
         for (UExpression valueArgument : valueArguments) {
             if (valueArgument instanceof UQualifiedReferenceExpression
-                    || valueArgument instanceof ULambdaExpression
-                    || valueArgument instanceof UCallExpression) {
+                   /* || valueArgument instanceof ULambdaExpression*/
+                    || valueArgument instanceof UCallExpression
+                   /* || valueArgument instanceof UCallableReferenceExpression*/) {
                 // generate value argument before call expression
                 valueArgument.accept(this);
                 isComplexCall = true;
@@ -144,5 +145,12 @@ public class UastSequenceGenerator extends AbstractUastVisitor implements IGener
             return true;
         }
         return super.visitLambdaExpression(node);
+    }
+
+    @Override
+    public boolean visitCallableReferenceExpression(@NotNull UCallableReferenceExpression node) {
+        GeneratorFactory.createGenerator(node.getLang(), params)
+                .generate(node.resolve(), currentStack);
+        return super.visitCallableReferenceExpression(node);
     }
 }
