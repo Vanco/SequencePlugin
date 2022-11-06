@@ -8,7 +8,7 @@ import vanstudio.sequence.openapi.model.LambdaExprDescription
 import vanstudio.sequence.openapi.model.MethodDescription
 
 fun createMethod(node: ULambdaExpression, offset: Int): MethodDescription {
-    val paramPair: ParamPair = extractParameters(node.parameters)
+    val paramPair: ParamPair = extractParameters(node.valueParameters)
     val returnType = node.getExpressionType()?.canonicalText
 
     val uMethod = node.getParentOfType(UMethod::class.java, true)
