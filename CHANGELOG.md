@@ -1,6 +1,8 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+### Change
+- rollback to old java/kotlin generator because UAST api will throw `UnsupportedOperatonException`
 
 ## [2.2.5]
 ### Added

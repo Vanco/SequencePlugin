@@ -87,12 +87,12 @@ The original version SequencePlugin come from ksibilev@yahoo.com.</p>
 
     </extensions>
     <extensions defaultExtensionNs="SequenceDiagram">
-        <sequenceNavigable language="UAST"
+        <sequenceNavigable language="JAVA"
                            implementationClass="vanstudio.sequence.generator.JavaSequenceNavigable"/>
-<!--        <generator language="JAVA" implementationClass="vanstudio.sequence.generator.JavaGeneratorFactory"/>-->
-        <generator language="UAST" implementationClass="vanstudio.sequence.ext.uast.UastGeneratorFactory"/>
-<!--        <actionFinder language="JAVA" implementationClass="vanstudio.sequence.generator.JavaActionFinder"/>-->
-        <actionFinder language="UAST" implementationClass="vanstudio.sequence.ext.uast.UastActionFinder"/>
+        <generator language="JAVA" implementationClass="vanstudio.sequence.generator.JavaGeneratorFactory"/>
+<!--        <generator language="UAST" implementationClass="vanstudio.sequence.ext.uast.UastGeneratorFactory"/>-->
+        <actionFinder language="JAVA" implementationClass="vanstudio.sequence.generator.JavaActionFinder"/>
+<!--        <actionFinder language="UAST" implementationClass="vanstudio.sequence.ext.uast.UastActionFinder"/>-->
         <typeFinder language="JAVA" implementationClass="vanstudio.sequence.generator.JavaElementTypeFinder"/>
     </extensions>
 </idea-plugin>
