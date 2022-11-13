@@ -1,6 +1,5 @@
 package vanstudio.sequence;
 
-import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.ReadAction;
@@ -42,7 +41,7 @@ public class ShowSequenceAction extends AnAction implements DumbAware {
 
     private boolean isEnabled(PsiElement psiElement) {
         return psiElement != null
-                && ActionFinder.getInstance(psiElement.getLanguage()) != null;
+                && ActionFinder.isValid(psiElement.getLanguage());
     }
 
     public void actionPerformed(@NotNull AnActionEvent event) {
@@ -59,16 +58,19 @@ public class ShowSequenceAction extends AnAction implements DumbAware {
 
             if (psiFile != null && caret != null) {
                 // try to find the enclosed PsiMethod / KtFunction of caret
-                Class<? extends PsiElement> method = ElementTypeFinder.EP_NAME.forLanguage(psiFile.getLanguage()).findMethod();
-                psiElement = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caret.getOffset(), method, false);
+                ElementTypeFinder typeFinder = ElementTypeFinder.EP_NAME.forLanguage(psiFile.getLanguage());
+                if (typeFinder != null) {
+                    Class<? extends PsiElement> method = typeFinder.findMethod();
+                    psiElement = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caret.getOffset(), method, false);
 
-                // try to get top PsiClass / KtClass
-                if (psiElement == null) {
-                    Class<? extends PsiElement> aClass = ElementTypeFinder.EP_NAME.forLanguage(psiFile.getLanguage()).findClass();
-                    psiElement = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caret.getOffset(), aClass, false);
-                    if (psiElement != null) {
-                        chooseMethodToGenerate(event, plugin, psiElement, project);
-                        return;
+                    // try to get top PsiClass / KtClass
+                    if (psiElement == null) {
+                        Class<? extends PsiElement> aClass = typeFinder.findClass();
+                        psiElement = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caret.getOffset(), aClass, false);
+                        if (psiElement != null) {
+                            chooseMethodToGenerate(event, plugin, psiElement, project);
+                            return;
+                        }
                     }
                 }
             }

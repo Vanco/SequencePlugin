@@ -8,9 +8,19 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 public interface ActionFinder {
+    static String[] UAST_Language = new String[] {
+          "JAVA", "kotlin", "Groovy", "Scala"
+    };
     @NotNull
     LanguageExtension<ActionFinder> EP_NAME = new LanguageExtension<>("SequenceDiagram.actionFinder");
+    static boolean isValid(@NotNull Language language) {
+        boolean match = Arrays.stream(UAST_Language).anyMatch(p -> p.equals(language.getID()));
+
+        return match || EP_NAME.forLanguage(language) != null;
+    }
 
     @Nullable
     static ActionFinder getInstance(@NotNull Language language) {
