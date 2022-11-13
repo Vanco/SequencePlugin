@@ -1,6 +1,22 @@
 # SequenceDiagram Changelog
 
 ## [Unreleased]
+
+## [3.0.0-alpha.1]
+### Added
+- UAST Generator
+
+### Changed
+- Add `Smart Interface` configuration
+- Add `isExternal` method
+- Remove `showSequence(UMethod)` method
+- Remove `UastSequnceNavigable.kt` kotlin class
+- Remove `CallStack generate(UElement node, CallStack parent)` method
+
+### fixed
+- issue #139
+
+## [2.2.6]
 ### Change
 - rollback to old java/kotlin generator because UAST api will throw `UnsupportedOperatonException`
 
