@@ -54,6 +54,7 @@ public class SequenceSettingsComponent implements ActionListener {
     private JButton _interfaceColor;
     private JCheckBox _showSimplifyCallName;
     private JCheckBox _showLambdaCall;
+    private JCheckBox _smartInterface;
 
     private final ExcludeTableModel _excludeTableModel;
     private final ColorMapTableModel _colorMapTableModel;
@@ -129,6 +130,9 @@ public class SequenceSettingsComponent implements ActionListener {
         if(sequenceSettingsState.SHOW_LAMBDA_CALL != _showLambdaCall.isSelected()) {
             return true;
         }
+        if(sequenceSettingsState.SMART_INTERFACE != _smartInterface.isSelected()) {
+            return true;
+        }
         if(sequenceSettingsState.USE_3D_VIEW != _use3dView.isSelected())
             return true;
         if(!Objects.equals(_fontName.getSelectedItem(), sequenceSettingsState.FONT_NAME))
@@ -153,6 +157,7 @@ public class SequenceSettingsComponent implements ActionListener {
         sequenceSettingsState.SHOW_CALL_NUMBERS = _showCallNumbers.isSelected();
         sequenceSettingsState.SHOW_SIMPLIFY_CALL_NAME = _showSimplifyCallName.isSelected();
         sequenceSettingsState.SHOW_LAMBDA_CALL = _showLambdaCall.isSelected();
+        sequenceSettingsState.SMART_INTERFACE = _smartInterface.isSelected();
         sequenceSettingsState.USE_3D_VIEW = _use3dView.isSelected();
         sequenceSettingsState.FONT_NAME = (String)_fontName.getSelectedItem();
         sequenceSettingsState.FONT_SIZE = Integer.parseInt(((String) Objects.requireNonNull(_fondSize.getSelectedItem())));
@@ -171,6 +176,7 @@ public class SequenceSettingsComponent implements ActionListener {
         _showCallNumbers.setSelected(sequenceSettingsState.SHOW_CALL_NUMBERS);
         _showSimplifyCallName.setSelected(sequenceSettingsState.SHOW_SIMPLIFY_CALL_NAME);
         _showLambdaCall.setSelected(sequenceSettingsState.SHOW_LAMBDA_CALL);
+        _smartInterface.setSelected(SequenceSettingsState.getInstance().SMART_INTERFACE);
         _use3dView.setSelected(sequenceSettingsState.USE_3D_VIEW);
         _fontName.setSelectedItem(sequenceSettingsState.FONT_NAME);
         _fondSize.setSelectedItem(String.valueOf(sequenceSettingsState.FONT_SIZE));
