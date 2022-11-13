@@ -89,8 +89,12 @@ fun extractParameters(uastParameters: List<UParameter>): ParamPair {
 }
 
 fun isExternal(uClass: UClass?): Boolean {
-    // todo: check in scope
-    return false;
+    val virtualFile = uClass?.containingFile?.virtualFile
+    val protocol = virtualFile?.fileSystem?.protocol
+
+    return virtualFile?.name?.endsWith(".class") == true
+            || protocol?.equals("jar", ignoreCase = true) == true
+            || protocol?.equals("zip", ignoreCase = true) == true
 }
 
 fun isInterface(uClass: UClass?): Boolean {
