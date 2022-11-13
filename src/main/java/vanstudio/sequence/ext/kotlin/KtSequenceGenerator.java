@@ -1,11 +1,21 @@
 package vanstudio.sequence.ext.kotlin;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.Stack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.descriptors.CallableDescriptor;
 import org.jetbrains.kotlin.idea.KotlinLanguage;
-import org.jetbrains.uast.UElement;
+import org.jetbrains.kotlin.idea.caches.resolve.ResolutionUtils;
+import org.jetbrains.kotlin.idea.codeInsight.DescriptorToSourceUtilsIde;
+import org.jetbrains.kotlin.psi.*;
+import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
+import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode;
 import vanstudio.sequence.config.SequenceSettingsState;
 import vanstudio.sequence.diagram.Info;
 import vanstudio.sequence.openapi.*;
@@ -14,16 +24,11 @@ import vanstudio.sequence.openapi.model.ClassDescription;
 import vanstudio.sequence.openapi.model.LambdaExprDescription;
 import vanstudio.sequence.openapi.model.MethodDescription;
 import vanstudio.sequence.util.MyPsiUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.descriptors.CallableDescriptor;
-import org.jetbrains.kotlin.idea.caches.resolve.ResolutionUtils;
-import org.jetbrains.kotlin.idea.codeInsight.DescriptorToSourceUtilsIde;
-import org.jetbrains.kotlin.psi.*;
-import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
-import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator {
     private static final Logger LOGGER = Logger.getInstance(KtSequenceGenerator.class);
@@ -78,11 +83,6 @@ public class KtSequenceGenerator extends KtTreeVisitorVoid implements IGenerator
         }
 
         return topStack;
-    }
-
-    @Override
-    public CallStack generate(UElement node, CallStack parent) {
-        return parent;
     }
 
     private void generateLambda(KtLambdaExpression lambdaExpression) {

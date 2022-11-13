@@ -6,7 +6,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.searches.DefinitionsScopedSearch;
 import com.intellij.util.Query;
 import com.intellij.util.containers.Stack;
-import org.jetbrains.uast.UElement;
+import org.jetbrains.kotlin.idea.KotlinLanguage;
 import vanstudio.sequence.config.SequenceSettingsState;
 import vanstudio.sequence.diagram.Info;
 import vanstudio.sequence.generator.filters.ImplementClassFilter;
@@ -18,7 +18,6 @@ import vanstudio.sequence.openapi.model.ClassDescription;
 import vanstudio.sequence.openapi.model.LambdaExprDescription;
 import vanstudio.sequence.openapi.model.MethodDescription;
 import vanstudio.sequence.util.MyPsiUtil;
-import org.jetbrains.kotlin.idea.KotlinLanguage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,11 +61,6 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
         }
 
         return topStack;
-    }
-
-    @Override
-    public CallStack generate(UElement node, CallStack parent) {
-        return parent;
     }
 
     /**

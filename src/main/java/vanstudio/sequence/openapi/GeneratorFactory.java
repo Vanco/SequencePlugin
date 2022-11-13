@@ -5,7 +5,6 @@ import com.intellij.lang.LanguageExtension;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.uast.UElement;
 import vanstudio.sequence.openapi.model.CallStack;
 
 public abstract class GeneratorFactory {
@@ -38,8 +37,7 @@ public abstract class GeneratorFactory {
     @NotNull
     public abstract IGenerator getGenerator(@NotNull SequenceParams params, int offset);
 
-    @NotNull
-    public abstract SequenceParams loadParams(@NotNull SequenceParams params);
+    public abstract void loadParams(@NotNull SequenceParams params);
 
 
     static class UnsupportedGenerator implements IGenerator{
@@ -49,9 +47,5 @@ public abstract class GeneratorFactory {
             return CallStack.EMPTY;
         }
 
-        @Override
-        public CallStack generate(UElement node, CallStack parent) {
-            return CallStack.EMPTY;
-        }
     }
 }

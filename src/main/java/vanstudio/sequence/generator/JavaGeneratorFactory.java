@@ -30,8 +30,7 @@ public class JavaGeneratorFactory extends GeneratorFactory {
     }
 
     @Override
-    @NotNull
-    public SequenceParams loadParams(SequenceParams params) {
+    public void loadParams(@NotNull SequenceParams params) {
         SequenceParamsState state = SequenceParamsState.getInstance();
 
         params.setMaxDepth(state.callDepth);
@@ -56,6 +55,5 @@ public class JavaGeneratorFactory extends GeneratorFactory {
                 params.getMethodFilter().addFilter(new SingleClassFilter(excludeName));
         }
 
-        return params;
     }
 }

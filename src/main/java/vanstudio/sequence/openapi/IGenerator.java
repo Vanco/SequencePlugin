@@ -1,11 +1,8 @@
 package vanstudio.sequence.openapi;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.uast.UElement;
-import org.jetbrains.uast.UExpression;
-import org.jetbrains.uast.ULambdaExpression;
-import vanstudio.sequence.openapi.model.CallStack;
 import org.jetbrains.annotations.Nullable;
+import vanstudio.sequence.openapi.model.CallStack;
 
 import java.util.List;
 
@@ -17,8 +14,6 @@ public interface IGenerator {
      * @return <code>CallStack</code> includes method call of PsiMethod/KtFunction and calls in its body.
      */
     CallStack generate(PsiElement psiElement, @Nullable CallStack parent);
-
-    CallStack generate(UElement node, CallStack parent);
 
     class ParamPair {
         public final List<String> argNames;
