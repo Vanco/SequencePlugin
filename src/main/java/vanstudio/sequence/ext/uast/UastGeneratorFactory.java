@@ -28,7 +28,7 @@ public class UastGeneratorFactory extends GeneratorFactory {
     }
 
     @Override
-    public @NotNull SequenceParams loadParams(@NotNull SequenceParams params) {
+    public void loadParams(@NotNull SequenceParams params) {
         SequenceParamsState state = SequenceParamsState.getInstance();
 
         params.setMaxDepth(state.callDepth);
@@ -53,6 +53,5 @@ public class UastGeneratorFactory extends GeneratorFactory {
                 params.getMethodFilter().addFilter(new UastSingleClassFilter(excludeName));
         }
 
-        return params;
     }
 }

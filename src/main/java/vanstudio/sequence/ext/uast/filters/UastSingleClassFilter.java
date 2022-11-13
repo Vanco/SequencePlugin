@@ -1,9 +1,7 @@
 package vanstudio.sequence.ext.uast.filters;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.uast.UElement;
-import org.jetbrains.uast.UMethod;
-import org.jetbrains.uast.UastContextKt;
+import org.jetbrains.uast.*;
 import vanstudio.sequence.openapi.Constants;
 import vanstudio.sequence.openapi.filters.MethodFilter;
 
@@ -18,18 +16,19 @@ public class UastSingleClassFilter implements MethodFilter {
 
     @Override
     public boolean allow(PsiElement psiElement) {
-        UElement uElement = UastContextKt.toUElement(psiElement, UElement.class);
-        if (uElement instanceof UMethod) {
-            UMethod uMethod = (UMethod) uElement;
-            if ( /* method in Anonymous class*/
+        UMethod uMethod = UastContextKt.toUElement(psiElement, UMethod.class);
+        if (uMethod != null) {
+            UClass uClass = UastUtils.getContainingUClass(uMethod);
+            if (
+                /* method in Anonymous class*/
                     _className.equals(Constants.ANONYMOUS_CLASS_NAME)
-                            && (uMethod.getContainingClass() == null || uMethod.getContainingClass().getQualifiedName() == null)
+                            && (uClass == null || uClass.getQualifiedName() == null)
                             ||
                             /* or method's classname is same as filtered classname */
-                            uMethod.getContainingClass() != null
-                                    && uMethod.getContainingClass().getQualifiedName() != null
-                                    && _className.equals(uMethod.getContainingClass().getQualifiedName())
-            ) return false;
+                            uClass != null
+                                    && uClass.getQualifiedName() != null
+                                    && _className.equals(uClass.getQualifiedName()))
+                return false;
         }
         return true;
     }

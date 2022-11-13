@@ -1,15 +1,16 @@
 package vanstudio.sequence.ext.uast;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
+import com.intellij.psi.*;
+import com.intellij.psi.search.searches.DefinitionsScopedSearch;
+import com.intellij.util.Query;
 import com.intellij.util.containers.Stack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.uast.*;
 import org.jetbrains.uast.visitor.AbstractUastVisitor;
 import vanstudio.sequence.config.SequenceSettingsState;
-import vanstudio.sequence.openapi.GeneratorFactory;
+import vanstudio.sequence.generator.filters.ImplementClassFilter;
 import vanstudio.sequence.openapi.IGenerator;
 import vanstudio.sequence.openapi.SequenceParams;
 import vanstudio.sequence.openapi.model.CallStack;
@@ -31,10 +32,12 @@ public class UastSequenceGenerator extends AbstractUastVisitor implements IGener
     private final SequenceParams params;
 
     private final boolean SHOW_LAMBDA_CALL;
+    private final boolean SMART_INTERFACE;
 
     public UastSequenceGenerator(SequenceParams params) {
         this.params = params;
         SHOW_LAMBDA_CALL = SequenceSettingsState.getInstance().SHOW_LAMBDA_CALL;
+        SMART_INTERFACE = SequenceSettingsState.getInstance().SMART_INTERFACE;
     }
 
     public UastSequenceGenerator(SequenceParams params, int offset) {
@@ -48,33 +51,57 @@ public class UastSequenceGenerator extends AbstractUastVisitor implements IGener
             topStack = parent;
             currentStack = topStack;
         }
-        return generateMethod(psiElement);
-    }
-
-    @Override
-    public CallStack generate(UElement node, CallStack parent) {
-        if (parent != null) {
-            topStack = parent;
-            currentStack = topStack;
+        if (psiElement instanceof UMethod) {
+            generateMethod((UMethod) psiElement);
+        } else {
+            UMethod uMethod = UastContextKt.toUElement(psiElement, UMethod.class);
+            generateMethod(uMethod);
         }
-        if (node instanceof ULambdaExpression)
-            return generateLambda((ULambdaExpression) node);
-
         return topStack;
     }
 
-    private CallStack generateLambda(ULambdaExpression node) {
+    private void generateLambda(ULambdaExpression node) {
         MethodDescription method = MyUastUtilKt.createMethod(node, MyPsiUtil.findNaviOffset(node.getSourcePsi()));
         makeMethodCallExceptCurrentStackIsRecursive(method);
         node.getBody().accept(this);
-        return topStack;
     }
 
-    private CallStack generateMethod(PsiElement psiElement) {
-        UMethod uMethod = UastContextKt.toUElement(psiElement, UMethod.class);
-        if (uMethod != null)
+    private void generateMethod(UMethod uMethod) {
+        UClass containingUClass = UastUtils.getContainingUClass(uMethod);
+
+        if (containingUClass != null && containingUClass.isInterface() && !MyUastUtilKt.isExternal(containingUClass)) {
             uMethod.accept(this);
-        return topStack;
+
+            // follow implementation
+            PsiElement sourcePsi = uMethod.getSourcePsi();
+            if (sourcePsi != null) {
+                Query<PsiElement> search = DefinitionsScopedSearch.search(sourcePsi).allowParallelProcessing();
+
+                for (PsiElement psiElement : search) {
+
+                    if (psiElement instanceof PsiMethod) {
+                        UMethod method = UastContextKt.toUElement(psiElement, UMethod.class);
+//                        if (alreadyInStack((PsiMethod) psiElement)) continue;
+
+                        if (method != null && params.getImplementationWhiteList().allow(psiElement)) {
+                            if (params.getMethodFilter().allow(psiElement)) {
+                                method.accept(this);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            // resolve variable initializer
+            if (SMART_INTERFACE
+                    && !MyUastUtilKt.isExternal(containingUClass)
+                    && containingUClass != null
+                    && !imfCache.contains(containingUClass.getQualifiedName())) {
+                containingUClass.accept(new MyImplFinder());
+                imfCache.add(containingUClass.getQualifiedName());
+            }
+            uMethod.accept(this);
+        }
     }
 
     private boolean makeMethodCallExceptCurrentStackIsRecursive(MethodDescription method) {
@@ -97,7 +124,8 @@ public class UastSequenceGenerator extends AbstractUastVisitor implements IGener
             CallStack oldStack = currentStack;
             LOGGER.debug("+ depth = " + currentStack.level() + " method = " + psiMethod.getName());
             offsetStack.push(offset);
-            generateMethod(psiMethod);
+            UMethod uMethod = UastContextKt.toUElement(psiMethod, UMethod.class);
+            generateMethod(uMethod);
             LOGGER.debug("- depth = " + currentStack.level() + " method = " + psiMethod.getName());
             currentStack = oldStack;
         } else {
@@ -122,9 +150,9 @@ public class UastSequenceGenerator extends AbstractUastVisitor implements IGener
         List<UExpression> valueArguments = node.getValueArguments();
         for (UExpression valueArgument : valueArguments) {
             if (valueArgument instanceof UQualifiedReferenceExpression
-                   /* || valueArgument instanceof ULambdaExpression*/
+                    /* || valueArgument instanceof ULambdaExpression*/
                     || valueArgument instanceof UCallExpression
-                   /* || valueArgument instanceof UCallableReferenceExpression*/) {
+                /* || valueArgument instanceof UCallableReferenceExpression*/) {
                 // generate value argument before call expression
                 valueArgument.accept(this);
                 isComplexCall = true;
@@ -135,13 +163,13 @@ public class UastSequenceGenerator extends AbstractUastVisitor implements IGener
         return isComplexCall;
     }
 
+
     @Override
     public boolean visitLambdaExpression(@NotNull ULambdaExpression node) {
         if (SHOW_LAMBDA_CALL) {
             // generate dummy () -> call, and it's body in separate generator
-            GeneratorFactory.createGenerator(node.getLang(), params)
-                    .generate(node, currentStack);
-           //true:  do not need to generate lambda body in this generator.
+            generateLambda(node);
+            //true:  do not need to generate lambda body in this generator.
             return true;
         }
         return super.visitLambdaExpression(node);
@@ -149,8 +177,117 @@ public class UastSequenceGenerator extends AbstractUastVisitor implements IGener
 
     @Override
     public boolean visitCallableReferenceExpression(@NotNull UCallableReferenceExpression node) {
-        GeneratorFactory.createGenerator(node.getLang(), params)
-                .generate(node.resolve(), currentStack);
+        final PsiElement resolve = node.resolve();
+        if (resolve instanceof PsiMethod) {
+            final PsiMethod psiMethod = (PsiMethod) resolve;
+            final int offset = MyPsiUtil.findNaviOffset(node.getSourcePsi());
+            methodCall(psiMethod, offset);
+        }
         return super.visitCallableReferenceExpression(node);
+    }
+
+    @Override
+    public boolean visitDeclaration(@NotNull UDeclaration node) {
+        if (SMART_INTERFACE && node instanceof ULocalVariable) {
+            ULocalVariable localVariable = (ULocalVariable) node;
+            variableImplementationFinder(localVariable.getTypeReference(), localVariable.getUastInitializer());
+        }
+        return super.visitDeclaration(node);
+    }
+
+    @Override
+    public boolean visitBinaryExpression(@NotNull UBinaryExpression node) {
+        UExpression uExpression = node.getRightOperand();
+        if (SMART_INTERFACE && uExpression instanceof UCallExpression) {
+            findAssignmentImplFilter(node.getLeftOperand().getExpressionType(), uExpression);
+        }
+        return super.visitBinaryExpression(node);
+    }
+
+    private void variableImplementationFinder(UTypeReferenceExpression typeReference, UExpression uastInitializer) {
+        if (typeReference == null || uastInitializer == null) return;
+
+        String face = typeReference.getQualifiedName();
+
+        if (face == null) return;
+
+        if (uastInitializer instanceof UCallExpression) {
+            UastCallKind kind = ((UCallExpression) uastInitializer).getKind();
+            if (kind.equals(UastCallKind.CONSTRUCTOR_CALL)) {
+                PsiType initializerType = uastInitializer.getExpressionType();
+                if (initializerType != null) {
+                    ArrayList<String> list = new ArrayList<>();
+
+                    String impl = initializerType.getCanonicalText();
+                    if (!face.equals(impl)) {
+                        list.add(impl);
+                    }
+
+                    PsiType[] superTypes = initializerType.getSuperTypes();
+                    for (PsiType superType : superTypes) {
+                        String superImpl = superType.getCanonicalText();
+                        if (!face.equals(superImpl)) {
+                            list.add(superImpl);
+                        }
+                    }
+
+                    if (!list.isEmpty()) {
+                        params.getImplementationWhiteList().putIfAbsent(face, new ImplementClassFilter(list.toArray(new String[0])));
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    private void findAssignmentImplFilter(PsiType psiType, UExpression expression) {
+
+        if (expression instanceof UCallExpression) {
+            UastCallKind kind = ((UCallExpression) expression).getKind();
+            if (kind.equals(UastCallKind.CONSTRUCTOR_CALL)) {
+                String face = psiType.getCanonicalText();
+                PsiType type = expression.getExpressionType();
+                if (type != null) {
+                    String impl = type.getCanonicalText();
+                    if (!impl.equals(face)) {
+                        params.getImplementationWhiteList().putIfAbsent(face, new ImplementClassFilter(impl));
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    /**
+     * Find interface -> implementation in assignment
+     */
+    private class MyImplFinder extends AbstractUastVisitor {
+//        @Override
+//        public boolean visitClass(@NotNull UClass node) {
+//            List<UTypeReferenceExpression> uastSuperTypes = node.getUastSuperTypes();
+//            for (UTypeReferenceExpression uastSuperType : uastSuperTypes) {
+////                if (!MyUastUtilKt.isExternal(uastSuperType)) {
+//                uastSuperType.accept(this);
+////                }
+//            }
+//
+//            return node.isInterface() || MyUastUtilKt.isExternal(node);
+//        }
+
+        @Override
+        public boolean visitField(@NotNull UField node) {
+            UTypeReferenceExpression typeReference = node.getTypeReference();
+            UExpression uastInitializer = node.getUastInitializer();
+            variableImplementationFinder(typeReference, uastInitializer);
+            return super.visitField(node);
+        }
+//
+//        @Override
+//        public boolean visitMethod(@NotNull UMethod node) {
+//            return !node.isConstructor();
+//        }
+
     }
 }

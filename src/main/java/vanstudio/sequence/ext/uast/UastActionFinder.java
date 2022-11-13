@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiCompiledElement;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.*;
@@ -21,29 +22,31 @@ public class UastActionFinder implements ActionFinder {
     @Override
     public AnAction[] find(@NotNull Project project, @NotNull PsiElement element, Task task) {
 
+        // UAST api will throw `java.lang.UnsupportedOperationException: Method not implemented `
+        // when use with compiled code. https://youtrack.jetbrains.com/issue/IDEA-305778
+        if (element instanceof PsiCompiledElement) {
+            return AnAction.EMPTY_ARRAY;
+        }
+
         ArrayList<AnAction> list = new ArrayList<>();
 
-        UElement uElement = UastContextKt.toUElement(element);
-        if (uElement != null) {
-            uElement.accept(new AbstractUastVisitor() {
-                @Override
-                public boolean visitClass(@NotNull UClass node) {
-                    list.add(Separator.create(node.getName()));
-                    list.addAll(List.of(getActions(node, task)));
+        try {
+            UElement uElement = UastContextKt.toUElement(element);
+            if (uElement != null) {
+                uElement.accept(new AbstractUastVisitor() {
+                    @Override
+                    public boolean visitClass(@NotNull UClass node) {
+                        list.add(Separator.create(node.getName()));
+                        list.addAll(List.of(getActions(node, task)));
 
-                    return false;
-                }
-
-                /**
-                 * Do nothing to avoid `UnsupportedOperationException`
-                 * @param node
-                 * @return
-                 */
-                @Override
-                public boolean visitAnnotation(@NotNull UAnnotation node) {
-                    return true;
-                }
-            });
+                        return false;
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // UAST api will throw `java.lang.UnsupportedOperationException: Method not implemented `
+            // when use with compiled code. https://youtrack.jetbrains.com/issue/IDEA-305778
         }
 
         return list.toArray(new AnAction[0]);
@@ -54,17 +57,14 @@ public class UastActionFinder implements ActionFinder {
 
         UMethod[] methods = uClass.getMethods();
         for (UMethod method : methods) {
-            final PsiElement sourcePsi = method.getSourcePsi();
-            if (sourcePsi != null) {
-                subList.add(new AnAction(formatMethod(method), "Generate sequence " + method.getName(), AllIcons.Nodes.Method) {
-                    @Override
-                    public void actionPerformed(@NotNull AnActionEvent e) {
-                        Project project = e.getProject();
-                        if (project == null) return;
-                        task.run(sourcePsi, project);
-                    }
-                });
-            }
+            subList.add(new AnAction(formatMethod(method), "Generate sequence " + method.getName(), AllIcons.Nodes.Method) {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent e) {
+                    Project project = e.getProject();
+                    if (project == null) return;
+                    task.run(method, project);
+                }
+            });
         }
 
         return subList.toArray(new AnAction[0]);
@@ -73,7 +73,7 @@ public class UastActionFinder implements ActionFinder {
     private String formatMethod(UMethod method) {
         StringBuilder s = new StringBuilder(method.getName());
         List<UParameter> parameters = method.getUastParameters();
-        if (parameters.size() > 0){
+        if (parameters.size() > 0) {
             s.append("(");
             s.append(parameters.stream().map(p -> p.getType().getPresentableText()).collect(Collectors.joining(",")));
             s.append(")");
