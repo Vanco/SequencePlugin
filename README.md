@@ -106,7 +106,7 @@ The Kotlin language support are in very early stage.
 SequenceDiagram can generate sequence diagram from JAVA and Kotlin File. 
 ### When installed, where to find it?
 Since v2.1.0, the UI has improved a lot. now you can easily find it everywhere :)
-1. In navigation toolbar, A new ICON ![Sequence Diagram ...](imges/sequence.svg){:height="24px" width="24px"} added.
+1. ~~In navigation toolbar, A new ICON ![Sequence Diagram ...](imges/sequence.svg){:height="24px" width="24px"} added.~~
 2. In Tools menu. `Tools` > `Sequence Diagram`
 3. ~~In Project view popup up menu. `Sequence Diagram ...`~~
 4. In Editor popup up menu. `Sequence Diagram`
@@ -123,7 +123,42 @@ Current Version
 
 [![GitHub release](https://img.shields.io/github/v/release/Vanco/SequencePlugin)](https://github.com/Vanco/SequencePlugin/releases)
 
-versions history:
+### Version and API comparison
+
+| Open API          | v2.x.x                                          | v3.x.x                    |
+|-------------------|-------------------------------------------------|---------------------------|
+| IGenerator        | SequenceGenerator <br> KtSequenceGenerator      | UastSequenceGenerator     |
+| GeneratorFactory  | JavaGeneratorFactory <br> KtGeneratorFactory    | UastGeneratorFactory      |
+| ElementTypeFinder | JavaElementTypeFinder  <br> KtElementTypeFinder |                           |
+| ActionFinder      | JavaActionFinder  <br>  KtActionFinder          | UastActionFinder          |
+| SequenceNavigable | JavaSequenceNavigable  <br> KtSequenceNavigable | JavaSequenceNavigable[^*] |
+
+[^*] `JavaSequenceNavigable` work for Java, Kotlin, Scala, Groovy
+
+### Function comparison
+
+|                                                        | v2.x.x                | v3.x.x      |
+|--------------------------------------------------------|-----------------------|-------------|
+| **Language:**                                          |                       |             |
+| Java                                                   | [x]                   | [x]         |
+| Kotlin                                                 | [x] Partial           | [x]         |
+| Scala                                                  | [ ]                   | [x]         |
+| Groovy                                                 | [ ]                   | [x] Partial |
+| **Entry:**                                             |                       |             |
+| Navigation Bar                                         | [x]                   | [ ]         |
+| Tools Menu                                             | [x]                   | [x]         |
+| Editor Context Menu                                    | [x]                   | [x]         |
+| Shortcut `Alt S` for windows <br> `Option S` for macOS | [x]                   | [x]         |
+| Project view popup menu                                | [ ]                   | [ ]         |
+| Structure view popup menu                              | [ ]                   | [ ]         |
+| **Feature:**                                           |                       |             |
+| Smart Interface[^2]                                    | [x] EXC: 2.2.4, 2.2.5 | [x]         |
+| Smart Interface configuration                          | [ ]                   | [x]         |
+| Lambda call configuration                              | [x]                   | [x]         |
+
+[^2] `Smart interface` will scan entire file and spend more generate time.
+
+### versions history:
 [Changelog](CHANGELOG.md)
 
 ## Acknowledgement
