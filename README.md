@@ -1,6 +1,6 @@
 [![GitHub release](https://img.shields.io/github/v/release/Vanco/SequencePlugin)](https://github.com/Vanco/SequencePlugin/releases)
 [![JetBrains Plugins](https://img.shields.io/jetbrains/plugin/v/8286)](https://plugins.jetbrains.com/plugin/8286-sequencediagram)
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/Vanco/SequencePlugin?color=red&display_name=tag&label=latest%20release)
+[![GitHub release (release name instead of tag name)](https://img.shields.io/github/v/release/Vanco/SequencePlugin?include_prereleases)](https://github.com/Vanco/SequencePlugin/releases)
 
 # SequenceDiagram
 <!-- Plugin description -->
