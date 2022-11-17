@@ -22,7 +22,7 @@ with this plugin, you can
 ## Experimental features
 **The experimental features created by myself, which is not part of UML standard. Use this feature in your own risk.**
 
-### UAST support (version 3.0.0-alpha)
+### UAST support ([version 3.0.0-alpha](https://plugins.jetbrains.com/plugin/8286-sequencediagram/versions/alpha))
 UAST (Unified Abstract Syntax Tree) is an abstraction layer on the PSI of different programming languages targeting the 
 JVM (Java Virtual Machine). It provides a unified API for working with common language elements like classes and method 
 declarations, literal values, and control flow operators.
