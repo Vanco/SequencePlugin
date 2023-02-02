@@ -6,18 +6,25 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
+import com.intellij.ui.BrowserHyperlinkListener;
+import com.intellij.ui.ColorUtil;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
+import com.intellij.util.ui.HTMLEditorKitBuilder;
+import com.intellij.util.ui.UIUtil;
 import icons.SequencePluginIcons;
+import org.jetbrains.annotations.NotNull;
 import vanstudio.sequence.SequencePanel;
 import vanstudio.sequence.SequenceParamsEditor;
 import vanstudio.sequence.SequenceService;
 import vanstudio.sequence.diagram.Parser;
 import vanstudio.sequence.openapi.model.MethodDescription;
 import vanstudio.sequence.util.MyPsiUtil;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,17 +49,31 @@ public class Welcome {
 
         myHtmlPanelWrapper = new JPanel(new BorderLayout());
         myHtmlPanelWrapper.add(actionToolbar.getComponent(), BorderLayout.WEST);
-        JEditorPane myPanel = new JEditorPane();
+        JTextPane myPanel = new JTextPane();
         myHtmlPanelWrapper.add(new JScrollPane(myPanel), BorderLayout.CENTER);
         myHtmlPanelWrapper.repaint();
 
         actionToolbar.setTargetComponent(myPanel);
 
         String currentHtml = loadWelcome();
-        myPanel.setContentType("text/html");
-        myPanel.setText(currentHtml);
         myPanel.setEditable(false);
-        myPanel.setEnabled(true);
+
+        HTMLEditorKit kit = HTMLEditorKitBuilder.simple();
+        myPanel.setEditorKit(kit);
+        myPanel.setHighlighter(null);
+
+        Font descriptionFont = UIUtil.getLabelFont(UIUtil.FontSize.SMALL);
+        StyleSheet styleSheet = kit.getStyleSheet();
+        styleSheet.addRule("body {color:#"+ ColorUtil.toHex(UIUtil.getLabelFontColor(UIUtil.FontColor.BRIGHTER))+"; font-family:"+descriptionFont.getFamily()+"; font-size: "+descriptionFont.getSize()+"pt; margin: 12px;}");
+        styleSheet.addRule("h1 {color: #159957;}");
+        styleSheet.addRule("h2 {color: #159957;}");
+        styleSheet.addRule("pre {font : 10px monaco; background-color: #"+ColorUtil.toHex(UIUtil.getToolTipBackground())+"; padding: 10px}");
+
+        Document doc = kit.createDefaultDocument();
+        myPanel.setDocument(doc);
+        myPanel.setText(currentHtml);
+        // open link
+        myPanel.addHyperlinkListener(new BrowserHyperlinkListener());
     }
 
     @NotNull
