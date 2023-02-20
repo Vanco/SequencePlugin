@@ -501,7 +501,8 @@ public class SequencePanel extends JPanel implements ConfigListener {
             _sequenceParams.getMethodFilter().addFilter(new SingleMethodFilter(
                     _methodInfo.getObjectInfo().getFullName(),
                     _methodInfo.getRealName(),
-                    _methodInfo.getArgTypes()
+                    _methodInfo.getArgTypes(),
+                    navIndexMap.getOrDefault(_methodInfo.getNumbering().getName(), 0)
             ));
             generate();
 

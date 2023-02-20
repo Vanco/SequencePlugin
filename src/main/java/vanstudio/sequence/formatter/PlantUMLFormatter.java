@@ -17,9 +17,9 @@ public class PlantUMLFormatter implements IFormatter{
         buffer.append("participant Actor").append('\n');
         String classA = callStack.getMethod().getClassDescription().getClassShortName();
         String method = getMethodName(callStack.getMethod());
-        if (Constants.CONSTRUCTOR_METHOD_NAME.equals(callStack.getMethod().getMethodName())) {
-            buffer.append("create ").append(classA).append('\n');
-        }
+//        if (Constants.CONSTRUCTOR_METHOD_NAME.equals(callStack.getMethod().getMethodName())) {
+//            buffer.append("create ").append(classA).append('\n');
+//        }
         buffer.append("Actor").append(" -> ").append(classA).append(" : ").append(method).append('\n');
         buffer.append("activate ").append(classA).append('\n');
         generate(buffer, callStack);
@@ -34,9 +34,9 @@ public class PlantUMLFormatter implements IFormatter{
         for (CallStack callStack : parent.getCalls()) {
             String classB = callStack.getMethod().getClassDescription().getClassShortName();
             String method = getMethodName(callStack.getMethod());
-            if (Constants.CONSTRUCTOR_METHOD_NAME.equals(callStack.getMethod().getMethodName())) {
-                buffer.append("create ").append(classB).append('\n');
-            }
+//            if (Constants.CONSTRUCTOR_METHOD_NAME.equals(callStack.getMethod().getMethodName())) {
+//                buffer.append("create ").append(classB).append('\n');
+//            }
             buffer.append(classA).append(" -> ").append(classB).append(" : ").append(method).append('\n');
             buffer.append("activate ").append(classB).append('\n');
             generate(buffer, callStack);

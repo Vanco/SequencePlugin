@@ -1,9 +1,13 @@
 package vanstudio.sequence.openapi.filters;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiLambdaExpression;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import vanstudio.sequence.generator.filters.SingleMethodFilter;
+import vanstudio.sequence.openapi.model.MethodDescription;
 
 public class CompositeElementFilter implements MethodFilter {
     private final List<MethodFilter> _filters = new ArrayList<>();
@@ -31,6 +35,20 @@ public class CompositeElementFilter implements MethodFilter {
             }
         }
         return true;
+    }
+
+    public boolean allowLambda(MethodDescription method) {
+        for (MethodFilter psiElementFilter : _filters) {
+            if (!(psiElementFilter instanceof SingleMethodFilter)) {
+                continue;
+            }
+            SingleMethodFilter singleMethodFilter = (SingleMethodFilter) psiElementFilter;
+            if (!singleMethodFilter.allowLambda(method)) {
+                return false;
+            }
+        }
+        return true;
+
     }
 
 }
