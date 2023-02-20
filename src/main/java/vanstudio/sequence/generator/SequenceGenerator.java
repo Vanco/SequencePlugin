@@ -71,6 +71,9 @@ public class SequenceGenerator extends JavaRecursiveElementVisitor implements IG
      */
     private CallStack generate(PsiLambdaExpression expression) {
         MethodDescription method = createMethod(expression);
+        if (!params.getMethodFilter().allowLambda(method)) {
+            return topStack;
+        }
         makeMethodCallExceptCurrentStackIsRecursive(method);
         super.visitLambdaExpression(expression);
         return topStack;
