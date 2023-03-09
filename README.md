@@ -4,7 +4,7 @@
 
 # SequenceDiagram
 <!-- Plugin description -->
-SequenceDiagram for IntelliJ IDEA
+Sequence Diagram is tool to generate simple sequence diagram(UML) from java, kotlin, scala(Beta) and groovy(limited) code.
 https://vanco.github.io/SequencePlugin.
 
 with this plugin, you can
@@ -16,7 +16,9 @@ with this plugin, you can
 + Exclude classes from diagram by Settings > Tools > Sequence Diagram
 + Smart Interface(experimental)
 + Lambda Expression(experimental)
-+ Kotlin Support(Experimental, No code navigation)
++ Kotlin Support(Experimental)
++ Scala support(Experimental, Beta)
++ Groovy Support(Experimental, limited)
 <!-- Plugin description end -->
 
 ## Experimental features
@@ -92,28 +94,9 @@ I draw a dummy `() ->` self call in diagram.
 
 ![Lambda Expression](imges/lambda_expr.png)
 
-### Kotlin support
-The Kotlin language support are in very early stage. 
-  - [x] Support generate topLevel function
-  - [x] Support generate PrimaryConstructor and SecondaryConstructor
-  - [x] Support generate Default Constructor Class
-  - [x] Support generate JavaCall deeply
-  - [ ] Support generate lambda argument
-  - [ ] Support generate function with expression body
-  - [x] Support generate class initializer
-  - [ ] Code navigation
-
 ## How to use
-SequenceDiagram can generate sequence diagram from JAVA and Kotlin File. 
-### When installed, where to find it?
-Since v2.1.0, the UI has improved a lot. now you can easily find it everywhere :)
-1. ~~In navigation toolbar, A new ICON ![Sequence Diagram ...](imges/sequence.svg){:height="24px" width="24px"} added.~~
-2. In Tools menu. `Tools` > `Sequence Diagram`
-3. ~~In Project view popup up menu. `Sequence Diagram ...`~~
-4. In Editor popup up menu. `Sequence Diagram`
-5. ~~In IntentionAction tips.`Generate sequence diagram`~~(removed, not stable)
-6. Shortcut `Alt S` for windows, `Option S` for macOS
-7. ~~Structure popup up menu `Sequence Diagram`~~
+1. Open Java/Kotlin/Scala/Groovy file
+2. Generate SequenceDiagram with shortcut `Alt S` for windows, `Option S` for macOS
 
 Please try to experience it and find what happen. 
 
@@ -143,7 +126,7 @@ Current Version
 | **Language:**                                          |                       |             |
 | Java                                                   | [x]                   | [x]         |
 | Kotlin                                                 | [x] Partial           | [x]         |
-| Scala                                                  | [ ]                   | [x]         |
+| Scala                                                  | [ ]                   | [x] Beta    |
 | Groovy                                                 | [ ]                   | [x] Partial |
 | **Entry:**                                             |                       |             |
 | Navigation Bar                                         | [x]                   | [ ]         |
@@ -161,6 +144,50 @@ Current Version
 
 ### versions history:
 [Changelog](CHANGELOG.md)
+
+## Known issue
+#### Scala for comprehension calls is not supported #151
+for example:
+```scala
+class B() {
+  def bar() = Option("bar")
+}
+
+class A(b: B) {
+  def foo() = {
+    val r = "foo" + b.bar().getOrElse("?")
+    r
+  }
+
+  def foo2() = {
+    val r = for {
+      x <- b.bar()
+    } yield "foo" + x
+    r.getOrElse("?")
+  }
+}
+```
+the for comprehension call
+```scala
+val r = for {
+      x <- b.bar()
+    } yield "foo" + x
+```
+it's UAST tree is `UastEmptyexpression`. 
+```
+ UMethod (name = foo2)
+            UBlockExpression
+                UDeclarationsExpression
+                    ULocalVariable (name = r)
+                        UastEmptyExpression(type = PsiType:Option<String>)
+                UReturnExpression
+                    UQualifiedReferenceExpression
+                        USimpleNameReferenceExpression (identifier = r)
+                        UMethodCall(name = getOrElse)
+                            UIdentifier (Identifier (getOrElse))
+                            ULiteralExpression (value = "?")
+```
+so the `b.bar()` method call will not generate base on `UastEmptyexpression`. Hopefully, the UAST api will solve this problem sooner.
 
 ## Acknowledgement
 
