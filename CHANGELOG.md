@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+## 3.0.4 - 2023-04-06
+
+### Added
+- Don't show `remove xxx` popup menu on `Actor` or bootstrap Class, Method, Call
+- Generic Filter
+
+### Fixed
+- Fix welcome color support light/dark theme
+- Fix smart interface only fellow first one found
+- Fix export JPEG/PNG/TIFF null error (affect idea 2023.1)
+
+### Removed
+- Remove old Java and Kotlin generator (2.2.6)
+
+## 3.0.3 - 2023-03-29
+
+### Added
+- Anonymous class support
+- Cancel generate process
+
+### Changed
+- Rename ElementTypeFinder to SequenceLanguagePlugin
+- improve navigation
+- improve generate speed
+- Make expend implementation a select list
+
+### Fixed
+- limited call deep overflow when interface -> impl call
+- config issue.
+- fix NPE when some psiElement to UMethod is null
+- fix null in implementation search result
+- fix color mapping remove issue
+
 ## 3.0.2 - 2023-03-09
 
 ### Changed
