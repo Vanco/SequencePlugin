@@ -1,6 +1,25 @@
 # SequenceDiagram Changelog
 
 ## Unreleased
+### Added
+- RegexFilter: e.g. `.*Builder` to filter `my.package.MyBuilder`, `java.lang.StringBuilder`...
+
+## 3.0.5 - 2023-05-24
+
+### Added
+- add FilterManager (Paid)
+
+### Changed
+- improve smart interface
+- Change icons to default icons
+
+### Fixed
+- Exporting change dark/light style bug.
+- Click empty other toolwindow (Terminal, Service...) create welcome page issue
+
+### Removed
+- Remove unused UI class
+- Remove `Expend...` from class context menu.
 
 ## 3.0.4 - 2023-04-06
 
@@ -179,7 +198,7 @@
 
 ### Added
 - - Support code navigation
-- Support Java code call kotlin
+  - Support Java code call kotlin
 
 ### Changed
 - Global share sequence diagram options.
@@ -215,18 +234,18 @@
 ### Added
 - Use `org.jetbrains.changelog` gradle plugin `1.0.0` to manage changelog file.
 - - Support generate topLevel function
-- Support generate PrimaryConstructor and SecondaryConstructor
-- Support generate No Constructor Class
-- Support generate JavaCall
-- Code navigation is Not Implement Yet
+  - Support generate PrimaryConstructor and SecondaryConstructor
+  - Support generate No Constructor Class
+  - Support generate JavaCall
+  - Code navigation is Not Implement Yet
 - - Use vector icons.
-- Add Generate sequence diagram intention.
-- Add Icon to Toolbar.
-- Add Settings Icon.
+  - Add Generate sequence diagram intention.
+  - Add Icon to Toolbar.
+  - Add Settings Icon.
 
 ### Changed
 - Move changelog from `README.md` to `CHANGELOG.md`
-- Add some missing `@Override` annotations in `ConfigurationOptions.java`(And it seems that SequenceDiagram support the
+- Add some missing `@Override` annotations in `ConfigurationOptions.java`(And it seems that SequenceDiagram support the 
   2021.1 IDEA platform now ?)
 - Build for 2021.2
 - Change to gradle kotlin script.
@@ -330,7 +349,7 @@
 ## 1.2.0
 
 ### Added
-- new feature: Smart Interface, List implementation of interface in project, user can choose one to
+- new feature: Smart Interface, List implementation of interface in project, user can choose one to 
   show in sequence diagram. If only one implementation found, it will show automatically.
 
 ## 1.1.0
