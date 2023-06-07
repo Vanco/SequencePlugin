@@ -145,7 +145,7 @@ Current Version
 | Smart Interface configuration                          |                            | &#x2713;         |
 | Lambda call configuration                              | &#x2713;                   | &#x2713;         |
 
-[^2] `Smart interface` will scan entire file and spend more generate time.
+[^2]: `Smart interface` will scan entire file and spend more generate time.
 
 ### versions history:
 [Changelog](CHANGELOG.md)
