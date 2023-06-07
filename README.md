@@ -120,9 +120,9 @@ Current Version
 | GeneratorFactory  | JavaGeneratorFactory <br> KtGeneratorFactory    | UastGeneratorFactory      |
 | ElementTypeFinder | JavaElementTypeFinder  <br> KtElementTypeFinder |                           |
 | ActionFinder      | JavaActionFinder  <br>  KtActionFinder          | UastActionFinder          |
-| SequenceNavigable | JavaSequenceNavigable  <br> KtSequenceNavigable | JavaSequenceNavigable[^*] |
+| SequenceNavigable | JavaSequenceNavigable  <br> KtSequenceNavigable | JavaSequenceNavigable[^1] |
 
-[^*]: `JavaSequenceNavigable` work for Java, Kotlin, Scala, Groovy
+[^1]: `JavaSequenceNavigable` work for Java, Kotlin, Scala, Groovy
 
 ### Function comparison
 
@@ -255,3 +255,5 @@ In 2016, I change the Name again to **SequenceDiagram** and host the source code
 Now it is open source.
 
 Thanks Kentaur for the great work on the original source.
+
+---
