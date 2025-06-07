@@ -29,7 +29,7 @@ public class NoPrivateMethodsFilter implements MethodFilter {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        return o != null && getClass() == o.getClass();
+        return o instanceof NoPrivateMethodsFilter;
     }
 
 }

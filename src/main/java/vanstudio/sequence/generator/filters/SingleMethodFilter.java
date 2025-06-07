@@ -43,7 +43,7 @@ public class SingleMethodFilter implements MethodFilter {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof SingleMethodFilter)) return false;
         SingleMethodFilter that = (SingleMethodFilter) o;
         return _className.equals(that._className) && _methodName.equals(that._methodName) && _argTypes.equals(that._argTypes);
     }

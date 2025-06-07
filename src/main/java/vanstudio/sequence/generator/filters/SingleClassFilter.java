@@ -40,7 +40,7 @@ public class SingleClassFilter implements MethodFilter {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof SingleClassFilter)) return false;
         SingleClassFilter that = (SingleClassFilter) o;
         return _className.equals(that._className);
     }
